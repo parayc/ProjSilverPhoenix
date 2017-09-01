@@ -27,19 +27,22 @@ TArray<FInventorySlots> UInventoryComponent::GetInventorySlots() const
 
 void UInventoryComponent::AddItem(TSubclassOf<class ABaseItem> Item, int32 AmountToAdd)
 {
+
+	UE_LOG(LogTemp, Warning, TEXT("Add Item: %d"), AmountToAdd)
 	if (Item.GetDefaultObject()->ItemInfo.CanBeStacked)
 	{
 
 		int32 FoundIndex = SearchFreeStack(Item);
 		if (0 <= FoundIndex) //If we find a stack already in inventory
 		{
-			//Check to see if the amount to add is
+			//Check to see if the current amount and amount to add is greater than max stack size
 			if ((InventorySlots[FoundIndex].Amount + AmountToAdd) > MaxStackSize)
 			{
+				
+				int32 NewAmountToAdd = (InventorySlots[FoundIndex].Amount + AmountToAdd) - MaxStackSize;
 				InventorySlots[FoundIndex].Amount = MaxStackSize;
-				int32 NewAmount = AmountToAdd - MaxStackSize;
 				/*Add the remaining amount */
-				AddItem(Item, NewAmount);
+				AddItem(Item, NewAmountToAdd);
 				//Update the widget at this index
 				OnUpdateRequest.Broadcast(FoundIndex);
 			}
@@ -80,6 +83,7 @@ void UInventoryComponent::AddItem(TSubclassOf<class ABaseItem> Item, int32 Amoun
 			else
 			{
 				//No space avaialble
+				UE_LOG(LogTemp, Warning, TEXT("No Inventory space"))
 			}
 		}
 	}
@@ -106,6 +110,7 @@ void UInventoryComponent::AddItem(TSubclassOf<class ABaseItem> Item, int32 Amoun
 		else
 		{
 			//No space to add item
+			UE_LOG(LogTemp, Warning, TEXT("No Inventory space"))
 		}
 		
 	}
@@ -145,14 +150,15 @@ int32 UInventoryComponent::SearchFreeStack(TSubclassOf<class ABaseItem> Item)
 
 	for (int i = 0; i < InventorySlots.Num(); i++)
 	{
-		if (InventorySlots[i].ItemClass == Item && InventorySlots[i].Amount <= MaxStackSize)
+		if (InventorySlots[i].ItemClass == Item && InventorySlots[i].Amount < MaxStackSize)
 		{
-			//InventorySlots[i].Amount++;
+			UE_LOG(LogTemp, Warning, TEXT("Stack Space found"))
 			Index = i;
 			return Index;
 		}
 	}  
 
+	UE_LOG(LogTemp, Warning, TEXT("No Stack Space found"))
 	return Index;
 	
 
