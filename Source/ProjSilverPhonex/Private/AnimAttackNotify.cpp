@@ -9,7 +9,7 @@ void UAnimAttackNotify::Notify(USkeletalMeshComponent * MeshComp, UAnimSequenceB
 
 	if (PlayerAnimation)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Notiify"));
+		
 		PlayerAnimation->SetAcceptNextCombo(true);
 	}
 }
