@@ -52,6 +52,7 @@ public:
 	/*The Number of items the inventory can hold*/
 	UPROPERTY(EditAnywhere)
 	int32 NumberOfSlots = 10;
+
 	UPROPERTY(EditAnywhere)
 	int32 MaxStackSize = 50;
 
@@ -63,8 +64,30 @@ public:
 	int32 SearchEmptySlot();
 
 	int32 SearchFreeStack(TSubclassOf<class ABaseItem> Item);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void RemoveItemFromIndex(int32 Index, int32 AmountToRemove);
+
+	//Swaps two inventory slots when one item slot is dragged over another 
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void SwapSlots(int32 Index1, int32 Index2);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void SplitStacks(int32 Index, int32 Amount);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	void UseItemAtIndex(int32 Index);
+
+	/*When an item is dragged on to the same item it check if i can be added to the stack*/
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+		bool AddToIndex(int32 FromIndex, int32 ToIndex);
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+		bool SplitStackToIndex(int32 FromIndex, int32 ToIndex, int32 Amount);
+
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	int32 GetAmountAtIndex(int32 index) const;
+
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	FItemInfo GetItemInfoAtIndex(int32 index) const;
 

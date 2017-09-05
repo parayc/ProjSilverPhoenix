@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "BaseItem.generated.h"
 
-
+class UInventoryComponent;
 /*Contain Inofrmation on what the item is */
 USTRUCT(BlueprintType)
 struct FItemInfo
@@ -41,6 +41,12 @@ public:
 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemInfo")
 	FItemInfo ItemInfo;
+
+	virtual void OnUseItem();
+
+	UInventoryComponent* InventoryRef = nullptr;
+
+	int32 Index;
 
 protected:
 	// Called when the game starts or when spawned

@@ -164,6 +164,147 @@ int32 UInventoryComponent::SearchFreeStack(TSubclassOf<class ABaseItem> Item)
 
 }
 
+void UInventoryComponent::RemoveItemFromIndex(int32 Index, int32 AmountToRemove)
+{
+	//Check to see if the slot is not empty
+	if (IsSlotEmpty(Index) != true && AmountToRemove > 0)
+	{
+		//If the AmounToRemove is greater than the current amount item from slot
+		if (AmountToRemove >= InventorySlots[Index].Amount)
+		{
+			InventorySlots[Index].Amount = 0;
+			InventorySlots[Index].ItemClass = NULL;
+			OnUpdateRequest.Broadcast(Index);
+
+		}
+		else
+		{
+			//Decrease the current amount in slot
+			InventorySlots[Index].Amount = InventorySlots[Index].Amount - AmountToRemove;
+			OnUpdateRequest.Broadcast(Index);
+		}
+	}
+}
+
+void UInventoryComponent::SwapSlots(int32 Index1, int32 Index2)
+{
+	//Check if its in range of the array fisrt
+	if (Index1 > InventorySlots.Num() || Index2 > InventorySlots.Num())
+	{
+		return;
+	}
+	else
+	{
+		//Swaps the elements in array
+		auto TempVar = InventorySlots[Index2];
+		InventorySlots[Index2] = InventorySlots[Index1];
+		InventorySlots[Index1] = TempVar;
+		//Update Slots
+		OnUpdateRequest.Broadcast(Index1);
+		OnUpdateRequest.Broadcast(Index2);
+	}
+}
+
+void UInventoryComponent::SplitStacks(int32 Index, int32 Amount)
+{
+	if (!IsSlotEmpty(Index))
+	{
+		if (GetItemInfoAtIndex(Index).CanBeStacked && GetAmountAtIndex(Index) > Amount)
+		{
+			int32 FoundIndex = SearchEmptySlot();
+			if (0 < FoundIndex)
+			{
+				//Remove the requested amount from index
+				InventorySlots[Index].Amount = InventorySlots[Index].Amount - Amount;
+
+				//And added it to the empty slot found
+				InventorySlots[FoundIndex].ItemClass = InventorySlots[Index].ItemClass;
+				InventorySlots[FoundIndex].Amount = Amount;
+
+				OnUpdateRequest.Broadcast(Index);
+				OnUpdateRequest.Broadcast(FoundIndex);
+				return;
+			}
+			else
+			{
+				return;
+			}
+		}
+		
+	}
+}
+
+void UInventoryComponent::UseItemAtIndex(int32 Index)
+{
+	if (InventorySlots[Index].ItemClass != nullptr)
+	{
+		//GetWorld()->SpawnActor<ABaseItem>()
+		ABaseItem* ItemSpawned = GetWorld()->SpawnActor<ABaseItem>(InventorySlots[Index].ItemClass, FVector(0, 0, 0), FRotator(0, 0, 0));
+		ItemSpawned->InventoryRef = this;
+		ItemSpawned->Index = Index;
+
+		ItemSpawned->OnUseItem();
+	}
+}
+
+bool UInventoryComponent::AddToIndex(int32 FromIndex, int32 ToIndex)
+{
+	if (InventorySlots[FromIndex].ItemClass == InventorySlots[ToIndex].ItemClass && InventorySlots[ToIndex].Amount < MaxStackSize && GetItemInfoAtIndex(FromIndex).CanBeStacked)
+	{
+		if (MaxStackSize - GetAmountAtIndex(ToIndex) >= GetAmountAtIndex(FromIndex))
+		{
+			InventorySlots[ToIndex].Amount = GetAmountAtIndex(FromIndex) + GetAmountAtIndex(ToIndex);
+			InventorySlots[ToIndex].ItemClass = InventorySlots[FromIndex].ItemClass;
+
+			InventorySlots[FromIndex].ItemClass = nullptr;
+			InventorySlots[FromIndex].Amount = 0;
+
+			OnUpdateRequest.Broadcast(FromIndex);
+			OnUpdateRequest.Broadcast(ToIndex);
+
+			
+			return true;
+		}
+		else
+		{
+			InventorySlots[FromIndex].Amount = (GetAmountAtIndex(FromIndex) - (MaxStackSize - GetAmountAtIndex(ToIndex)));
+
+			InventorySlots[ToIndex].ItemClass = InventorySlots[FromIndex].ItemClass;
+			InventorySlots[ToIndex].Amount = MaxStackSize;
+
+			OnUpdateRequest.Broadcast(FromIndex);
+			OnUpdateRequest.Broadcast(ToIndex);
+			
+
+			return true;
+
+		}
+	}
+
+	
+	return false;
+}
+
+bool UInventoryComponent::SplitStackToIndex(int32 FromIndex, int32 ToIndex, int32 Amount)
+{
+	if (IsSlotEmpty(ToIndex) && !IsSlotEmpty(FromIndex) && GetItemInfoAtIndex(FromIndex).CanBeStacked && GetAmountAtIndex(FromIndex) > 1 && GetAmountAtIndex(FromIndex) > Amount)
+	{
+		InventorySlots[FromIndex].Amount = (InventorySlots[FromIndex].Amount - Amount);
+
+		InventorySlots[ToIndex].ItemClass = InventorySlots[FromIndex].ItemClass;
+		InventorySlots[ToIndex].Amount = Amount;
+
+		OnUpdateRequest.Broadcast(FromIndex);
+		OnUpdateRequest.Broadcast(ToIndex);
+
+		return true;
+	}
+	else
+	{
+		return false;
+	}
+}
+
 int32 UInventoryComponent::GetAmountAtIndex(int32 index) const
 {
 	return InventorySlots[index].Amount;
