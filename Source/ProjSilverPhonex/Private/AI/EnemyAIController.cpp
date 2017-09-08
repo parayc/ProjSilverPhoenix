@@ -25,7 +25,7 @@ void AEnemyAIController::Possess(APawn * pawn)
 	//Initialize its blackboard and start it behaviour
 	if (auto AICharacter = Cast<AEnemyMaster>(pawn))
 	{
-		if (AICharacter->BehaviorTree->BlackboardAsset)
+		if (AICharacter->BehaviorTree->BlackboardAsset != nullptr)
 		{
 			BlackboardComp->InitializeBlackboard(*(AICharacter->BehaviorTree->BlackboardAsset));
 			BehaviorComp->StartTree(*AICharacter->BehaviorTree);

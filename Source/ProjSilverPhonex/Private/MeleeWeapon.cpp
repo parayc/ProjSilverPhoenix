@@ -56,6 +56,9 @@ void AMeleeWeapon::AttackTrace()
 	float prevLength = (prevBase - prevTip).Size();
 
 	FCollisionQueryParams* TraceParams = new FCollisionQueryParams();
+	TraceParams->AddIgnoredActor(Instigator);
+
+
 	for (int i = 1; i < sub; i++)
 	{
 		FVector tmpBase = FMath::Lerp(curBase, prevBase, i / float(sub));
@@ -63,11 +66,9 @@ void AMeleeWeapon::AttackTrace()
 		FVector tmpOff = (tmpTip - tmpBase);
 		tmpOff.Normalize();
 		//DrawDebugLine(GetWorld(), tmpBase, tmpBase + tmpOff*FMath::Lerp(curLength, prevLength, i / float(sub)), FColor::Red, false, 1 / 15.0f * 2);
-		//Needs to be single 
-		//GetWorld()->LineTraceMultiByChannel
+	
 		if (GetWorld()->LineTraceSingleByChannel(HitResult, tmpBase, tmpBase + tmpOff*FMath::Lerp(curLength, prevLength, i / float(sub)), ECC_Weapon, *TraceParams))
 		{
-
 
 			AEnemyMaster* Enemy = Cast<AEnemyMaster>(HitResult.GetActor());
 			if (Enemy)
