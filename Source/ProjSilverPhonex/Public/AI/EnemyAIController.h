@@ -6,7 +6,7 @@
 #include "AIController.h"
 #include "EnemyAIController.generated.h"
 
-class APawn;
+class AActor;
 
 /**
  * 
@@ -28,9 +28,19 @@ public:
 
 	virtual void UnPossess() override;
 
-	void SetSeenTarget(APawn* pawn);
+	void SetSeenTarget(AActor* NewEnemy);
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName Enemy;
+
+	UPROPERTY(EditDefaultsOnly, Category = AI)
+	bool CanAttack;
+
+	UFUNCTION(BlueprintCallable)
+	AActor* GetEnemyRef() const;
+	
+private:
+
+	AActor* EnemyRef;
 
 };

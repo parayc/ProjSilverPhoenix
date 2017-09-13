@@ -7,6 +7,7 @@
 #include "Perception/PawnSensingComponent.h"
 #include "BehaviorTree/BehaviorTree.h"
 #include "Components/WidgetComponent.h"
+#include "CombatComponent.H"
 
 
 // Sets default values
@@ -25,7 +26,10 @@ AEnemyMaster::AEnemyMaster()
 
 
 	PawningSensingComp = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComp"));
-	PawningSensingComp->SetPeripheralVisionAngle(90.f);
+	PawningSensingComp->SetPeripheralVisionAngle(40.f);
+	
+
+	CombatStates = CreateDefaultSubobject<UCombatComponent>(TEXT("Combat States"));
 
 }
 
@@ -42,8 +46,16 @@ void AEnemyMaster::BeginPlay()
 		PawningSensingComp->OnSeePawn.AddDynamic(this, &AEnemyMaster::OnseePlayer);
 	}
 	
+	if (CombatStates)
+	{
+		CombatStates->SetBattleState(EBattleState::PS_Normal);
+	}
 
-	TargetIcon->SetHiddenInGame(true);
+	if (TargetIcon)
+	{
+		TargetIcon->SetHiddenInGame(true);
+	}
+	
 }
 
 // Called every frame
@@ -63,11 +75,24 @@ float AEnemyMaster::TakeDamage(float Damage, FDamageEvent const & DamageEvent, A
 
 		bIsDead = true;
 		OnDeath();
+		return 0;
 		
 	}
-	
-	//UE_LOG(LogTemp, Warning, TEXT("Health: %d"), Health);
 
+	if (CombatStates->GetBattleState() == EBattleState::PS_Normal)
+	{
+		//UE_LOG(LogTemp, Warning, TEXT("Dmagae Causer: %s"), *DamageCauser->GetName());
+		auto DamageInstigator = Cast<ACharacter>(DamageCauser);
+		if (DamageInstigator)
+		{
+
+			CombatStates->KnockBack(DamageInstigator, this);
+			//Play flinch animation 
+			CombatStates->Flinch();
+
+		}
+
+	}
 
 	return Health;
 }
@@ -111,7 +136,7 @@ void AEnemyMaster::SetTargetHidden(bool NewState)
 	TargetIcon->SetHiddenInGame(NewState);
 }
 
-bool AEnemyMaster::GetbIsTargeted()
+bool AEnemyMaster::GetIsTargeted()
 {
 	return false;
 }
@@ -122,6 +147,7 @@ void AEnemyMaster::OnseePlayer(APawn * pawn)
 	if (AIController)
 	{
 		AIController->SetSeenTarget(pawn);
+
 	}
 }
 

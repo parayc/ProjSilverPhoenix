@@ -74,13 +74,13 @@ public:
 
 	void EndDoubleJump();
 
-	UFUNCTION(BlueprintCallable, Category = "Stats")
+	UFUNCTION(BlueprintCallable, Category = "Setup")
 	bool GetIsJumping() const;
 
-	UFUNCTION(BlueprintCallable, Category = "Stats")
+	UFUNCTION(BlueprintCallable, Category = "Setup")
 	bool GetIsDoubleJumping() const;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Stats")
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 	float JumpHeight = 600.f;
 
 
@@ -157,7 +157,7 @@ public:
 protected:
 
 
-	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Enum")
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayerState")
 	EPlayerStates CurrentPlayerState;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
@@ -167,19 +167,19 @@ protected:
 	class UCameraComponent* Camera;
 
 	//The weapon that the player starts with
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UPROPERTY(EditDefaultsOnly, Category = "Setup | Weapon")
 	TSubclassOf<class ABaseWeapon> StartingWeaponBlueprint;
 
 	UPROPERTY(EditDefaultsOnly)
-	FName WeaponSocketName = FName("Melee");
+		FName WeaponSocketName;
 
-	UPROPERTY(EditDefaultsOnly)
-	FName BackSocketName = FName("Back");
+		UPROPERTY(EditDefaultsOnly)
+		FName BackSocketName;
 
-	UPROPERTY(VisibleAnywhere, Category = "Stats")
+	UPROPERTY(VisibleAnywhere, Category = "Setup")
 	float CurrentHealth;
 
-	UPROPERTY(EditAnywhere, Category = "Stats")
+	UPROPERTY(EditAnywhere, Category = "Setup")
 	float MaxHealth = 100.f;
 
 private:
@@ -210,13 +210,13 @@ private:
 	float MoveRightAxisValue = 0.f;
 
 	/*Roll Animations*/
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Roll")
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | Movement")
 		UAnimMontage* ForwardRoll;
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Roll")
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | Movement")
 		UAnimMontage* BackwardRoll;
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Roll")
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | Movement")
 		UAnimMontage* RightRoll;
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Roll")
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | Movement")
 		UAnimMontage* LeftRoll;
 
 

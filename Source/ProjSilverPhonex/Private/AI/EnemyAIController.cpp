@@ -27,6 +27,7 @@ void AEnemyAIController::Possess(APawn * pawn)
 	{
 		if (AICharacter->BehaviorTree->BlackboardAsset != nullptr)
 		{
+
 			BlackboardComp->InitializeBlackboard(*(AICharacter->BehaviorTree->BlackboardAsset));
 			BehaviorComp->StartTree(*AICharacter->BehaviorTree);
 		}
@@ -39,10 +40,19 @@ void AEnemyAIController::UnPossess()
 	BehaviorComp->StopTree();
 }
 
-void AEnemyAIController::SetSeenTarget(APawn* pawn)
+void AEnemyAIController::SetSeenTarget(AActor* NewEnemy)
 {
-	if (BlackboardComp)
+	
+	if (BlackboardComp && NewEnemy != EnemyRef)
 	{
-		BlackboardComp->SetValueAsObject(Enemy, pawn);
+		EnemyRef = NewEnemy;
+		BlackboardComp->SetValueAsObject(Enemy, EnemyRef);
+		UE_LOG(LogTemp, Warning, TEXT("See Player"))
 	}
 }
+
+AActor * AEnemyAIController::GetEnemyRef() const
+{
+	return EnemyRef;
+}
+

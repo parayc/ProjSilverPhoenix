@@ -11,6 +11,7 @@ class UWidgetComponent;
 class UStaticMeshComponent;
 class UPawnSensingComponent;
 class UBehaviorTree;
+class UCombatComponent;
 
 UCLASS()
 class PROJSILVERPHONEX_API AEnemyMaster : public ACharacter
@@ -51,9 +52,12 @@ public:
 
 	void SetTargetHidden(bool NewState);
 
-	bool GetbIsTargeted();
+	bool GetIsTargeted();
 
 private:
+
+	UPROPERTY(Category = "SetUp", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		UCombatComponent* CombatStates = nullptr;
 
 	UFUNCTION()
 	void OnseePlayer(APawn* pawn);
