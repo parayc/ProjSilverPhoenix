@@ -11,6 +11,7 @@
  */
 
 class USphereComponent;
+class USphereComponent;
 class USkeletalMeshComponent;
 
 UCLASS()
@@ -25,7 +26,10 @@ public:
 	UPROPERTY(EditDefaultsOnly)
 	FName WeaponSocketName;
 
+	UFUNCTION(BlueprintCallable, Category = "Attack")
 	void SetIsAttacking(bool NewState);
+
+	TArray<AActor*> EnemiesHitList;
 
 protected:
 	// Called when the game starts or when spawned
@@ -33,6 +37,15 @@ protected:
 
 	UFUNCTION()
 		virtual void OnPlayerEnterPickupBox(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFomSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+	void OnEnemyEnterDamageBox(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFomSweep, const FHitResult& SweepResult);
+
+	UFUNCTION()
+		void OnEnemyLeavesDamageBox(UPrimitiveComponent* OverlappedComp, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex);
+
+	UFUNCTION(BlueprintCallable, Category = "Attack")
+		void ResetEnemyAttackList();
 
 
 private:
@@ -43,9 +56,14 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "SetUp")
 		UCapsuleComponent* DamageBox;
-	
+
+	UPROPERTY(EditDefaultsOnly, Category = "SetUp")
+	USphereComponent* BattleCircle;
+
 	UPROPERTY(EditDefaultsOnly, Category = "SetUp")
 		int32 WeaponDamage;
 
 	bool bIsAttacking = false;
+
+	bool EnemyInRange = false;
 };

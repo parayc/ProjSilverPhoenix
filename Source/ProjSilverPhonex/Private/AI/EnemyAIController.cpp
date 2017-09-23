@@ -16,6 +16,7 @@ AEnemyAIController::AEnemyAIController()
 
 
 	Enemy = "Enemy";
+	EnemyInRange = "EnemyInRange";
 }
 
 void AEnemyAIController::Possess(APawn * pawn)
@@ -47,7 +48,17 @@ void AEnemyAIController::SetSeenTarget(AActor* NewEnemy)
 	{
 		EnemyRef = NewEnemy;
 		BlackboardComp->SetValueAsObject(Enemy, EnemyRef);
-		UE_LOG(LogTemp, Warning, TEXT("See Player"))
+		//UE_LOG(LogTemp, Warning, TEXT("See Player"))
+	}
+}
+
+void AEnemyAIController::SetEnemyInRnage(bool NewState)
+{
+
+	if (BlackboardComp)
+	{
+		BlackboardComp->SetValueAsBool(EnemyInRange, NewState);
+		//UE_LOG(LogTemp, Warning, TEXT("Enemy in range"))
 	}
 }
 

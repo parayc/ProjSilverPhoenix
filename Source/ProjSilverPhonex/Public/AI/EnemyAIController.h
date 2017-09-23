@@ -30,11 +30,13 @@ public:
 
 	void SetSeenTarget(AActor* NewEnemy);
 
+	void SetEnemyInRnage(bool NewState);
+
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName Enemy;
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
-	bool CanAttack;
+	FName EnemyInRange;
 
 	UFUNCTION(BlueprintCallable)
 	AActor* GetEnemyRef() const;
