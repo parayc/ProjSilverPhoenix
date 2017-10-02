@@ -49,7 +49,7 @@ void ABasePlayer::BeginPlay()
 
 	CurrentHealth = MaxHealth;
 
-	CurrentPlayerState = EPlayerStates::PS_Passive;
+	CurrentPlayerState = EPlayerStatess::PS_Passive;
 
 
 	//Closet target will never be bigger than the lock radius 
@@ -144,7 +144,6 @@ void ABasePlayer::MoveForward(float Value)
 		const FVector Direction = FRotationMatrix(YawRotation).GetUnitAxis(EAxis::X);
 		MoveForwardAxisValue = Value;
 		AddMovementInput(Direction, Value);
-
 
 	}
 }
@@ -332,7 +331,7 @@ void ABasePlayer::RollDircetion()
 	}
 
 	//switchstate back to passive 
-	//SwitchStats(EPlayerStates::PS_Passive);
+	//SwitchStats(EPlayerStatess::PS_Passive);
 	//reset combo and stop weapon trace
 
 	//TODO - Stop player from attacking when rolling
@@ -612,18 +611,18 @@ float ABasePlayer::TakeDamage(float Damage, FDamageEvent const & DamageEvent, AC
 	return CurrentHealth;
 }
 
-EPlayerStates ABasePlayer::GetCurrentState() const
+EPlayerStatess ABasePlayer::GetCurrentState() const
 {
 	return CurrentPlayerState;
 }
 
-void ABasePlayer::SwitchStats(EPlayerStates NewState)
+void ABasePlayer::SwitchStats(EPlayerStatess NewState)
 {
 	CurrentPlayerState = NewState;
 	if (Inventory.CurrentWeapon)
 	{
 
-		if (EPlayerStates::PS_Passive == CurrentPlayerState && bIsRolling == false)
+		if (EPlayerStatess::PS_Passive == CurrentPlayerState && bIsRolling == false)
 		{
 			Inventory.CurrentWeapon->UnEquip();
 		}
@@ -635,13 +634,13 @@ void ABasePlayer::SwitchStats(EPlayerStates NewState)
 	else 
 	{
 		//No weapon we are in passive state
-		CurrentPlayerState = EPlayerStates::PS_Passive;
+		CurrentPlayerState = EPlayerStatess::PS_Passive;
 	}
 }
 
 void ABasePlayer::AttachWeaponToSocket()
 {
-	if (EPlayerStates::PS_Combat == CurrentPlayerState)
+	if (EPlayerStatess::PS_Combat == CurrentPlayerState)
 	{//SnapToTargetIncludingScale
 		Inventory.CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);
 	}
@@ -657,13 +656,14 @@ void ABasePlayer::AddWeaponToOnventory(class ABaseWeapon* NewWeapon)
 	if (Inventory.CurrentWeapon == nullptr)
 	{
 		NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, BackSocketName);
+
 	}
 	else
 	{
 		NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);//Attching the new weapon to the weapon socket - New to update
 	}
 
-	NewWeapon->SetOwningPawn(this);
+//	NewWeapon->SetOwningPawn(this);
 	Inventory.CurrentWeapon = NewWeapon;
 }
 
@@ -673,10 +673,10 @@ void ABasePlayer::LightAttack()
 	{
 		if (GetIsRolling() == true) { return; }//If Player is rolling they cant attack 
 
-		if (EPlayerStates::PS_Passive == CurrentPlayerState)
+		if (EPlayerStatess::PS_Passive == CurrentPlayerState)
 		{
 			//When we attack we go into combat state
-			SwitchStats(EPlayerStates::PS_Combat);
+			SwitchStats(EPlayerStatess::PS_Combat);
 			//When we attack, attach sword to hand
 			AttachWeaponToSocket();
 		}
@@ -693,10 +693,10 @@ void ABasePlayer::HeavyAttack()
 	{
 		if (GetIsRolling() == true) { return; }//If Player is rolling they cant attack 
 
-		if (EPlayerStates::PS_Passive == CurrentPlayerState)
+		if (EPlayerStatess::PS_Passive == CurrentPlayerState)
 		{
 			//When we attack we go into combat state
-			SwitchStats(EPlayerStates::PS_Combat);
+			SwitchStats(EPlayerStatess::PS_Combat);
 			//When we attack, attach sword to hand
 			AttachWeaponToSocket();
 		}

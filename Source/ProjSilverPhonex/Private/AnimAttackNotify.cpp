@@ -9,7 +9,6 @@ void UAnimAttackNotify::Notify(USkeletalMeshComponent * MeshComp, UAnimSequenceB
 
 	if (PlayerAnimation)
 	{
-		
 		PlayerAnimation->SetAcceptNextCombo(true);
 	}
 }

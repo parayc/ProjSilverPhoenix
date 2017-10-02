@@ -23,7 +23,7 @@ struct FPlayerInventory
 };
 
 UENUM(BlueprintType)
-enum class EPlayerStates : uint8
+enum class EPlayerStatess : uint8
 {
 	PS_Combat UMETA(DisplayName = "Combat"),
 	PS_Passive UMETA(DisplayName = "Passive"),
@@ -131,9 +131,9 @@ public:
 
 
 	UFUNCTION(BlueprintCallable, Category = "Animations")
-	EPlayerStates GetCurrentState() const;
+	EPlayerStatess GetCurrentState() const;
 
-	void SwitchStats(EPlayerStates NewState);
+	void SwitchStats(EPlayerStatess NewState);
 
 	UFUNCTION(BlueprintCallable, Category = "Animations")
 	void AttachWeaponToSocket();
@@ -158,7 +158,7 @@ protected:
 
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayerState")
-	EPlayerStates CurrentPlayerState;
+	EPlayerStatess CurrentPlayerState;
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 	class USpringArmComponent* SpringArm;
@@ -183,8 +183,6 @@ protected:
 	float MaxHealth = 100.f;
 
 private:
-	
-
 	
 
 	bool bCanJump = true;

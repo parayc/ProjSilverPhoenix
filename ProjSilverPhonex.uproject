@@ -13,5 +13,12 @@
 				"AIModule"
 			]
 		}
+	],
+	"Plugins": [
+		{
+			"Name": "MeleeTrace",
+			"Enabled": false,
+			"MarketplaceURL": "com.epicgames.launcher://ue/marketplace/content/675b379402674bf7811017efbc6b83ef"
+		}
 	]
 }

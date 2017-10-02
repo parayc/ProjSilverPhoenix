@@ -4,9 +4,11 @@
 #include "BasePlayer.h"
 #include "BaseWeapon.h"
 #include "MeleeWeapon.h"
+#include "XBaseCharacter.h"
 #include "Camera/CameraComponent.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
+#include "SPlayer.h"
 
 
 void UMeleeAnimInstance::Attack(EAttackType AttackType)
@@ -14,43 +16,44 @@ void UMeleeAnimInstance::Attack(EAttackType AttackType)
 	//Check if the player is attacking 
 	//Set can jump to false, to stop the player from jumping
 	bisAttacking = true;
-	ABasePlayer* Player = Cast<ABasePlayer>(TryGetPawnOwner());
-	ABaseWeapon* Weapon = Player->Inventory.CurrentWeapon;
-	AMeleeWeapon* Melee = Cast<AMeleeWeapon>(Weapon);
+	
 
-	if (Player && Melee)
+	AXBaseCharacter* CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
+	ABaseWeapon* Weapon2 = CharacterPawn->CharacterEquipment.CurrentWeapon;
+	AMeleeWeapon* Melee2 = Cast<AMeleeWeapon>(Weapon2);
+
+	if (CharacterPawn && Melee2)
 	{
-		Player->SetCanJump(false);
-		Player->Inventory.CurrentWeapon->StartAttack();
+	//	CharacterPawn->SetCanJump(false);
+		CharacterPawn->CharacterEquipment.CurrentWeapon->StartAttack();
 
 		if (AttackType == EAttackType::PS_Light)
 		{
-
-			//	Melee->GetLightAttackMontages();
+			
 			PlayCombo(EAttackType::PS_Light);
 		}
 		else if (AttackType == EAttackType::PS_Heavy)
 		{
-			//Melee->GetHeavyAttackMontages();
+			
 			PlayCombo(EAttackType::PS_Heavy);
 		}
 
 	}
+
 }
 
 void UMeleeAnimInstance::PlayCombo(EAttackType AttackType)
 {
-	ABasePlayer* Player = Cast<ABasePlayer>(TryGetPawnOwner());
-	ABaseWeapon* Weapon = Player->Inventory.CurrentWeapon;
-	AMeleeWeapon* Melee = Cast<AMeleeWeapon>(Weapon);
+	
+	AXBaseCharacter* CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
+	ABaseWeapon* Weapon2 = CharacterPawn->CharacterEquipment.CurrentWeapon;
+	AMeleeWeapon* Melee = Cast<AMeleeWeapon>(Weapon2);
 
-	//UE_LOG(LogTemp, Warning, TEXT("PlayCombo"));
-	if (Player)
+	if (CharacterPawn)
 	{
 		TArray<FWeaponAnimation> Montages;
 		if (AttackType == EAttackType::PS_Light)
 		{
-			//
 			//	UE_LOG(LogTemp, Warning, TEXT("Montage light"));
 			Montages = Melee->GetLightAttackMontages();
 		}
@@ -63,9 +66,10 @@ void UMeleeAnimInstance::PlayCombo(EAttackType AttackType)
 
 		//Can have a loop - instead mutiple ifs
 		// ComboCounter == 0 - This bypass the base cass
+
 		if (bAcceptNextCombo || ComboCounter == 0)
 		{
-
+			
 			if (ComboCounter < Montages.Num())
 			{
 				//0 != Montages.Num() &&
@@ -73,17 +77,17 @@ void UMeleeAnimInstance::PlayCombo(EAttackType AttackType)
 				if (Montages[ComboCounter].LaunchCharacter)
 				{
 					//Launch Character
-					Player->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+					CharacterPawn->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
 				}
 				else
 				{
-					Player->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+					CharacterPawn->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 				}
 
 				//Clear array before each attack
 				Melee->ClearEnemiesHitArray();//Clears array
 
-										  // change direction after each attack montage
+											  // change direction after each attack montage
 				ChangeDirection();
 				//StartAttackingTrace();
 
@@ -96,6 +100,8 @@ void UMeleeAnimInstance::PlayCombo(EAttackType AttackType)
 
 		}
 	}
+
+
 }
 
 void UMeleeAnimInstance::ComboReset()
@@ -105,10 +111,11 @@ void UMeleeAnimInstance::ComboReset()
 
 		float time = Montage_GetPosition(GetCurrentActiveMontage());
 		GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &UMeleeAnimInstance::Reset, 0.6f, false);
-		ABasePlayer* Player = Cast<ABasePlayer>(TryGetPawnOwner());
-		if (Player)
+		
+		AXBaseCharacter* CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
+		if (CharacterPawn)
 		{
-			Player->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+			CharacterPawn->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
 		}
 		//TODO - Maybe have different timers one to reset combo and other to return player back to passive
 	}
@@ -116,16 +123,25 @@ void UMeleeAnimInstance::ComboReset()
 
 void UMeleeAnimInstance::Reset()
 {
-	ABasePlayer* Player = Cast<ABasePlayer>(TryGetPawnOwner());
-	ABaseWeapon* Weapon = Player->Inventory.CurrentWeapon;
-	AMeleeWeapon* Melee = Cast<AMeleeWeapon>(Weapon);
-	if (Player && Melee)
+	//AXBaseCharacter* CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
+	
+	ASPlayer* CharacterPawn = Cast<ASPlayer>(TryGetPawnOwner());
+	ABaseWeapon* Weapon2 = CharacterPawn->CharacterEquipment.CurrentWeapon;
+	AMeleeWeapon* Melee2 = Cast<AMeleeWeapon>(Weapon2);
+	
+	if (CharacterPawn && Melee2)
 	{
-		Melee->ClearEnemiesHitArray();//Clears array
+		Melee2->ClearEnemiesHitArray();//Clears array
 
-		Player->SetCanJump(true);
-		Player->SwitchStats(EPlayerStates::PS_Passive);
-		Player->Inventory.CurrentWeapon->StopAttack();
+		//Player->SetCanJump(true);
+
+		//If not rolling play unequip animation
+		if (CharacterPawn->GetIsRolling() == false)
+		{
+			CharacterPawn->SwitchStats(EPlayerStates::PS_Passive);
+		}
+
+		CharacterPawn->CharacterEquipment.CurrentWeapon->StopAttack();
 	}
 
 	ComboCounter = 0;
@@ -134,20 +150,22 @@ void UMeleeAnimInstance::Reset()
 
 void UMeleeAnimInstance::ChangeDirection()
 {
-	ABasePlayer* Player = Cast<ABasePlayer>(TryGetPawnOwner());
+	
+
+	auto* CharacterPawn = Cast<ASPlayer>(TryGetPawnOwner());
 	//If player is locked on we dont allow the player to change direction
-	if (Player && !Player->GetIsLockedOn())
+	if (CharacterPawn && !CharacterPawn->GetIsLockedOn())
 	{
 
 
-		MoveForwad = Player->GetMoveForward();
-		MoveRight = Player->GetMoveRight();
+		MoveForwad = CharacterPawn->GetMoveForward();
+		MoveRight = CharacterPawn->GetMoveRight();
 		MoveRight *= -1;
 
-		auto CameraLocation = Player->GetCamera()->GetComponentLocation();
+		auto CameraLocation = CharacterPawn->GetCamera()->GetComponentLocation();
 
 		//This makes sure wheh for example presses up its relative to the camera 
-		auto LookRotator = UKismetMathLibrary::FindLookAtRotation(CameraLocation, Player->GetActorLocation());
+		auto LookRotator = UKismetMathLibrary::FindLookAtRotation(CameraLocation, CharacterPawn->GetActorLocation());
 		auto Dire = UKismetMathLibrary::MakeVector(MoveForwad, MoveRight, 0.f);
 		auto VectorLength = UKismetMathLibrary::VSize(Dire);
 		//RotationFromXVector
@@ -157,7 +175,7 @@ void UMeleeAnimInstance::ChangeDirection()
 		auto newRotationValue = UKismetMathLibrary::NormalizedDeltaRotator(LookRotator, UKismetMathLibrary::Conv_VectorToRotator(Dire)).Yaw;
 		if (VectorLength > 0.01)
 		{
-			Player->SetActorRotation(UKismetMathLibrary::MakeRotator(0, 0, newRotationValue));
+			CharacterPawn->SetActorRotation(UKismetMathLibrary::MakeRotator(0, 0, newRotationValue));
 		}
 
 		//Need to reset values after each call 
@@ -170,15 +188,18 @@ void UMeleeAnimInstance::ChangeDirection()
 
 void UMeleeAnimInstance::StopAttackingTrace()
 {
-	ABasePlayer* Player = Cast<ABasePlayer>(TryGetPawnOwner());
-	ABaseWeapon* Weapon = Player->Inventory.CurrentWeapon;
-	AMeleeWeapon* Melee = Cast<AMeleeWeapon>(Weapon);
+	
 
-	if (Player && Weapon)
+	AXBaseCharacter* CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
+	ABaseWeapon* Weapon2 = CharacterPawn->CharacterEquipment.CurrentWeapon;
+	AMeleeWeapon* Melee2 = Cast<AMeleeWeapon>(Weapon2);
+
+
+	if (CharacterPawn && Weapon2)
 	{
-		if (Melee)
+		if (Melee2)
 		{
-			Melee->StopTraceAttack();
+			Melee2->StopTraceAttack();
 		}
 	}
 }
@@ -186,11 +207,13 @@ void UMeleeAnimInstance::StopAttackingTrace()
 
 void UMeleeAnimInstance::StartAttackingTrace()
 {
-	ABasePlayer* Player = Cast<ABasePlayer>(TryGetPawnOwner());
-	ABaseWeapon* Weapon = Player->Inventory.CurrentWeapon;
+	
+	AXBaseCharacter* CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
+	ABaseWeapon* Weapon = CharacterPawn->CharacterEquipment.CurrentWeapon;
 	AMeleeWeapon* Melee = Cast<AMeleeWeapon>(Weapon);
 
-	if (Player && Weapon)
+
+	if (CharacterPawn && Weapon)
 	{
 		if (Melee)
 		{
@@ -209,12 +232,12 @@ float UMeleeAnimInstance::PlayAnimation(UAnimMontage * Animation, float InPlayRa
 {
 	float Duration = 0.0f;
 
-	ABasePlayer* Player = Cast<ABasePlayer>(TryGetPawnOwner());
-	if (Player)
+	AXBaseCharacter* CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
+	if (CharacterPawn)
 	{
 		if (Animation)
 		{
-			Duration = Player->PlayAnimMontage(Animation, 1.3, StartSectionName);
+			Duration = CharacterPawn->PlayAnimMontage(Animation, 1.3, StartSectionName);
 		}
 	}
 
@@ -223,3 +246,55 @@ float UMeleeAnimInstance::PlayAnimation(UAnimMontage * Animation, float InPlayRa
 
 
 
+//UE_LOG(LogTemp, Warning, TEXT("PlayCombo"));
+//if (Player)
+//{
+//	TArray<FWeaponAnimation> Montages;
+//	if (AttackType == EAttackType::PS_Light)
+//	{
+//		//
+//		//	UE_LOG(LogTemp, Warning, TEXT("Montage light"));
+//		Montages = Melee->GetLightAttackMontages();
+//	}
+//	else if (AttackType == EAttackType::PS_Heavy)
+//	{
+//		Montages = Melee->GetHeavyAttackMontages();
+//	}
+
+//	if (0 == Montages.Num()) { return; }
+
+//	//Can have a loop - instead mutiple ifs
+//	// ComboCounter == 0 - This bypass the base cass
+//	if (bAcceptNextCombo || ComboCounter == 0)
+//	{
+
+//		if (ComboCounter < Montages.Num())
+//		{
+//			//0 != Montages.Num() &&
+//			//UE_LOG(LogTemp, Warning, TEXT("Counter: %d"), ComboCounter);
+//			if (Montages[ComboCounter].LaunchCharacter)
+//			{
+//				//Launch Character
+//				Player->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+//			}
+//			else
+//			{
+//				Player->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+//			}
+
+//			//Clear array before each attack
+//			Melee->ClearEnemiesHitArray();//Clears array
+
+//									  // change direction after each attack montage
+//			ChangeDirection();
+//			//StartAttackingTrace();
+
+//			//Play appropriate animations 
+//			//Weapon->PlayWeaponAnimation(Montages[ComboCounter].MeleeAttackMontages);
+//			PlayAnimation(Montages[ComboCounter].MeleeAttackMontages);
+//			ComboCounter++;
+//			bAcceptNextCombo = false;//Stops the player from attacking again straight away
+//		}
+
+//	}
+//}

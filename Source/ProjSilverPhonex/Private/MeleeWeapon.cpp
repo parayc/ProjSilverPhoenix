@@ -5,6 +5,7 @@
 #include "EnemyMaster.h"
 #include "ProjSilverPhonex.h"
 #include "BasePlayer.h"
+#include "XBaseCharacter.h"
 #include "DrawDebugHelpers.h"
 
 AMeleeWeapon::AMeleeWeapon()
@@ -102,9 +103,9 @@ void AMeleeWeapon::DealDamage(const FHitResult & HitResult)
 		FPointDamageEvent DamageEvent;
 		DamageEvent.Damage = DealtDamage;
 		DamageEvent.HitInfo = HitResult;
-
-		Enemy->TakeDamage(DealtDamage, DamageEvent, Instigator->GetController(), MyPawn);
-		UE_LOG(LogTemp, Warning, TEXT("Enemy: %s"), *Enemy->GetName());
+		//TODO - REFACTOR
+		//Enemy->TakeDamage(DealtDamage, DamageEvent, Instigator->GetController(), MyPawn);
+		//UE_LOG(LogTemp, Warning, TEXT("Enemy: %s"), *Enemy->GetName());
 
 	}
 }

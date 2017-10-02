@@ -2,6 +2,7 @@
 
 #include "BaseWeapon.h"
 #include "BasePlayer.h"
+#include "XBaseCharacter.h"
 
 
 // Sets default values
@@ -41,7 +42,7 @@ void ABaseWeapon::StopAttack()
 
 }
 
-void ABaseWeapon::SetOwningPawn(ABasePlayer* NewOwner)
+void ABaseWeapon::SetOwningPawn(AXBaseCharacter* NewOwner)
 {
 	//Check if not already the owner
 	if (MyPawn != NewOwner)

@@ -7,6 +7,7 @@
 #include "BaseWeapon.generated.h"
 
 class ABasePlayer;
+class AXBaseCharacter;
 
 UCLASS()
 class PROJSILVERPHONEX_API ABaseWeapon : public AActor
@@ -29,7 +30,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	class UAnimMontage* UnEquipAnimation;
 
-	void SetOwningPawn(ABasePlayer* NewOwner);
+	void SetOwningPawn(AXBaseCharacter* NewOwner);
 
 	float PlayWeaponAnimation(UAnimMontage* Animation, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
 
@@ -46,7 +47,7 @@ protected:
 	virtual void BeginPlay() override;
 	/** pawn owner */
 	UPROPERTY()
-	class ABasePlayer* MyPawn;
+	class AXBaseCharacter* MyPawn;
 
 private:
 
