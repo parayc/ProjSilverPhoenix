@@ -71,12 +71,16 @@ void AMeleeWeapon::AttackTrace()
 		if (GetWorld()->LineTraceSingleByChannel(HitResult, tmpBase, tmpBase + tmpOff*FMath::Lerp(curLength, prevLength, i / float(sub)), ECC_Weapon, *TraceParams))
 		{
 
-			AEnemyMaster* Enemy = Cast<AEnemyMaster>(HitResult.GetActor());
+			AXBaseCharacter* Enemy = Cast<AXBaseCharacter>(HitResult.GetActor());
+			//UE_LOG(LogTemp, Warning, TEXT("Enemy: %s"), *HitResult.GetActor()->GetName());
 			if (Enemy)
 			{
+				//UE_LOG(LogTemp, Warning, TEXT("Enemy yh: %s"), *HitResult.GetActor()->GetName());
 				//Only add enemy to array if not in array
 				if (!EnemiesHit.Contains(Enemy))
 				{
+					
+
 					//Add to array
 					EnemiesHit.Add(Enemy);
 					//Deal damage to enemy
@@ -95,7 +99,7 @@ void AMeleeWeapon::AttackTrace()
 
 void AMeleeWeapon::DealDamage(const FHitResult & HitResult)
 {
-	AEnemyMaster* Enemy = Cast<AEnemyMaster>(HitResult.GetActor());
+	AXBaseCharacter* Enemy = Cast<AXBaseCharacter>(HitResult.GetActor());
 	if (Enemy)
 	{
 		float DealtDamage = Damage;//Later maybe damage multipler 
@@ -104,8 +108,8 @@ void AMeleeWeapon::DealDamage(const FHitResult & HitResult)
 		DamageEvent.Damage = DealtDamage;
 		DamageEvent.HitInfo = HitResult;
 		//TODO - REFACTOR
-		//Enemy->TakeDamage(DealtDamage, DamageEvent, Instigator->GetController(), MyPawn);
-		//UE_LOG(LogTemp, Warning, TEXT("Enemy: %s"), *Enemy->GetName());
+		Enemy->TakeDamage(DealtDamage, DamageEvent, Instigator->GetController(), MyPawn);
+		UE_LOG(LogTemp, Warning, TEXT("Enemy: %s"), *Enemy->GetName());
 
 	}
 }

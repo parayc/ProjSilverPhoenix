@@ -4,6 +4,7 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
+#include "XBaseCharacter.h"
 #include "EnemyMaster.generated.h"
 
 
@@ -11,10 +12,10 @@ class UWidgetComponent;
 class UStaticMeshComponent;
 class UPawnSensingComponent;
 class UBehaviorTree;
-class UCombatComponent;
+//class UCombatComponent;
 
 UCLASS()
-class PROJSILVERPHONEX_API AEnemyMaster : public ACharacter
+class PROJSILVERPHONEX_API AEnemyMaster : public AXBaseCharacter
 {
 	GENERATED_BODY()
 
@@ -31,9 +32,6 @@ protected:
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
-
-	/** Applies damage to the character */
-	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	UPROPERTY(EditAnywhere, Category = "Setup")
 	UBehaviorTree* BehaviorTree;
@@ -52,21 +50,14 @@ public:
 
 	void SetTargetHidden(bool NewState);
 
-	bool GetIsTargeted();
 
 private:
 
-	UPROPERTY(Category = "SetUp", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		UCombatComponent* CombatStates = nullptr;
+	//UPROPERTY(Category = "SetUp", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+	//	UCombatComponent* CombatStates = nullptr;
 
 	UFUNCTION()
 	void OnseePlayer(APawn* pawn);
-
-	UPROPERTY(EditDefaultsOnly, Category = "Stats")
-	int32 MaxHealth = 100;
-
-	UPROPERTY(VisibleAnywhere, Category = "Stats")
-	int32 Health = 0;
 
 	int32 AttackDamage;
 

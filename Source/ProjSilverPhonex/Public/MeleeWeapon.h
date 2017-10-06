@@ -77,7 +77,7 @@ protected:
 	virtual void BeginPlay() override;
 private:
 
-	TArray<AEnemyMaster*> EnemiesHit;
+	TArray<AXBaseCharacter*> EnemiesHit;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 		FName SocketBase;

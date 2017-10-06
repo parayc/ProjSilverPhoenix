@@ -126,13 +126,11 @@ void UMeleeAnimInstance::Reset()
 	//AXBaseCharacter* CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
 	
 	ASPlayer* CharacterPawn = Cast<ASPlayer>(TryGetPawnOwner());
-	ABaseWeapon* Weapon2 = CharacterPawn->CharacterEquipment.CurrentWeapon;
-	AMeleeWeapon* Melee2 = Cast<AMeleeWeapon>(Weapon2);
 	
-	if (CharacterPawn && Melee2)
+	if (CharacterPawn)
 	{
-		Melee2->ClearEnemiesHitArray();//Clears array
-
+		//Clears array
+		StopAttack();
 		//Player->SetCanJump(true);
 
 		//If not rolling play unequip animation
@@ -145,6 +143,20 @@ void UMeleeAnimInstance::Reset()
 	}
 
 	ComboCounter = 0;
+	
+}
+
+void UMeleeAnimInstance::StopAttack()
+{
+	auto CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
+	ABaseWeapon* Weapon = CharacterPawn->CharacterEquipment.CurrentWeapon;
+	
+
+	if (AMeleeWeapon* Melee = Cast<AMeleeWeapon>(Weapon))
+	{
+		Melee->ClearEnemiesHitArray();//Clears array
+	}
+	
 	bisAttacking = false;
 }
 
@@ -188,18 +200,16 @@ void UMeleeAnimInstance::ChangeDirection()
 
 void UMeleeAnimInstance::StopAttackingTrace()
 {
-	
 
 	AXBaseCharacter* CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
-	ABaseWeapon* Weapon2 = CharacterPawn->CharacterEquipment.CurrentWeapon;
-	AMeleeWeapon* Melee2 = Cast<AMeleeWeapon>(Weapon2);
+	ABaseWeapon* Weapon = CharacterPawn->CharacterEquipment.CurrentWeapon;
+	AMeleeWeapon* Melee = Cast<AMeleeWeapon>(Weapon);
 
-
-	if (CharacterPawn && Weapon2)
+	if (CharacterPawn && Weapon)
 	{
-		if (Melee2)
+		if (Melee)
 		{
-			Melee2->StopTraceAttack();
+			Melee->StopTraceAttack();
 		}
 	}
 }

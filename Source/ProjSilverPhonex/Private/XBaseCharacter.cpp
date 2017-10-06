@@ -20,8 +20,7 @@ void AXBaseCharacter::BeginPlay()
 
 	CurrentHealth = MaxHealth;
 
-	CurrentPlayerState = EPlayerStates::PS_Passive;
-
+	//CurrentPlayerState = EPlayerStates::PS_Passive;
 
 	if (StartingWeaponBlueprint)
 	{
@@ -33,13 +32,19 @@ void AXBaseCharacter::BeginPlay()
 
 		AddWeaponToOnventory(Weapon);
 	}
+
+
+	CombatStates = this->FindComponentByClass<UCombatComponent>();
+	if (CombatStates)
+	{
+		CombatStates->SetBattleState(EBattleState::PS_Normal);
+	}
 }
 
 // Called every frame
 void AXBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 
 }
 
@@ -62,10 +67,12 @@ float AXBaseCharacter::TakeDamage(float Damage, FDamageEvent const & DamageEvent
 		IsDead = true;
 	}
 
+	
+	if (!ensure(CombatStates)) { return CurrentHealth; }
 
 	if (CombatStates->GetBattleState() == EBattleState::PS_Normal)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Dmagae Causer: %s"), *DamageCauser->GetName());
+		UE_LOG(LogTemp, Warning, TEXT("Dmagae Causer: %s"), *DamageCauser->GetName());
 		auto DamageInstigator = Cast<ACharacter>(DamageCauser);
 		if (DamageInstigator)
 		{
@@ -74,30 +81,29 @@ float AXBaseCharacter::TakeDamage(float Damage, FDamageEvent const & DamageEvent
 			CombatStates->Flinch();
 
 		}
-		
-
 	}
+
 
 	return CurrentHealth;
 }
 
 void AXBaseCharacter::AddWeaponToOnventory(ABaseWeapon * NewWeapon)
 {
-	if (CharacterEquipment.CurrentWeapon == nullptr)
-	{
-		UE_LOG(LogTemp, Warning, TEXT("hand socket1"));
-		NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, BackSocketName);
-		
-	}
-	else
-	{
-		UE_LOG(LogTemp, Warning, TEXT("Back socket1"));
-		NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);//Attching the new weapon to the weapon socket - New to update
 
-	}
+	if (NewWeapon)
+	{
+		if (CurrentPlayerState == EPlayerStates::PS_Combat)
+		{
+			NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);//Attching the new weapon 
+		}
+		else if (CurrentPlayerState == EPlayerStates::PS_Passive)
+		{
+			NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, BackSocketName);
+		}
 
-	NewWeapon->SetOwningPawn(this);
-	CharacterEquipment.CurrentWeapon = NewWeapon;
+		NewWeapon->SetOwningPawn(this);
+		CharacterEquipment.CurrentWeapon = NewWeapon;
+	}
 }
 
 void AXBaseCharacter::AttachWeaponToSocket()
@@ -105,12 +111,12 @@ void AXBaseCharacter::AttachWeaponToSocket()
 	if (EPlayerStates::PS_Combat == CurrentPlayerState)
 	{//SnapToTargetIncludingScale
 		CharacterEquipment.CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);
-		UE_LOG(LogTemp, Warning, TEXT("hand socket"));
+		//UE_LOG(LogTemp, Warning, TEXT("hand socket"));
 	}
 	else
 	{
 		CharacterEquipment.CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, BackSocketName);
-		UE_LOG(LogTemp, Warning, TEXT("Back socket"));
+		
 	}
 }
 

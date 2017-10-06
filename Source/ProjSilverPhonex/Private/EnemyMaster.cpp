@@ -8,6 +8,7 @@
 #include "BehaviorTree/BehaviorTree.h"
 #include "Components/WidgetComponent.h"
 #include "CombatComponent.H"
+#include "XBaseCharacter.h"
 
 
 // Sets default values
@@ -21,7 +22,7 @@ AEnemyMaster::AEnemyMaster()
 	TargetIcon->SetupAttachment(GetMesh());
 	TargetIcon->SetDrawSize(FVector2D(20, 15));
 	TargetIcon->bVisible = true;
-	////TargetIcon->bHiddenInGame = true;
+	
 	TargetIcon->SetHiddenInGame(false);
 
 
@@ -38,7 +39,7 @@ void AEnemyMaster::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	Health = 100;
+	CurrentHealth = MaxHealth;
 	
 
 	if (PawningSensingComp)
@@ -65,38 +66,6 @@ void AEnemyMaster::Tick(float DeltaTime)
 	SetTargetIconDirection();
 }
 
-float AEnemyMaster::TakeDamage(float Damage, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
-{
-
-	Health = Health - Damage;
-
-	if (Health <= 0)
-	{
-
-		bIsDead = true;
-		OnDeath();
-		return 0;
-		
-	}
-
-	if (CombatStates->GetBattleState() == EBattleState::PS_Normal)
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("Dmagae Causer: %s"), *DamageCauser->GetName());
-		auto DamageInstigator = Cast<ACharacter>(DamageCauser);
-		if (DamageInstigator)
-		{
-
-			CombatStates->KnockBack(DamageInstigator, this);
-			//Play flinch animation 
-			CombatStates->Flinch();
-
-		}
-
-	}
-
-	return Health;
-}
-
 bool AEnemyMaster::GetIsDead()
 {
 	return bIsDead;
@@ -118,7 +87,7 @@ void AEnemyMaster::OnDeath()
 
 void AEnemyMaster::SetTargetIconDirection()
 {
-	auto* Player = Cast<ABasePlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	auto* Player = Cast<AXBaseCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
 	if (Player)
 	{
@@ -136,10 +105,6 @@ void AEnemyMaster::SetTargetHidden(bool NewState)
 	TargetIcon->SetHiddenInGame(NewState);
 }
 
-bool AEnemyMaster::GetIsTargeted()
-{
-	return false;
-}
 
 void AEnemyMaster::OnseePlayer(APawn * pawn)
 {

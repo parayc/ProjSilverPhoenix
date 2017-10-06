@@ -21,9 +21,6 @@ public:
 	UPROPERTY(VisibleAnywhere)
 	USkeletalMeshComponent* WeaponMesh;
 
-	UPROPERTY(EditDefaultsOnly)
-	FName WeaponSocket;
-
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	float NoEquipAnimDuration = 0.f;
 
@@ -32,6 +29,7 @@ public:
 
 	void SetOwningPawn(AXBaseCharacter* NewOwner);
 
+	UFUNCTION(BlueprintCallable,Category = "Animation")
 	float PlayWeaponAnimation(UAnimMontage* Animation, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
 
 	virtual void StartAttack();

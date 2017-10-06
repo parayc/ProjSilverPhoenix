@@ -34,6 +34,10 @@ public:
 
 	void Reset();
 
+	//Resets the array hit list a
+	UFUNCTION(BlueprintCallable, Category = "WeaponSetup")
+	void StopAttack();
+
 	void ChangeDirection();
 
 	/*Called in the anim instance using BP notifies - this stops the line trace  */
