@@ -1,7 +1,6 @@
 // Copyright Project Silver Phoneix
 
 #include "BaseWeapon.h"
-#include "BasePlayer.h"
 #include "XBaseCharacter.h"
 
 

@@ -1,7 +1,6 @@
 // Copyright Project Silver Phoneix
 
 #include "MeleeAnimInstance.h"
-#include "BasePlayer.h"
 #include "BaseWeapon.h"
 #include "MeleeWeapon.h"
 #include "XBaseCharacter.h"

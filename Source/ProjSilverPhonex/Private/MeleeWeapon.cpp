@@ -4,7 +4,6 @@
 #include "Particles/ParticleSystemComponent.h"
 #include "EnemyMaster.h"
 #include "ProjSilverPhonex.h"
-#include "BasePlayer.h"
 #include "XBaseCharacter.h"
 #include "DrawDebugHelpers.h"
 

@@ -6,7 +6,6 @@
 #include "GameFramework/Actor.h"
 #include "BaseWeapon.generated.h"
 
-class ABasePlayer;
 class AXBaseCharacter;
 
 UCLASS()

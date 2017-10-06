@@ -1,7 +1,6 @@
 // Copyright Project Silver Phoneix
 
 #include "EnemyMaster.h"
-#include "BasePlayer.h"
 #include "EnemyAIController.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "Perception/PawnSensingComponent.h"
@@ -9,6 +8,7 @@
 #include "Components/WidgetComponent.h"
 #include "CombatComponent.H"
 #include "XBaseCharacter.h"
+#include "SPlayer.h"
 
 
 // Sets default values
@@ -74,7 +74,7 @@ bool AEnemyMaster::GetIsDead()
 //TODO - Pass a reference of the person who killed them 
 void AEnemyMaster::OnDeath()
 {
-	auto* Player = Cast<ABasePlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
+	auto* Player = Cast<ASPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
 	if (Player && Player->GetIsLockedOn())
 	{
