@@ -18,7 +18,7 @@ void AXBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
-	CurrentHealth = MaxHealth;
+	CurrentHealth = MaxHealth - 10.f;
 
 	//CurrentPlayerState = EPlayerStates::PS_Passive;
 
@@ -57,6 +57,28 @@ float AXBaseCharacter::GetMaxHealth() const
 {
 	return MaxHealth;
 }
+
+void AXBaseCharacter::SetAddCurrentHealth(float Value)
+{
+	if (CurrentHealth + Value < MaxHealth)
+	{
+		CurrentHealth += Value;
+	}
+	else
+	{
+		CurrentHealth = MaxHealth;
+	}
+	
+}
+
+void AXBaseCharacter::SetAddMaxHealth(float Value)
+{
+	MaxHealth = Value;
+}
+
+
+
+
 
 float AXBaseCharacter::TakeDamage(float Damage, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
 {

@@ -31,8 +31,8 @@ void AMeleeWeapon::BeginPlay()
 	
 	if (SwordTrail)
 	{
-		SwordTrail->BeginTrails(SocketBase, SocketTip, ETrailWidthMode::ETrailWidthMode_FromCentre, 1.f);
-		SetSwordTrailVisibility(false);
+		//SwordTrail->BeginTrails(SocketBase, SocketTip, ETrailWidthMode::ETrailWidthMode_FromCentre, 1.f);
+		//SetSwordTrailVisibility(false);
 	}
 }
 

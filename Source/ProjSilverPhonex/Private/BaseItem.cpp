@@ -12,12 +12,16 @@ ABaseItem::ABaseItem()
 
 }
 
-void ABaseItem::OnUseItem()
+
+void ABaseItem::UseItem()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Item Used"))
+	
+	UE_LOG(LogTemp, Warning, TEXT("Used Item"))
 	InventoryRef->RemoveItemFromIndex(Index, 1);
-	Destroy();
+	OnUseItemRequest.Broadcast();
+	//Destroy();
 }
+
 
 // Called when the game starts or when spawned
 void ABaseItem::BeginPlay()

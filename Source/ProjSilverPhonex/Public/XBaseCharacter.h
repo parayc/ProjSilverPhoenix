@@ -55,6 +55,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Character Condition")
 	float GetMaxHealth() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Character Condition")
+	void SetAddCurrentHealth(float Value);
+
+	UFUNCTION(BlueprintCallable, Category = "Character Condition")
+	void SetAddMaxHealth(float Value);
+
 	/*Equipent & Attacking*/
 
 	/** Applies damage to the character */
@@ -68,12 +74,12 @@ public:
 	void SetCanAttack(bool NewState);
 
 	UFUNCTION(BlueprintCallable, Category = "Animations")
-		EPlayerStates GetCurrentState() const;
+	EPlayerStates GetCurrentState() const;
 
 	void SwitchStats(EPlayerStates NewState);
 
 	UPROPERTY(BlueprintReadWrite)
-		FCharacterEquipment CharacterEquipment;
+	FCharacterEquipment CharacterEquipment;
 
 protected:
 

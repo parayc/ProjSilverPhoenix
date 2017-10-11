@@ -7,6 +7,9 @@
 #include "BaseItem.generated.h"
 
 class UInventoryComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUseItemRequest);
+
 /*Contain Inofrmation on what the item is */
 USTRUCT(BlueprintType)
 struct FItemInfo
@@ -19,6 +22,8 @@ struct FItemInfo
 	FText Description;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTexture2D* Icon;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	UStaticMesh* ItemMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText UseText;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -42,8 +47,14 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "ItemInfo")
 	FItemInfo ItemInfo;
 
-	virtual void OnUseItem();
+	//UFUNCTION(BlueprintCallable,BlueprintNativeEvent, Category= "Item")
 
+	UPROPERTY(BlueprintAssignable)
+	FOnUseItemRequest OnUseItemRequest;
+
+	void UseItem();
+
+	UPROPERTY( BlueprintReadWrite, Category = "Inventory")
 	UInventoryComponent* InventoryRef = nullptr;
 
 	int32 Index;
@@ -51,6 +62,9 @@ public:
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
+
+	//UFUNCTION(BlueprintImplementableEvent, Category = "Inventory")
+
 
 public:	
 	// Called every frame

@@ -23,8 +23,6 @@ TArray<FInventorySlots> UInventoryComponent::GetInventorySlots() const
 }
 
 
-
-
 void UInventoryComponent::AddItem(TSubclassOf<class ABaseItem> Item, int32 AmountToAdd)
 {
 
@@ -243,7 +241,7 @@ void UInventoryComponent::UseItemAtIndex(int32 Index)
 		ItemSpawned->InventoryRef = this;
 		ItemSpawned->Index = Index;
 
-		ItemSpawned->OnUseItem();
+		ItemSpawned->UseItem();
 	}
 }
 
