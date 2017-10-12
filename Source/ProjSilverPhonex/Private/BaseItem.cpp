@@ -2,6 +2,7 @@
 
 #include "BaseItem.h"
 #include "InventoryComponent.h"
+#include "Components/SphereComponent.h"
 
 
 // Sets default values
@@ -9,7 +10,11 @@ ABaseItem::ABaseItem()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
+	ItemStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
+	RootComponent = ItemStaticMesh;
 
+	PickUpSphere = CreateDefaultSubobject<USphereComponent>(TEXT("PickUpSphere"));
+	PickUpSphere->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 }
 
 

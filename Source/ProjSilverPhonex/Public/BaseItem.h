@@ -7,6 +7,7 @@
 #include "BaseItem.generated.h"
 
 class UInventoryComponent;
+class USphereComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUseItemRequest);
 
@@ -22,8 +23,6 @@ struct FItemInfo
 	FText Description;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTexture2D* Icon;
-	UPROPERTY(EditAnywhere, BlueprintReadWrite)
-	UStaticMesh* ItemMesh;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText UseText;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
@@ -56,6 +55,10 @@ public:
 
 	UPROPERTY( BlueprintReadWrite, Category = "Inventory")
 	UInventoryComponent* InventoryRef = nullptr;
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* ItemStaticMesh;
+	UPROPERTY(VisibleAnywhere)
+	USphereComponent* PickUpSphere;
 
 	int32 Index;
 
