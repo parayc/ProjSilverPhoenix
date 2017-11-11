@@ -194,9 +194,10 @@ void UInventoryComponent::SwapSlots(int32 Index1, int32 Index2)
 	else
 	{
 		//Swaps the elements in array
-		auto TempVar = InventorySlots[Index2];
-		InventorySlots[Index2] = InventorySlots[Index1];
-		InventorySlots[Index1] = TempVar;
+		auto TempVar = InventorySlots[Index1];
+		InventorySlots[Index1] = InventorySlots[Index2];
+		InventorySlots[Index2] = TempVar;
+
 		//Update Slots
 		OnUpdateRequest.Broadcast(Index1);
 		OnUpdateRequest.Broadcast(Index2);
@@ -249,6 +250,7 @@ bool UInventoryComponent::AddToIndex(int32 FromIndex, int32 ToIndex)
 {
 	if (InventorySlots[FromIndex].ItemClass == InventorySlots[ToIndex].ItemClass && InventorySlots[ToIndex].Amount < MaxStackSize && GetItemInfoAtIndex(FromIndex).CanBeStacked)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Add to index"))
 		if (MaxStackSize - GetAmountAtIndex(ToIndex) >= GetAmountAtIndex(FromIndex))
 		{
 			InventorySlots[ToIndex].Amount = GetAmountAtIndex(FromIndex) + GetAmountAtIndex(ToIndex);
@@ -278,7 +280,10 @@ bool UInventoryComponent::AddToIndex(int32 FromIndex, int32 ToIndex)
 
 		}
 	}
+	UE_LOG(LogTemp, Warning, TEXT("False"))
 
+	//OnUpdateRequest.Broadcast(FromIndex);
+	//OnUpdateRequest.Broadcast(ToIndex);
 	
 	return false;
 }
