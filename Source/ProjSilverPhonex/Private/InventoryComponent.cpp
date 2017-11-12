@@ -211,8 +211,9 @@ void UInventoryComponent::SplitStacks(int32 Index, int32 Amount)
 		if (GetItemInfoAtIndex(Index).CanBeStacked && GetAmountAtIndex(Index) > Amount)
 		{
 			int32 FoundIndex = SearchEmptySlot();
-			if (0 < FoundIndex)
+			if (-1 < FoundIndex)
 			{
+				
 				//Remove the requested amount from index
 				InventorySlots[Index].Amount = InventorySlots[Index].Amount - Amount;
 
@@ -281,7 +282,7 @@ bool UInventoryComponent::AddToIndex(int32 FromIndex, int32 ToIndex)
 
 		}
 	}
-	UE_LOG(LogTemp, Warning, TEXT("False"))
+	
 
 	//OnUpdateRequest.Broadcast(FromIndex);
 	//OnUpdateRequest.Broadcast(ToIndex);
@@ -293,6 +294,7 @@ bool UInventoryComponent::SplitStackToIndex(int32 FromIndex, int32 ToIndex, int3
 {
 	if (IsSlotEmpty(ToIndex) && !IsSlotEmpty(FromIndex) && GetItemInfoAtIndex(FromIndex).CanBeStacked && GetAmountAtIndex(FromIndex) > 1 && GetAmountAtIndex(FromIndex) > Amount)
 	{
+		
 		InventorySlots[FromIndex].Amount = (InventorySlots[FromIndex].Amount - Amount);
 
 		InventorySlots[ToIndex].ItemClass = InventorySlots[FromIndex].ItemClass;
