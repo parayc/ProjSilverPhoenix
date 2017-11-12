@@ -238,10 +238,11 @@ void UInventoryComponent::UseItemAtIndex(int32 Index)
 	if (InventorySlots[Index].ItemClass != nullptr)
 	{
 		//GetWorld()->SpawnActor<ABaseItem>()
-		ABaseItem* ItemSpawned = GetWorld()->SpawnActor<ABaseItem>(InventorySlots[Index].ItemClass, FVector(0, 0, 0), FRotator(0, 0, 0));
+		//Would crash if the player walks over the item that they spawned to use
+		ABaseItem* ItemSpawned = GetWorld()->SpawnActor<ABaseItem>(InventorySlots[Index].ItemClass, FVector(0, 0, -500), FRotator(0, 0, -500));
 		ItemSpawned->InventoryRef = this;
 		ItemSpawned->Index = Index;
-
+		
 		ItemSpawned->UseItem();
 	}
 }

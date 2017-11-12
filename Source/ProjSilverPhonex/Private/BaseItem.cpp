@@ -24,7 +24,7 @@ void ABaseItem::UseItem()
 	UE_LOG(LogTemp, Warning, TEXT("Used Item"))
 	InventoryRef->RemoveItemFromIndex(Index, 1);
 	OnUseItemRequest.Broadcast();
-	//Destroy();
+	Destroy();//TODO - update to support items we dont want to destroy once we used it
 }
 
 
