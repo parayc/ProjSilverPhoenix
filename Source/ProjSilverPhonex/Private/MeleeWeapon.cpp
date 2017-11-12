@@ -29,10 +29,11 @@ void AMeleeWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	
+	//Crashes if the socketbase and sockettip is not set
 	if (SwordTrail)
 	{
-		//SwordTrail->BeginTrails(SocketBase, SocketTip, ETrailWidthMode::ETrailWidthMode_FromCentre, 1.f);
-		//SetSwordTrailVisibility(false);
+		SwordTrail->BeginTrails(SocketBase, SocketTip, ETrailWidthMode::ETrailWidthMode_FromCentre, 1.f);
+		SetSwordTrailVisibility(false);
 	}
 }
 
@@ -86,7 +87,7 @@ void AMeleeWeapon::AttackTrace()
 					DealDamage(HitResult);
 
 				}
-				DrawDebugLine(GetWorld(), tmpBase, tmpBase + tmpOff*FMath::Lerp(curLength, prevLength, i / float(sub)), FColor::Red, false, 1 / 15.0f * 2);
+				//DrawDebugLine(GetWorld(), tmpBase, tmpBase + tmpOff*FMath::Lerp(curLength, prevLength, i / float(sub)), FColor::Red, false, 1 / 15.0f * 2);
 			}
 
 		}

@@ -9,6 +9,9 @@
 /**
  * 
  */
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDeathRequest);
+
 class AEnemyMaster;
 class UCameraComponent;
 class AEnemyMaster;
@@ -119,6 +122,11 @@ public:
 	UCameraComponent* GetCamera();
 
 
+	virtual void OnDeath() override;
+
+		
+	UPROPERTY(BlueprintAssignable)
+	FOnDeathRequest OnDeathRequest;
 	
 protected:
 	// Called when the game starts or when spawned

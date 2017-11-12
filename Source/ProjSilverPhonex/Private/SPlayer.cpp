@@ -177,10 +177,11 @@ void ASPlayer::DoubleJump()
 
 void ASPlayer::SetIsJumping(bool NewState) 
 {
-	//Reset jump counter everytime before the first jump
+	
 	bIsJumping = NewState;
 	if (bCanJump)
 	{
+		//Reset jump counter everytime before the first jump
 		if (GetCharacterMovement()->IsMovingOnGround() == true)
 		{
 			JumpCounter = 0;
@@ -558,6 +559,14 @@ void ASPlayer::LightAttack()
 	}
 }
 
+void ASPlayer::OnDeath()
+{
+	Super::OnDeath();
+	auto playerController = Cast<APlayerController>(this->GetController());
+	DisableInput(playerController);
+	OnDeathRequest.Broadcast();
+}
+
 void ASPlayer::HeavyAttack()
 {
 }
@@ -570,3 +579,4 @@ UCameraComponent * ASPlayer::GetCamera()
 {
 	return Camera;
 }
+

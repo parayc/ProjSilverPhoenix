@@ -3,6 +3,7 @@
 #include "XBaseCharacter.h"
 #include "BaseWeapon.h"
 #include "CombatComponent.h"
+#include "GameFramework/CharacterMovementComponent.h"
 
 
 // Sets default values
@@ -18,6 +19,7 @@ void AXBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
 
+	//Todo - set back to normal
 	CurrentHealth = MaxHealth - 10.f;
 
 	//CurrentPlayerState = EPlayerStates::PS_Passive;
@@ -86,7 +88,9 @@ float AXBaseCharacter::TakeDamage(float Damage, FDamageEvent const & DamageEvent
 
 	if (CurrentHealth <= 0)
 	{
-		IsDead = true;
+		bIsDead = true;
+		OnDeath();
+		return CurrentHealth;
 	}
 
 	
@@ -173,4 +177,26 @@ void AXBaseCharacter::SwitchStats(EPlayerStates NewState)
 		//No weapon we are in passive state
 		CurrentPlayerState = EPlayerStates::PS_Passive;
 	}
+}
+
+bool AXBaseCharacter::GetIsDead()
+{
+	return bIsDead;
+}
+
+void AXBaseCharacter::OnDeath()
+{
+	
+	UCharacterMovementComponent* CharacterComp = Cast<UCharacterMovementComponent>(GetMovementComponent());
+	if (CharacterComp)
+	{
+		CharacterComp->StopMovementImmediately();
+		CharacterComp->DisableMovement();
+		CharacterComp->SetComponentTickEnabled(false);
+	}
+
+
+	CharacterEquipment.CurrentWeapon->DestroyWeapon();
+	//Destroy();
+
 }

@@ -89,3 +89,8 @@ void ABaseWeapon::EquipingFinished()
 	MyPawn->SetCanAttack(true);
 }
 
+void ABaseWeapon::DestroyWeapon()
+{
+	this->Destroy();
+}
+

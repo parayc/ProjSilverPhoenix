@@ -66,14 +66,12 @@ void AEnemyMaster::Tick(float DeltaTime)
 	SetTargetIconDirection();
 }
 
-bool AEnemyMaster::GetIsDead()
-{
-	return bIsDead;
-}
 
 //TODO - Pass a reference of the person who killed them 
-void AEnemyMaster::OnDeath()
+void AEnemyMaster::OnDeath() 
 {
+	Super::OnDeath();
+
 	auto* Player = Cast<ASPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
 	if (Player && Player->GetIsLockedOn())

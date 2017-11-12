@@ -7,8 +7,10 @@
 #include "XBaseCharacter.generated.h"
 
 
+
 class ABaseWeapon;
 class UCombatComponent;
+class UAnimMontage;
 
 USTRUCT(BlueprintType)
 struct FCharacterEquipment
@@ -81,6 +83,12 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FCharacterEquipment CharacterEquipment;
 
+	bool GetIsDead();
+
+	virtual void OnDeath();
+
+	
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayerState")
@@ -98,10 +106,17 @@ protected:
 	UPROPERTY(EditAnywhere, Category = "Character Condition")
 	float MaxHealth = 100.f;
 
-	bool IsDead;
-
 	bool bCanAttack = true;
 
 	UPROPERTY(Category = "SetUp", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCombatComponent* CombatStates;
+
+private:
+
+	bool bIsDead = false;
+
+	UAnimMontage* DeathMontage;
+
+
+
 };

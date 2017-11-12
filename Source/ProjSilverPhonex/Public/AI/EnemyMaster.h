@@ -42,9 +42,8 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Setup")
 	UPawnSensingComponent* PawningSensingComp;
 
-	bool GetIsDead();
 
-	void OnDeath();
+	virtual void OnDeath() override;
 
 	void SetTargetIconDirection();
 
@@ -63,6 +62,6 @@ private:
 
 	bool bIsTargeted = false;
 
-	bool bIsDead = false;
+	//bool bIsDead = false;
 
 };
