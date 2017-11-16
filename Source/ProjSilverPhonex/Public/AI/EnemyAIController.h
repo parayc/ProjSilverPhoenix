@@ -30,6 +30,8 @@ public:
 
 	void SetSeenTarget(AActor* NewEnemy);
 
+	void SetHeardLocation(FVector Location);
+
 	void SetEnemyInRnage(bool NewState);
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
@@ -37,6 +39,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName EnemyInRange;
+
+	UPROPERTY(EditDefaultsOnly, Category = AI)
+		FName NoiseLocation;
 
 	UFUNCTION(BlueprintCallable)
 	AActor* GetEnemyRef() const;

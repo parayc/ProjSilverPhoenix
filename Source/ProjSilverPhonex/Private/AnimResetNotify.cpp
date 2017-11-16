@@ -8,8 +8,6 @@ void UAnimResetNotify::Notify(USkeletalMeshComponent * MeshComp, UAnimSequenceBa
 	UMeleeAnimInstance* PlayerAnimation = Cast<UMeleeAnimInstance>(MeshComp->GetAnimInstance());
 	if (PlayerAnimation)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("Reset Combo"));
-		PlayerAnimation->SetAcceptNextCombo(false);
 		PlayerAnimation->ComboReset();
 	}
 }

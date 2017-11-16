@@ -3,6 +3,7 @@
 #include "XBaseCharacter.h"
 #include "BaseWeapon.h"
 #include "CombatComponent.h"
+#include "MeleeAnimInstance.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -78,10 +79,6 @@ void AXBaseCharacter::SetAddMaxHealth(float Value)
 	MaxHealth = Value;
 }
 
-
-
-
-
 float AXBaseCharacter::TakeDamage(float Damage, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
 {
 	CurrentHealth -= Damage;
@@ -98,7 +95,14 @@ float AXBaseCharacter::TakeDamage(float Damage, FDamageEvent const & DamageEvent
 
 	if (CombatStates->GetBattleState() == EBattleState::PS_Normal)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Dmagae Causer: %s"), *DamageCauser->GetName());
+		//Reset combo if we get hit
+		UMeleeAnimInstance* PlayerAnimation = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
+		if (PlayerAnimation)
+		{
+			PlayerAnimation->ComboReset();
+		}
+
+		//UE_LOG(LogTemp, Warning, TEXT("Dmagae Causer: %s"), *DamageCauser->GetName());
 		auto DamageInstigator = Cast<ACharacter>(DamageCauser);
 		if (DamageInstigator)
 		{

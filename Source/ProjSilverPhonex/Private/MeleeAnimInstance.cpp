@@ -24,7 +24,8 @@ void UMeleeAnimInstance::Attack(EAttackType AttackType)
 	if (CharacterPawn && Melee2)
 	{
 	//	CharacterPawn->SetCanJump(false);
-		CharacterPawn->CharacterEquipment.CurrentWeapon->StartAttack();
+		//TODO - Change behaviour
+		//CharacterPawn->CharacterEquipment.CurrentWeapon->StartAttack();
 
 		if (AttackType == EAttackType::PS_Light)
 		{
@@ -107,7 +108,7 @@ void UMeleeAnimInstance::ComboReset()
 {
 	if (GetWorld())
 	{
-
+		SetAcceptNextCombo(false);
 		float time = Montage_GetPosition(GetCurrentActiveMontage());
 		GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &UMeleeAnimInstance::Reset, 0.6f, false);
 		

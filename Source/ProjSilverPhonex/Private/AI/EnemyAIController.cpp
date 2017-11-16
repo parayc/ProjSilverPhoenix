@@ -17,6 +17,7 @@ AEnemyAIController::AEnemyAIController()
 
 	Enemy = "Enemy";
 	EnemyInRange = "EnemyInRange";
+	NoiseLocation = "NoiseLocation";
 }
 
 void AEnemyAIController::Possess(APawn * pawn)
@@ -49,6 +50,16 @@ void AEnemyAIController::SetSeenTarget(AActor* NewEnemy)
 		EnemyRef = NewEnemy;
 		BlackboardComp->SetValueAsObject(Enemy, EnemyRef);
 		//UE_LOG(LogTemp, Warning, TEXT("See Player"))
+	}
+}
+
+void AEnemyAIController::SetHeardLocation(FVector Location)
+{
+	if (BlackboardComp)
+	{
+		BlackboardComp->SetValueAsVector(NoiseLocation, Location);
+		UE_LOG(LogTemp, Warning, TEXT("Heard Player"))
+
 	}
 }
 

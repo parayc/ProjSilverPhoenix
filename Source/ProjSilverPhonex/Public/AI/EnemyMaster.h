@@ -40,7 +40,7 @@ public:
 	UWidgetComponent* TargetIcon;
 
 	UPROPERTY(VisibleAnywhere, Category = "Setup")
-	UPawnSensingComponent* PawningSensingComp;
+	UPawnSensingComponent* PawnSensingComp;
 
 
 	virtual void OnDeath() override;
@@ -49,6 +49,7 @@ public:
 
 	void SetTargetHidden(bool NewState);
 
+	
 
 private:
 
@@ -58,9 +59,23 @@ private:
 	UFUNCTION()
 	void OnseePlayer(APawn* pawn);
 
+	UFUNCTION()
+		void OnHearNoise(APawn * PawnInstigator, const FVector & Location, float Volume);
+
 	int32 AttackDamage;
 
+	bool bSensedTarget = false;
+
 	bool bIsTargeted = false;
+
+	float LastSeenTime;
+
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	float SenseTimeOut;
+
+	/*This is how much exp the player while receive when the AI is killed */
+	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	int32 Exp;
 
 	//bool bIsDead = false;
 

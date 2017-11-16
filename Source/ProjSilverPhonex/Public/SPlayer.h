@@ -68,6 +68,9 @@ public:
 	void EndDoubleJump();
 
 	UFUNCTION(BlueprintCallable, Category = "Setup")
+		void CreateNoise(float Loudness);
+
+	UFUNCTION(BlueprintCallable, Category = "Setup")
 		bool GetIsJumping() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Setup")
@@ -76,7 +79,8 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Setup | Movement")
 		float JumpHeight = 600.f;
 
-
+	
+	
 	/*Rolling*/
 
 	void StartRoll();
@@ -113,6 +117,9 @@ public:
 
 
 	/*Equipent & Attacking*/
+
+	void Attack();
+
 	void LightAttack();
 
 	void HeavyAttack();
@@ -124,7 +131,6 @@ public:
 
 	virtual void OnDeath() override;
 
-		
 	UPROPERTY(BlueprintAssignable)
 	FOnDeathRequest OnDeathRequest;
 	

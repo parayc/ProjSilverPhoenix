@@ -9,6 +9,7 @@
 #include "CombatComponent.h"
 #include "MeleeAnimInstance.h"
 #include "ProjSilverPhonex.h"
+#include "BaseWeapon.h"
 
 ASPlayer::ASPlayer()
 {
@@ -83,7 +84,7 @@ void ASPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASPlayer::StartJump);
 	PlayerInputComponent->BindAction("Roll", IE_Pressed, this, &ASPlayer::StartRoll);
-	PlayerInputComponent->BindAction("LightAttack", IE_Pressed, this, &ASPlayer::LightAttack);
+	PlayerInputComponent->BindAction("LightAttack", IE_Pressed, this, &ASPlayer::Attack);
 	PlayerInputComponent->BindAction("HeavyAttack", IE_Pressed, this, &ASPlayer::HeavyAttack);
 
 	PlayerInputComponent->BindAction("LockOn", IE_Pressed, this, &ASPlayer::FindLockOnTargets);
@@ -216,6 +217,11 @@ void ASPlayer::EndDoubleJump()
 	GetWorldTimerManager().ClearTimer(DJumpResetHandle);
 }
 
+void ASPlayer::CreateNoise(float Loudness)
+{
+	MakeNoise(Loudness, this, GetActorLocation());
+}
+
 bool ASPlayer::GetIsJumping() const
 {
 	return bIsJumping;
@@ -225,6 +231,8 @@ bool ASPlayer::GetIsDoubleJumping() const
 {
 	return bIsDoubleJump;
 }
+
+
 
 void ASPlayer::StartRoll()
 {
@@ -258,7 +266,7 @@ void ASPlayer::RollDircetion()
 	{
 		//Play montage 
 		Duration = AnimInst->PlayAnimation(ForwardRoll);
-		UE_LOG(LogTemp, Warning, TEXT("Roll"))
+		//UE_LOG(LogTemp, Warning, TEXT("Roll"))
 	}
 	else
 	{
@@ -538,6 +546,26 @@ bool ASPlayer::GetIsLockedOn() const
 	return bIsLockedOn;
 }
 
+void ASPlayer::Attack()
+{
+
+	if (GetIsRolling() == true) { return; }//If Player is rolling they cant attack 
+	if (CharacterEquipment.CurrentWeapon)
+	{
+		CharacterEquipment.CurrentWeapon->StartAttack();
+		if (EPlayerStates::PS_Passive == CurrentPlayerState)
+		{
+			//When we attack we go into combat state
+			SwitchStats(EPlayerStates::PS_Combat);
+			//When we attack, attach sword to hand
+			AttachWeaponToSocket();
+
+
+		}
+	}
+}
+
+//TODO - Remove
 void ASPlayer::LightAttack()
 {
 	if (CharacterEquipment.CurrentWeapon)
@@ -579,4 +607,5 @@ UCameraComponent * ASPlayer::GetCamera()
 {
 	return Camera;
 }
+
 

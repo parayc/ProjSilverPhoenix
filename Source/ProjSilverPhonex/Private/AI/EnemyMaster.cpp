@@ -9,6 +9,7 @@
 #include "CombatComponent.H"
 #include "XBaseCharacter.h"
 #include "SPlayer.h"
+#include "SPGameInstance.h"
 
 
 // Sets default values
@@ -26,8 +27,10 @@ AEnemyMaster::AEnemyMaster()
 	TargetIcon->SetHiddenInGame(false);
 
 
-	PawningSensingComp = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComp"));
-	PawningSensingComp->SetPeripheralVisionAngle(40.f);
+	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComp"));
+	PawnSensingComp->SetPeripheralVisionAngle(40.f);
+	PawnSensingComp->HearingThreshold = 600;//how far it can hear
+	PawnSensingComp->LOSHearingThreshold = 1200;
 	
 
 	CombatStates = CreateDefaultSubobject<UCombatComponent>(TEXT("Combat States"));
@@ -42,9 +45,13 @@ void AEnemyMaster::BeginPlay()
 	CurrentHealth = MaxHealth;
 	
 
-	if (PawningSensingComp)
+	if (PawnSensingComp)
 	{
-		PawningSensingComp->OnSeePawn.AddDynamic(this, &AEnemyMaster::OnseePlayer);
+
+		PawnSensingComp->OnHearNoise.AddDynamic(this, &AEnemyMaster::OnHearNoise);
+		PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyMaster::OnseePlayer);
+		
+		
 	}
 	
 	if (CombatStates)
@@ -64,6 +71,21 @@ void AEnemyMaster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	SetTargetIconDirection();
+
+
+	/* Check if the last time we sensed a player is beyond the time out value to prevent from endlessly following a player. */
+	if (bSensedTarget && (GetWorld()->TimeSeconds - LastSeenTime) > SenseTimeOut)
+	{
+		AEnemyAIController* AIController = Cast<AEnemyAIController>(GetController());
+		if (AIController)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Reset"))
+			bSensedTarget = false;
+			/* Reset */
+			AIController->SetSeenTarget(nullptr);
+
+		}
+	}
 }
 
 
@@ -71,6 +93,14 @@ void AEnemyMaster::Tick(float DeltaTime)
 void AEnemyMaster::OnDeath() 
 {
 	Super::OnDeath();
+
+
+	USPGameInstance* GameInstance = Cast<USPGameInstance>(GetGameInstance());
+
+	if (GameInstance)
+	{
+		GameInstance->AddExpPoints(Exp);
+	}
 
 	auto* Player = Cast<ASPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
@@ -103,13 +133,27 @@ void AEnemyMaster::SetTargetHidden(bool NewState)
 	TargetIcon->SetHiddenInGame(NewState);
 }
 
-
 void AEnemyMaster::OnseePlayer(APawn * pawn)
 {
 	AEnemyAIController* AIController = Cast<AEnemyAIController>(GetController());
 	if (AIController)
 	{
+		/* Keep track of the time the player was last sensed in order to clear the target */
+		LastSeenTime = GetWorld()->GetTimeSeconds();
+		bSensedTarget = true;
+
 		AIController->SetSeenTarget(pawn);
+
+	}
+}
+
+void AEnemyMaster::OnHearNoise(APawn * PawnInstigator, const FVector & Location, float Volume)
+{
+	
+	AEnemyAIController* AIController = Cast<AEnemyAIController>(GetController());
+	if (AIController)
+	{
+		AIController->SetHeardLocation(Location);
 
 	}
 }

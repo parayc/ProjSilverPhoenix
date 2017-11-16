@@ -6,6 +6,7 @@
 #include "ProjSilverPhonex.h"
 #include "XBaseCharacter.h"
 #include "DrawDebugHelpers.h"
+#include "MeleeAnimInstance.h"
 
 AMeleeWeapon::AMeleeWeapon()
 {
@@ -39,7 +40,11 @@ void AMeleeWeapon::BeginPlay()
 
 void AMeleeWeapon::StartAttack()
 {
-	bIsAttacking = true;
+	//bool does nothing!!!
+	//bIsAttacking = true;
+
+	UMeleeAnimInstance* AnimInstance = Cast<UMeleeAnimInstance>(MyPawn->GetMesh()->GetAnimInstance());
+	AnimInstance->Attack(EAttackType::PS_Light);
 }
 
 void AMeleeWeapon::StopAttack()

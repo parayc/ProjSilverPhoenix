@@ -16,11 +16,14 @@ class PROJSILVERPHONEX_API UAttackTask : public UBTTaskNode
 {
 	GENERATED_BODY()
 	
-		virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory);
+	virtual EBTNodeResult::Type ExecuteTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory) override;
 
-	void EndAttack();
 
-	FTimerHandle AttackTimerHandle;
+	virtual void TickTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory, float DeltaSeconds) override;
+
+
+
+	float dur = 0.0f;
 public:
 	//UPROPERTY(EditA)
 	
