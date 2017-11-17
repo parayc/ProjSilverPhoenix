@@ -51,6 +51,10 @@ public:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
+	void SetWalkSpeed(float Speed);
+
+	float GetWalkDirection();
+
 	UFUNCTION(BlueprintCallable, Category = "Character Condition")
 	float GetCurrentHealth() const;
 
@@ -62,6 +66,9 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Character Condition")
 	void SetAddMaxHealth(float Value);
+
+
+
 
 	/*Equipent & Attacking*/
 
@@ -90,7 +97,10 @@ public:
 
 	int32 GetTeamNumber();
 
-	
+	bool CanUnequip() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Combat")
+	bool IsFlinching() const;
 
 protected:
 
@@ -114,12 +124,28 @@ protected:
 	UPROPERTY(Category = "SetUp", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 	UCombatComponent* CombatStates;
 
+	
+
 private:
 
 	UPROPERTY(Category = "SetUp", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
 		int32 TeamNumber = 0;
 
 	bool bIsDead = false;
+
+
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | Movement")
+		float BackwardsWalkSpeed;
+
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | Movement")
+		float WalkSpeed;
+
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | Movement")
+		float StrafingSpeed;
+
+	
+
+	
 
 
 };

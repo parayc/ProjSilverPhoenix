@@ -38,6 +38,8 @@ ASPlayer::ASPlayer()
 	
 }
 
+
+
 void ASPlayer::BeginPlay()
 {
 	Super::BeginPlay();
@@ -62,19 +64,6 @@ void ASPlayer::Tick(float DeltaTime)
 		EndJump();
 	}
 
-	if (GetWalkDirection() > 0.8f)//Check if walking forward
-	{
-		SetWalkSpeed(WalkSpeed);
-
-	}
-	else if (GetWalkDirection() < 0.8f && GetWalkDirection()  > -0.6f)//starfing
-	{
-		SetWalkSpeed(StrafingSpeed);
-	}
-	else
-	{
-		SetWalkSpeed(BackwardsWalkSpeed);
-	}
 }
 
 void ASPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
@@ -99,11 +88,13 @@ void ASPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
 
 }
 
+
+
 void ASPlayer::MoveForward(float Value)
 {
 	//Needs to be called outside if statement to reset it back to zero
 	MoveForwardAxisValue = Value;
-	if ((Controller != NULL) && (Value != 0.0f))
+	if ((Controller != NULL) && (Value != 0.0f) && !IsFlinching() )
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -121,7 +112,7 @@ void ASPlayer::MoveRight(float Value)
 {
 	//Needs to be called outside if statement to reset it back to zero
 	MoveRightAxisValue = Value;
-	if ((Controller != NULL) && (Value != 0.0f))
+	if ((Controller != NULL) && (Value != 0.0f) && !IsFlinching())
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -146,19 +137,13 @@ void ASPlayer::LookUp(float Rate)
 	AddControllerPitchInput(Rate * BasePitchRate * GetWorld()->GetDeltaSeconds());
 }
 
-float ASPlayer::GetWalkDirection()
-{
-	return FVector::DotProduct(GetVelocity().GetSafeNormal2D(), GetActorRotation().Vector());
-}
-
-void ASPlayer::SetWalkSpeed(float Speed)
-{
-	GetCharacterMovement()->MaxWalkSpeed = Speed;
-}
 
 void ASPlayer::StartJump()
 {
-	SetIsJumping(true);
+	if (!IsFlinching() && GetIsRolling() != true)
+	{
+		SetIsJumping(true);
+	}
 }
 
 void ASPlayer::EndJump()
@@ -246,7 +231,7 @@ void ASPlayer::RollCoolDown()
 
 void ASPlayer::StartRoll()
 {
-	if (bCanRoll && RollCounter < MaxAmountPlayerCanRoll)
+	if (bCanRoll && RollCounter < MaxAmountPlayerCanRoll && !IsFlinching())
 	{
 		bIsRolling = true;
 		SetCanRoll(false);
@@ -566,7 +551,7 @@ bool ASPlayer::GetIsLockedOn() const
 void ASPlayer::Attack()
 {
 	//Stop the player from attacking if rolling
-	if (GetIsRolling() == true) { return; }
+	if (GetIsRolling() == true ||  IsFlinching() == true) { return; }
 	if (CharacterEquipment.CurrentWeapon)
 	{
 		CharacterEquipment.CurrentWeapon->StartAttack();

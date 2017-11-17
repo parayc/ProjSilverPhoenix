@@ -5,6 +5,7 @@
 #include "CombatComponent.h"
 #include "MeleeAnimInstance.h"
 #include "SPlayer.h"
+
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -50,7 +51,33 @@ void AXBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
+
+	if (GetWalkDirection() > 0.8f)//Check if walking forward
+	{
+		SetWalkSpeed(WalkSpeed);
+
+	}
+	else if (GetWalkDirection() < 0.8f && GetWalkDirection()  > -0.6f)//starfing
+	{
+		SetWalkSpeed(StrafingSpeed);
+	}
+	else
+	{
+		SetWalkSpeed(BackwardsWalkSpeed);
+	}
+
 }
+
+void AXBaseCharacter::SetWalkSpeed(float Speed)
+{
+	GetCharacterMovement()->MaxWalkSpeed = Speed;
+}
+
+float AXBaseCharacter::GetWalkDirection()
+{
+	return FVector::DotProduct(GetVelocity().GetSafeNormal2D(), GetActorRotation().Vector());
+}
+
 
 float AXBaseCharacter::GetCurrentHealth() const
 {
@@ -122,6 +149,11 @@ float AXBaseCharacter::TakeDamage(float Damage, FDamageEvent const & DamageEvent
 	return CurrentHealth;
 }
 
+bool AXBaseCharacter::IsFlinching() const
+{
+	return CombatStates->GetIsFlinching();
+}
+
 void AXBaseCharacter::AddWeaponToOnventory(ABaseWeapon * NewWeapon)
 {
 
@@ -172,10 +204,10 @@ void AXBaseCharacter::SwitchStats(EPlayerStates NewState)
 	if (CharacterEquipment.CurrentWeapon)
 	{
 
-		auto Player = Cast<ASPlayer>(this);
+	
 
-		//If not rolling play unequip animation
-		if (EPlayerStates::PS_Passive == CurrentPlayerState && Player->GetIsRolling() != true)
+		//If not rolling, flinching play unequip animation
+		if (EPlayerStates::PS_Passive == CurrentPlayerState && CanUnequip())
 		{
 			CharacterEquipment.CurrentWeapon->UnEquip();
 		}
@@ -218,3 +250,10 @@ int32 AXBaseCharacter::GetTeamNumber()
 {
 	return TeamNumber;
 }
+
+bool AXBaseCharacter::CanUnequip() const
+{
+	auto Player = Cast<ASPlayer>(this);
+	return  Player->GetIsRolling() != true && Player->GetIsJumping() != true && Player->IsFlinching() != true && Player->GetIsDead() != true;
+}
+

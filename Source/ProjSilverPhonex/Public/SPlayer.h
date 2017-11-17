@@ -50,10 +50,7 @@ public:
 
 	void LookUp(float Rate);
 
-	float GetWalkDirection();
-
-	void SetWalkSpeed(float Speed);
-
+	
 	/*Jumping*/
 	void StartJump();
 
@@ -132,6 +129,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable)
 	FOnDeathRequest OnDeathRequest;
+
+	
 	
 protected:
 	// Called when the game starts or when spawned
@@ -208,14 +207,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | LockOnSystem")
 		float LockOnSphereRadius = 600.f;
 
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | Movement")
-		float BackwardsWalkSpeed;
-
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | Movement")
-		float WalkSpeed;
-
-	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | Movement")
-		float StrafingSpeed;
 
 	float closetTargetDistance;
 

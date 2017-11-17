@@ -48,14 +48,28 @@ void UCombatComponent::Flinch()
 
 	if (Owner)
 	{
+		IsFlinching = true;
+		float Duration = 0.f; 
 		//Play animation when hit
 		if (FlinchAnimation)
 		{
-			Owner->PlayAnimMontage(FlinchAnimation);
+			Duration =  Owner->PlayAnimMontage(FlinchAnimation);
 			//Stop from attacking and reset everything when hit
 		}
-
+		
+		GetWorld()->GetTimerManager().SetTimer(FlinchHandleTimer, this, &UCombatComponent::StopFlinch, Duration, false);
 	}
+}
+
+void UCombatComponent::StopFlinch()
+{
+	IsFlinching = false;
+	GetWorld()->GetTimerManager().ClearTimer(FlinchHandleTimer);
+}
+
+bool UCombatComponent::GetIsFlinching() const
+{
+	return IsFlinching;
 }
 
 

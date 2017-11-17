@@ -158,7 +158,17 @@ void AEnemyMaster::OnseePlayer(APawn * pawn)
 		LastSeenTime = GetWorld()->GetTimeSeconds();
 		bSensedTarget = true;
 
-		AIController->SetSeenTarget(pawn);
+		ASPlayer* player = Cast<ASPlayer>(pawn);
+		if (player && !player->GetIsDead())
+		{
+			UE_LOG(LogTemp, Warning, TEXT("See some one"))
+			AIController->SetSeenTarget(pawn);
+		}
+		else
+		{
+			AIController->SetSeenTarget(nullptr);
+		}
+		
 
 	}
 }

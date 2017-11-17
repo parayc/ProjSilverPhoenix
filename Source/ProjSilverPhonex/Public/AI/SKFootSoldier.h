@@ -53,9 +53,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "SetUp")
 	USphereComponent* BattleCircle;
 
-	UPROPERTY(EditDefaultsOnly, Category = "SetUp")
-		int32 WeaponDamage;
-
 	bool bIsAttacking = false;
 
 	bool bEnemyInRange = false;

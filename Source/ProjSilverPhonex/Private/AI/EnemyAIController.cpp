@@ -49,7 +49,7 @@ void AEnemyAIController::SetSeenTarget(AActor* NewEnemy)
 	{
 		EnemyRef = NewEnemy;
 		BlackboardComp->SetValueAsObject(Enemy, EnemyRef);
-		//UE_LOG(LogTemp, Warning, TEXT("See Player"))
+	UE_LOG(LogTemp, Warning, TEXT("See Player"))
 	}
 }
 

@@ -37,13 +37,22 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "SetUp")
 		float KnockBackAmount = 5;
 
+
 	//Play flinch 
 	void Flinch();
 
+	void StopFlinch();
+
+	bool GetIsFlinching() const;
+
+	
 
 private: 
+	FTimerHandle FlinchHandleTimer;
 
 	EBattleState CurrentBattleState;
+
+	bool IsFlinching = false;
 
 	UPROPERTY(EditAnywhere, Category = "SetUp")
 		UAnimMontage* FlinchAnimation;

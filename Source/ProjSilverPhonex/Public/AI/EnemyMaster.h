@@ -73,11 +73,12 @@ private:
 
 	float LastSeenTime;
 
-	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	/*This is how long the AI will follow the enemy when there are not in their line of sight */
+	UPROPERTY(EditDefaultsOnly, Category = "SetUp")
 	float SenseTimeOut;
 
 	/*This is how much exp the player while receive when the AI is killed */
-	UPROPERTY(EditDefaultsOnly, Category = "AI")
+	UPROPERTY(EditDefaultsOnly, Category = "SetUp")
 	int32 Exp;
 
 	//bool bIsDead = false;
