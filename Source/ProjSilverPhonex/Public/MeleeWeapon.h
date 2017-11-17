@@ -19,9 +19,11 @@ struct FWeaponAnimation
 {
 	GENERATED_USTRUCT_BODY()
 
-		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SetUp")
-		class UAnimMontage* MeleeAttackMontages;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SetUp")
+	class UAnimMontage* MeleeAttackMontages;
 
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SetUp")
+		int32 DamagePerAnimation = 0;
 	//Some Montages 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SetUp")
 		bool LaunchCharacter;
@@ -44,6 +46,8 @@ public:
 	virtual void StopAttack() override;
 
 	void AttackTrace();
+
+	void SetDamage(int32 Value);
 
 	void DealDamage(const FHitResult& HitResult);
 
@@ -106,7 +110,6 @@ private:
 
 	FVector prevTip;
 
-
-	UPROPERTY(EditDefaultsOnly, Category = "SetUp")
+	//UPROPERTY(EditDefaultsOnly, Category = "SetUp")
 	int32 Damage = 0;
 };

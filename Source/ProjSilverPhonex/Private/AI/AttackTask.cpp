@@ -26,7 +26,8 @@ EBTNodeResult::Type UAttackTask::ExecuteTask(UBehaviorTreeComponent & OwnerComp,
 		}
 
 		auto AnimationToPlay = Weapon->GetLightAttackMontages()[RanValue].MeleeAttackMontages;
-		dur = Weapon->PlayWeaponAnimation(AnimationToPlay);
+		Duration = Weapon->PlayWeaponAnimation(AnimationToPlay);
+		Weapon->SetDamage(Weapon->GetLightAttackMontages()[RanValue].DamagePerAnimation);
 
 		
 	}
@@ -40,11 +41,10 @@ void UAttackTask::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory,
 {
 	Super::TickTask(OwnerComp, NodeMemory, DeltaSeconds);
 
-	UE_LOG(LogTemp, Warning, TEXT("tick"));
-	dur -= DeltaSeconds;
-	if (dur <= 0.0f)
+	
+	Duration -= DeltaSeconds;
+	if (Duration <= 0.0f)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Done"));
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

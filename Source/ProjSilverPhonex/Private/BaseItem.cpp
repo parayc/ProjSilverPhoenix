@@ -12,7 +12,7 @@ ABaseItem::ABaseItem()
 	PrimaryActorTick.bCanEverTick = true;
 	ItemStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
 	RootComponent = ItemStaticMesh;
-
+	
 	PickUpSphere = CreateDefaultSubobject<USphereComponent>(TEXT("PickUpSphere"));
 	PickUpSphere->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 }
@@ -21,7 +21,6 @@ ABaseItem::ABaseItem()
 void ABaseItem::UseItem()
 {
 	
-	UE_LOG(LogTemp, Warning, TEXT("Used Item"))
 	InventoryRef->RemoveItemFromIndex(Index, 1);
 	OnUseItemRequest.Broadcast();
 	Destroy();//TODO - update to support items we dont want to destroy once we used it
@@ -39,6 +38,8 @@ void ABaseItem::BeginPlay()
 void ABaseItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
+	auto Speed = DeltaTime * 90;
+	ItemStaticMesh->AddRelativeRotation(FRotator(0, Speed, 0));
 }
 

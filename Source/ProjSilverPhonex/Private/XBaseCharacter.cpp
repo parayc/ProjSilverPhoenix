@@ -4,6 +4,7 @@
 #include "BaseWeapon.h"
 #include "CombatComponent.h"
 #include "MeleeAnimInstance.h"
+#include "SPlayer.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -81,11 +82,16 @@ void AXBaseCharacter::SetAddMaxHealth(float Value)
 
 float AXBaseCharacter::TakeDamage(float Damage, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
 {
+
+	if (bIsDead == true || CombatStates->GetBattleState() == EBattleState::PS_Invincible)
+	{
+		return CurrentHealth;
+	}
+
 	CurrentHealth -= Damage;
 
 	if (CurrentHealth <= 0)
 	{
-		bIsDead = true;
 		OnDeath();
 		return CurrentHealth;
 	}
@@ -99,10 +105,9 @@ float AXBaseCharacter::TakeDamage(float Damage, FDamageEvent const & DamageEvent
 		UMeleeAnimInstance* PlayerAnimation = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
 		if (PlayerAnimation)
 		{
-			PlayerAnimation->ComboReset();
+			PlayerAnimation->ResetComboAttack();
 		}
 
-		//UE_LOG(LogTemp, Warning, TEXT("Dmagae Causer: %s"), *DamageCauser->GetName());
 		auto DamageInstigator = Cast<ACharacter>(DamageCauser);
 		if (DamageInstigator)
 		{
@@ -166,8 +171,11 @@ void AXBaseCharacter::SwitchStats(EPlayerStates NewState)
 	CurrentPlayerState = NewState;
 	if (CharacterEquipment.CurrentWeapon)
 	{
+
+		auto Player = Cast<ASPlayer>(this);
+
 		//If not rolling play unequip animation
-		if (EPlayerStates::PS_Passive == CurrentPlayerState)
+		if (EPlayerStates::PS_Passive == CurrentPlayerState && Player->GetIsRolling() != true)
 		{
 			CharacterEquipment.CurrentWeapon->UnEquip();
 		}
@@ -183,7 +191,7 @@ void AXBaseCharacter::SwitchStats(EPlayerStates NewState)
 	}
 }
 
-bool AXBaseCharacter::GetIsDead()
+bool AXBaseCharacter::GetIsDead() const
 {
 	return bIsDead;
 }
@@ -201,6 +209,12 @@ void AXBaseCharacter::OnDeath()
 
 
 	CharacterEquipment.CurrentWeapon->DestroyWeapon();
-	//Destroy();
+	
+	bIsDead = true;
 
+}
+
+int32 AXBaseCharacter::GetTeamNumber()
+{
+	return TeamNumber;
 }

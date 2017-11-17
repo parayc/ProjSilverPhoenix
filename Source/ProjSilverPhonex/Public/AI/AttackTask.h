@@ -23,7 +23,7 @@ class PROJSILVERPHONEX_API UAttackTask : public UBTTaskNode
 
 
 
-	float dur = 0.0f;
+	float Duration = 0.0f;
 public:
 	//UPROPERTY(EditA)
 	

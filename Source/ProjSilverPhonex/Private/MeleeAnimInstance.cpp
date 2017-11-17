@@ -72,8 +72,8 @@ void UMeleeAnimInstance::PlayCombo(EAttackType AttackType)
 			
 			if (ComboCounter < Montages.Num())
 			{
-				//0 != Montages.Num() &&
-				//UE_LOG(LogTemp, Warning, TEXT("Counter: %d"), ComboCounter);
+				
+				
 				if (Montages[ComboCounter].LaunchCharacter)
 				{
 					//Launch Character
@@ -87,15 +87,17 @@ void UMeleeAnimInstance::PlayCombo(EAttackType AttackType)
 				//Clear array before each attack
 				Melee->ClearEnemiesHitArray();//Clears array
 
-											  // change direction after each attack montage
+				 // change direction after each attack montage
 				ChangeDirection();
-				//StartAttackingTrace();
 
-				//Play appropriate animations 
-				//Weapon->PlayWeaponAnimation(Montages[ComboCounter].MeleeAttackMontages);
 				PlayAnimation(Montages[ComboCounter].MeleeAttackMontages);
+				//Depening on the animtion being played we set the damage of the sword
+				Melee->SetDamage(Montages[ComboCounter].DamagePerAnimation);
 				ComboCounter++;
 				bAcceptNextCombo = false;//Stops the player from attacking again straight away
+
+				//This sets  back to passive if the player hasnt attack in 10 seconds
+				GetWorld()->GetTimerManager().SetTimer(ResetStanceHandle, this, &UMeleeAnimInstance::ResetStance, 5.0f, false);
 			}
 
 		}
@@ -104,46 +106,37 @@ void UMeleeAnimInstance::PlayCombo(EAttackType AttackType)
 
 }
 
-void UMeleeAnimInstance::ComboReset()
+void UMeleeAnimInstance::ResetComboAttack()
 {
-	if (GetWorld())
-	{
-		SetAcceptNextCombo(false);
-		float time = Montage_GetPosition(GetCurrentActiveMontage());
-		GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &UMeleeAnimInstance::Reset, 0.6f, false);
-		
-		AXBaseCharacter* CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
-		if (CharacterPawn)
-		{
-			CharacterPawn->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-		}
-		//TODO - Maybe have different timers one to reset combo and other to return player back to passive
-	}
+
+	//We reset the combo counter after a period of time to stop the player from attacking immediately after
+	GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &UMeleeAnimInstance::Reset, 0.5f, false);
+	SetAcceptNextCombo(false);
+
+	//If we take take damage or so roll we need to stop the tracing on the sword as this will not get called if the attack animation doesnt complete
+	StopAttackingTrace();
+	
 }
 
 void UMeleeAnimInstance::Reset()
 {
-	//AXBaseCharacter* CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
-	
-	ASPlayer* CharacterPawn = Cast<ASPlayer>(TryGetPawnOwner());
-	
-	if (CharacterPawn)
-	{
-		//Clears array
-		StopAttack();
-		//Player->SetCanJump(true);
-
-		//If not rolling play unequip animation
-		if (CharacterPawn->GetIsRolling() == false)
-		{
-			CharacterPawn->SwitchStats(EPlayerStates::PS_Passive);
-		}
-
-		CharacterPawn->CharacterEquipment.CurrentWeapon->StopAttack();
-	}
 
 	ComboCounter = 0;
+	GetWorld()->GetTimerManager().ClearTimer(ComboTimerHandle);
 	
+}
+
+void UMeleeAnimInstance::ResetStance()
+{
+
+	GetWorld()->GetTimerManager().ClearTimer(ResetStanceHandle);
+
+	ASPlayer* CharacterPawn = Cast<ASPlayer>(TryGetPawnOwner());
+
+	if (CharacterPawn)
+	{
+		CharacterPawn->SwitchStats(EPlayerStates::PS_Passive);
+	}
 }
 
 void UMeleeAnimInstance::StopAttack()
@@ -197,7 +190,7 @@ void UMeleeAnimInstance::ChangeDirection()
 	}
 }
 
-
+/*This is called in the blurptint notifiy when to stop tracing when it gets to a certain point in the attack animation */
 void UMeleeAnimInstance::StopAttackingTrace()
 {
 
@@ -214,7 +207,7 @@ void UMeleeAnimInstance::StopAttackingTrace()
 	}
 }
 
-
+/*This is called in the blurptint notifiy when to start tracing when it gets to a certain point in the attack animation */
 void UMeleeAnimInstance::StartAttackingTrace()
 {
 	

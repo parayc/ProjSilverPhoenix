@@ -10,6 +10,7 @@
 #include "MeleeAnimInstance.h"
 #include "ProjSilverPhonex.h"
 #include "BaseWeapon.h"
+#include "Components/CapsuleComponent.h"
 
 ASPlayer::ASPlayer()
 {
@@ -31,7 +32,10 @@ ASPlayer::ASPlayer()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
-	UE_LOG(LogTemp, Warning, TEXT("Contrsuct"))
+
+	
+
+	
 }
 
 void ASPlayer::BeginPlay()
@@ -234,12 +238,19 @@ bool ASPlayer::GetIsDoubleJumping() const
 
 
 
+void ASPlayer::RollCoolDown()
+{
+	RollCounter = 0;
+	GetWorldTimerManager().ClearTimer(RollCoolDownHandle);
+}
+
 void ASPlayer::StartRoll()
 {
-	if (bCanRoll)
+	if (bCanRoll && RollCounter < MaxAmountPlayerCanRoll)
 	{
 		bIsRolling = true;
 		SetCanRoll(false);
+		RollCounter++;
 		RollDircetion();
 
 	}
@@ -247,9 +258,11 @@ void ASPlayer::StartRoll()
 
 void ASPlayer::EndRoll()
 {
+	CombatStates->SetBattleState(EBattleState::PS_Normal);
 	bIsRolling = false;
-	bCanRoll = true;
+	SetCanRoll(true);
 	GetWorldTimerManager().ClearTimer(RollResetHandle);
+	GetWorld()->GetTimerManager().SetTimer(RollResetHandle, this, &ASPlayer::RollCoolDown, RollCooldownTimer, false);
 }
 
 void ASPlayer::RollDircetion()
@@ -260,6 +273,11 @@ void ASPlayer::RollDircetion()
 	//Check if roll animation is set 
 	if (!ensure(ForwardRoll) || !ensure(BackwardRoll) || !ensure(RightRoll) || !ensure(LeftRoll)) { return; }
 
+
+	if (CombatStates)
+	{
+		CombatStates->SetBattleState(EBattleState::PS_Invincible);
+	}
 	
 	float Duration = 0.f;
 	if (!GetIsLockedOn())
@@ -299,17 +317,16 @@ void ASPlayer::RollDircetion()
 			//Play backward montage
 			Duration = AnimInst->PlayAnimation(BackwardRoll);
 		}
-		//TODO - if is rolling stop player from unequip with bool
+		
 	}
 
-	//switchstate back to passive 
-	//SwitchStats(EPlayerStates::PS_Passive);
-	//reset combo and stop weapon trace
 
-	//TODO - Stop player from attacking when rolling
-	GetWorld()->GetTimerManager().SetTimer(RollResetHandle, this, &ASPlayer::EndRoll, Duration - 0.4f, false);
-	AnimInst->StopAttackingTrace();
-	AnimInst->Reset();
+
+	/*This calls the method once the animation is played*/
+	GetWorld()->GetTimerManager().SetTimer(RollResetHandle, this, &ASPlayer::EndRoll, Duration - 0.3f, false);
+
+	AnimInst->ResetComboAttack();
+	
 
 }
 
@@ -548,8 +565,8 @@ bool ASPlayer::GetIsLockedOn() const
 
 void ASPlayer::Attack()
 {
-
-	if (GetIsRolling() == true) { return; }//If Player is rolling they cant attack 
+	//Stop the player from attacking if rolling
+	if (GetIsRolling() == true) { return; }
 	if (CharacterEquipment.CurrentWeapon)
 	{
 		CharacterEquipment.CurrentWeapon->StartAttack();
@@ -565,34 +582,15 @@ void ASPlayer::Attack()
 	}
 }
 
-//TODO - Remove
-void ASPlayer::LightAttack()
-{
-	if (CharacterEquipment.CurrentWeapon)
-	{
-		if (GetIsRolling() == true) { return; }//If Player is rolling they cant attack 
-
-		if (EPlayerStates::PS_Passive == CurrentPlayerState)
-		{
-			//When we attack we go into combat state
-			SwitchStats(EPlayerStates::PS_Combat);
-			//When we attack, attach sword to hand
-			AttachWeaponToSocket();
-
-			
-		}
-
-		UMeleeAnimInstance* AnimInstance = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
-		AnimInstance->Attack(EAttackType::PS_Light);
-	}
-}
 
 void ASPlayer::OnDeath()
 {
 	Super::OnDeath();
+	OnDeathRequest.Broadcast();
+	LockOff();
 	auto playerController = Cast<APlayerController>(this->GetController());
 	DisableInput(playerController);
-	OnDeathRequest.Broadcast();
+	
 }
 
 void ASPlayer::HeavyAttack()

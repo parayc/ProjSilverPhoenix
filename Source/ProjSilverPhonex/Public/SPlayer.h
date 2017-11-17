@@ -83,6 +83,8 @@ public:
 	
 	/*Rolling*/
 
+	void RollCoolDown();
+
 	void StartRoll();
 
 	void EndRoll();
@@ -120,14 +122,11 @@ public:
 
 	void Attack();
 
-	void LightAttack();
-
 	void HeavyAttack();
 
 	void SetCanAttack(bool NewState);
 
 	UCameraComponent* GetCamera();
-
 
 	virtual void OnDeath() override;
 
@@ -158,6 +157,18 @@ private:
 	FTimerHandle JumpResetHandle;
 
 	FTimerHandle DJumpResetHandle;
+
+	FTimerHandle RollCoolDownHandle;
+
+	
+	int RollCounter = 0;
+	/*This is the maximum amount the player can roll immediately after they performed a roll*/
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | Movement")
+	int MaxAmountPlayerCanRoll = 2;
+
+	/*This is the cooldown length once the player has reached the max time they can roll*/
+	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | Movement")
+		float RollCooldownTimer = 5.f;
 
 	int JumpCounter = 0;
 

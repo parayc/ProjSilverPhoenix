@@ -10,6 +10,7 @@
 #include "XBaseCharacter.h"
 #include "SPlayer.h"
 #include "SPGameInstance.h"
+#include "Components/CapsuleComponent.h"
 
 
 // Sets default values
@@ -89,18 +90,32 @@ void AEnemyMaster::Tick(float DeltaTime)
 }
 
 
+void AEnemyMaster::HandleDeath()
+{
+	GetWorld()->GetTimerManager().ClearTimer(DeathTimerHandle);
+	Destroy();
+}
+
 //TODO - Pass a reference of the person who killed them 
 void AEnemyMaster::OnDeath() 
 {
 	Super::OnDeath();
 
-
 	USPGameInstance* GameInstance = Cast<USPGameInstance>(GetGameInstance());
+
+	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 
 	if (GameInstance)
 	{
 		GameInstance->AddExpPoints(Exp);
 	}
+
+	if (GetController())
+	{
+		GetController()->UnPossess();
+	}
+	
 
 	auto* Player = Cast<ASPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
@@ -110,7 +125,8 @@ void AEnemyMaster::OnDeath()
 		Player->FindLockOnTargets();
 	}
 
-	Destroy();
+	GetWorld()->GetTimerManager().SetTimer(DeathTimerHandle, this, &AEnemyMaster::HandleDeath, 10.0f, false);
+
 }
 
 void AEnemyMaster::SetTargetIconDirection()

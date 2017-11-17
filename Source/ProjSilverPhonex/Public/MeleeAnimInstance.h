@@ -30,9 +30,11 @@ public:
 
 	void PlayCombo(EAttackType AttackType);
 	
-	void ComboReset();
+	void ResetComboAttack();
 
 	void Reset();
+
+	void ResetStance();
 
 	//Resets the array hit list a
 	UFUNCTION(BlueprintCallable, Category = "WeaponSetup")
@@ -56,6 +58,8 @@ public:
 private:
 
 	FTimerHandle ComboTimerHandle;
+
+	FTimerHandle ResetStanceHandle;
 
 	int ComboCounter = 0;
 

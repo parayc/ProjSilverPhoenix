@@ -12,6 +12,7 @@ class UWidgetComponent;
 class UStaticMeshComponent;
 class UPawnSensingComponent;
 class UBehaviorTree;
+class UAnimMontage;
 //class UCombatComponent;
 
 UCLASS()
@@ -42,8 +43,10 @@ public:
 	UPROPERTY(VisibleAnywhere, Category = "Setup")
 	UPawnSensingComponent* PawnSensingComp;
 
-
+	FTimerHandle DeathTimerHandle;
 	virtual void OnDeath() override;
+
+	void HandleDeath();
 
 	void SetTargetIconDirection();
 

@@ -83,9 +83,12 @@ public:
 	UPROPERTY(BlueprintReadWrite)
 	FCharacterEquipment CharacterEquipment;
 
-	bool GetIsDead();
+	UFUNCTION(BlueprintCallable, Category = "Animations")
+	bool GetIsDead() const;
 
 	virtual void OnDeath();
+
+	int32 GetTeamNumber();
 
 	
 
@@ -113,10 +116,10 @@ protected:
 
 private:
 
+	UPROPERTY(Category = "SetUp", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		int32 TeamNumber = 0;
+
 	bool bIsDead = false;
-
-	UAnimMontage* DeathMontage;
-
 
 
 };

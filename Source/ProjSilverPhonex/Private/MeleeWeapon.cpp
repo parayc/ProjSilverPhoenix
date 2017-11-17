@@ -102,20 +102,29 @@ void AMeleeWeapon::AttackTrace()
 	//DrawDebugLine(GetWorld(), curBase, curTip, FColor::Green, false, 1 / 15.0f * 2);
 }
 
+void AMeleeWeapon::SetDamage(int32 Value)
+{
+	Damage = Value;
+}
+
 void AMeleeWeapon::DealDamage(const FHitResult & HitResult)
 {
 	AXBaseCharacter* Enemy = Cast<AXBaseCharacter>(HitResult.GetActor());
+
 	if (Enemy)
 	{
-		float DealtDamage = Damage;//Later maybe damage multipler 
+		if (Enemy->GetTeamNumber() != MyPawn->GetTeamNumber())
+		{
+			float DealtDamage = Damage;//Later maybe damage multipler 
 
-		FPointDamageEvent DamageEvent;
-		DamageEvent.Damage = DealtDamage;
-		DamageEvent.HitInfo = HitResult;
-		//TODO - REFACTOR
-		Enemy->TakeDamage(DealtDamage, DamageEvent, Instigator->GetController(), MyPawn);
-		UE_LOG(LogTemp, Warning, TEXT("Enemy: %s"), *Enemy->GetName());
-
+			FPointDamageEvent DamageEvent;
+			DamageEvent.Damage = DealtDamage;
+			DamageEvent.HitInfo = HitResult;
+			//TODO - REFACTOR
+			Enemy->TakeDamage(DealtDamage, DamageEvent, Instigator->GetController(), MyPawn);
+			//UE_LOG(LogTemp, Warning, TEXT("Enemy: %s"), *Enemy->GetName());
+		}
+	
 	}
 }
 
