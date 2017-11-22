@@ -31,7 +31,7 @@ EBTNodeResult::Type UAttackTask::ExecuteTask(UBehaviorTreeComponent & OwnerComp,
 
 		
 	}
-	UE_LOG(LogTemp, Warning, TEXT("In Progress"));
+	
 	return EBTNodeResult::InProgress;
 	
 }

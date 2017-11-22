@@ -51,7 +51,7 @@ private:
 	ASKFootSoldier();
 
 	UPROPERTY(EditDefaultsOnly, Category = "SetUp")
-	USphereComponent* BattleCircle;
+	USphereComponent* AttackSphere;
 
 	bool bIsAttacking = false;
 

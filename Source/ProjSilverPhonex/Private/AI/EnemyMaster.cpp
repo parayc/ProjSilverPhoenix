@@ -75,18 +75,20 @@ void AEnemyMaster::Tick(float DeltaTime)
 
 
 	/* Check if the last time we sensed a player is beyond the time out value to prevent from endlessly following a player. */
-	if (bSensedTarget && (GetWorld()->TimeSeconds - LastSeenTime) > SenseTimeOut)
+	if (bSensedTarget && (GetWorld()->TimeSeconds - LastSeenTime) > SenseTimeOut && !GetIsDead())
 	{
 		AEnemyAIController* AIController = Cast<AEnemyAIController>(GetController());
 		if (AIController)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Reset"))
 			bSensedTarget = false;
 			/* Reset */
 			AIController->SetSeenTarget(nullptr);
+			
 
 		}
 	}
+
+	
 }
 
 
@@ -96,7 +98,6 @@ void AEnemyMaster::HandleDeath()
 	Destroy();
 }
 
-//TODO - Pass a reference of the person who killed them 
 void AEnemyMaster::OnDeath() 
 {
 	Super::OnDeath();
@@ -115,7 +116,6 @@ void AEnemyMaster::OnDeath()
 	{
 		GetController()->UnPossess();
 	}
-	
 
 	auto* Player = Cast<ASPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
@@ -144,7 +144,7 @@ void AEnemyMaster::SetTargetIconDirection()
 }
 
 //TODO - Chnage name of function
-void AEnemyMaster::SetTargetHidden(bool NewState)
+void AEnemyMaster::SetTargetIconVisibility(bool NewState)
 {
 	TargetIcon->SetHiddenInGame(NewState);
 }
@@ -159,14 +159,15 @@ void AEnemyMaster::OnseePlayer(APawn * pawn)
 		bSensedTarget = true;
 
 		ASPlayer* player = Cast<ASPlayer>(pawn);
-		if (player && !player->GetIsDead())
+		if (player && !player->GetIsDead() && GetIsDead() == false)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("See some one"))
 			AIController->SetSeenTarget(pawn);
+			UE_LOG(LogTemp, Warning, TEXT("see you"))
 		}
 		else
 		{
 			AIController->SetSeenTarget(nullptr);
+			UE_LOG(LogTemp, Warning, TEXT("set null"))
 		}
 		
 

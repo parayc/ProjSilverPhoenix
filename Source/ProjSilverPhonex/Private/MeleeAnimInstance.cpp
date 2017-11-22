@@ -23,9 +23,6 @@ void UMeleeAnimInstance::Attack(EAttackType AttackType)
 
 	if (CharacterPawn && Melee2)
 	{
-	//	CharacterPawn->SetCanJump(false);
-		//TODO - Change behaviour
-		//CharacterPawn->CharacterEquipment.CurrentWeapon->StartAttack();
 
 		if (AttackType == EAttackType::PS_Light)
 		{
@@ -247,57 +244,3 @@ float UMeleeAnimInstance::PlayAnimation(UAnimMontage * Animation, float InPlayRa
 	return Duration;
 }
 
-
-
-//UE_LOG(LogTemp, Warning, TEXT("PlayCombo"));
-//if (Player)
-//{
-//	TArray<FWeaponAnimation> Montages;
-//	if (AttackType == EAttackType::PS_Light)
-//	{
-//		//
-//		//	UE_LOG(LogTemp, Warning, TEXT("Montage light"));
-//		Montages = Melee->GetLightAttackMontages();
-//	}
-//	else if (AttackType == EAttackType::PS_Heavy)
-//	{
-//		Montages = Melee->GetHeavyAttackMontages();
-//	}
-
-//	if (0 == Montages.Num()) { return; }
-
-//	//Can have a loop - instead mutiple ifs
-//	// ComboCounter == 0 - This bypass the base cass
-//	if (bAcceptNextCombo || ComboCounter == 0)
-//	{
-
-//		if (ComboCounter < Montages.Num())
-//		{
-//			//0 != Montages.Num() &&
-//			//UE_LOG(LogTemp, Warning, TEXT("Counter: %d"), ComboCounter);
-//			if (Montages[ComboCounter].LaunchCharacter)
-//			{
-//				//Launch Character
-//				Player->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-//			}
-//			else
-//			{
-//				Player->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-//			}
-
-//			//Clear array before each attack
-//			Melee->ClearEnemiesHitArray();//Clears array
-
-//									  // change direction after each attack montage
-//			ChangeDirection();
-//			//StartAttackingTrace();
-
-//			//Play appropriate animations 
-//			//Weapon->PlayWeaponAnimation(Montages[ComboCounter].MeleeAttackMontages);
-//			PlayAnimation(Montages[ComboCounter].MeleeAttackMontages);
-//			ComboCounter++;
-//			bAcceptNextCombo = false;//Stops the player from attacking again straight away
-//		}
-
-//	}
-//}

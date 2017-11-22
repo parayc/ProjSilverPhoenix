@@ -50,7 +50,7 @@ public:
 
 	void SetTargetIconDirection();
 
-	void SetTargetHidden(bool NewState);
+	void SetTargetIconVisibility(bool NewState);
 
 	
 

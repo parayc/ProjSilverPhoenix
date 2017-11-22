@@ -13,8 +13,8 @@
 ASKFootSoldier::ASKFootSoldier()
 {
 
-	BattleCircle = CreateDefaultSubobject<USphereComponent>(TEXT("BattleCircle"));
-	BattleCircle->SetupAttachment(RootComponent);
+	AttackSphere = CreateDefaultSubobject<USphereComponent>(TEXT("BattleCircle"));
+	AttackSphere->SetupAttachment(RootComponent);
 }
 
 void ASKFootSoldier::SetIsAttacking(bool NewState)
@@ -32,11 +32,11 @@ void ASKFootSoldier::BeginPlay()
 {
 	Super::BeginPlay();
 
-		if (BattleCircle)
+		if (AttackSphere)
 		{
 			
-			BattleCircle->OnComponentBeginOverlap.AddDynamic(this, &ASKFootSoldier::OnEnemyEnterDamageBox);
-			BattleCircle->OnComponentEndOverlap.AddDynamic(this, &ASKFootSoldier::OnEnemyLeavesDamageBox);
+			AttackSphere->OnComponentBeginOverlap.AddDynamic(this, &ASKFootSoldier::OnEnemyEnterDamageBox);
+			AttackSphere->OnComponentEndOverlap.AddDynamic(this, &ASKFootSoldier::OnEnemyLeavesDamageBox);
 		}
 		
 }

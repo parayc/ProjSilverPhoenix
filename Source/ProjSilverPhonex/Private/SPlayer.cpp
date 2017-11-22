@@ -397,7 +397,7 @@ void ASPlayer::CheckTargetsWithinSight(TArray<FHitResult> ActorsHit)
 	//Checks if target list is empty, if not set thr first target icon visible 
 	if (LockOnListTarget.Num() > 0)
 	{
-		LockOnListTarget[0]->SetTargetHidden(false);
+		LockOnListTarget[0]->SetTargetIconVisibility(false);
 		//UE_LOG(LogTemp, Warning, TEXT("SetTargetIcon"))
 	}
 }
@@ -480,7 +480,7 @@ void ASPlayer::LockOff()
 		if (LockOnListTarget[TargetIndex] != nullptr)
 		{
 			//Remove the target icon 
-			LockOnListTarget[TargetIndex]->SetTargetHidden(true);
+			LockOnListTarget[TargetIndex]->SetTargetIconVisibility(true);
 		}
 
 		//Empty the array
@@ -502,19 +502,19 @@ void ASPlayer::NextTarget()
 		//Remove the current target icon 
 		if (LockOnListTarget[TargetIndex])
 		{
-			LockOnListTarget[TargetIndex]->SetTargetHidden(true);
+			LockOnListTarget[TargetIndex]->SetTargetIconVisibility(true);
 		}
 
 		//set the new icon 
 		if (TargetIndex == LockOnListTarget.Num() - 1)
 		{
 			TargetIndex = 0;
-			LockOnListTarget[TargetIndex]->SetTargetHidden(false);
+			LockOnListTarget[TargetIndex]->SetTargetIconVisibility(false);
 		}
 		else
 		{
 			TargetIndex++;
-			LockOnListTarget[TargetIndex]->SetTargetHidden(false);
+			LockOnListTarget[TargetIndex]->SetTargetIconVisibility(false);
 		}
 	}
 }
@@ -527,18 +527,18 @@ void ASPlayer::PrevTarget()
 	{
 
 		//Remove the current target icon 
-		LockOnListTarget[TargetIndex]->SetTargetHidden(true);
+		LockOnListTarget[TargetIndex]->SetTargetIconVisibility(true);
 
 		//if at the start of the list go to the end of the list 
 		if (LockOnListTarget[TargetIndex] == LockOnListTarget[0])
 		{
 			TargetIndex = LockOnListTarget.Num() - 1;
-			LockOnListTarget[TargetIndex]->SetTargetHidden(false);
+			LockOnListTarget[TargetIndex]->SetTargetIconVisibility(false);
 		}
 		else
 		{
 			TargetIndex--;
-			LockOnListTarget[TargetIndex]->SetTargetHidden(false);
+			LockOnListTarget[TargetIndex]->SetTargetIconVisibility(false);
 		}
 	}
 }

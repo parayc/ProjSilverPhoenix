@@ -40,8 +40,6 @@ void AMeleeWeapon::BeginPlay()
 
 void AMeleeWeapon::StartAttack()
 {
-	//bool does nothing!!!
-	//bIsAttacking = true;
 
 	UMeleeAnimInstance* AnimInstance = Cast<UMeleeAnimInstance>(MyPawn->GetMesh()->GetAnimInstance());
 	AnimInstance->Attack(EAttackType::PS_Light);
@@ -120,7 +118,7 @@ void AMeleeWeapon::DealDamage(const FHitResult & HitResult)
 			FPointDamageEvent DamageEvent;
 			DamageEvent.Damage = DealtDamage;
 			DamageEvent.HitInfo = HitResult;
-			//TODO - REFACTOR
+
 			Enemy->TakeDamage(DealtDamage, DamageEvent, Instigator->GetController(), MyPawn);
 			//UE_LOG(LogTemp, Warning, TEXT("Enemy: %s"), *Enemy->GetName());
 		}
