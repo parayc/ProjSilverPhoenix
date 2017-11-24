@@ -162,12 +162,11 @@ void AEnemyMaster::OnseePlayer(APawn * pawn)
 		if (player && !player->GetIsDead() && GetIsDead() == false)
 		{
 			AIController->SetSeenTarget(pawn);
-			UE_LOG(LogTemp, Warning, TEXT("see you"))
 		}
 		else
 		{
 			AIController->SetSeenTarget(nullptr);
-			UE_LOG(LogTemp, Warning, TEXT("set null"))
+		
 		}
 		
 

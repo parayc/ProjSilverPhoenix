@@ -17,6 +17,8 @@ EBTNodeResult::Type UAttackTask::ExecuteTask(UBehaviorTreeComponent & OwnerComp,
 
 	if (Weapon)
 	{
+
+		Weapon->SetLastSokcetFrame();
 		auto length = Weapon->GetLightAttackMontages().Num();
 
 		auto RanValue = FMath::RandRange(0, length - 1);

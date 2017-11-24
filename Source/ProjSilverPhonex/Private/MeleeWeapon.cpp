@@ -12,6 +12,9 @@ AMeleeWeapon::AMeleeWeapon()
 {
 	SwordTrail = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("SpawnTrail"));
 	SwordTrail->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
+
+	TraceParams = new FCollisionQueryParams();
 }
 
 void AMeleeWeapon::Tick(float DeltaTime)
@@ -20,7 +23,7 @@ void AMeleeWeapon::Tick(float DeltaTime)
 	
 	if (bIsAttackTrace)
 	{
-		AttackTrace();	
+		TraceSwing();
 	}
 
 
@@ -43,6 +46,9 @@ void AMeleeWeapon::StartAttack()
 
 	UMeleeAnimInstance* AnimInstance = Cast<UMeleeAnimInstance>(MyPawn->GetMesh()->GetAnimInstance());
 	AnimInstance->Attack(EAttackType::PS_Light);
+
+	SetLastSokcetFrame();
+
 }
 
 void AMeleeWeapon::StopAttack()
@@ -50,29 +56,32 @@ void AMeleeWeapon::StopAttack()
 	bIsAttacking = false;
 }
 
-void AMeleeWeapon::AttackTrace()
+void AMeleeWeapon::TraceSwing()
 {
+
 	FHitResult HitResult;
-
-	FVector curBase = WeaponMesh->GetSocketLocation(SocketBase), curTip = WeaponMesh->GetSocketLocation(SocketTip);
-	const int sub = 20;
-	float curLength = (curBase - curTip).Size();
-	float prevLength = (prevBase - prevTip).Size();
-
-	FCollisionQueryParams* TraceParams = new FCollisionQueryParams();
 	TraceParams->AddIgnoredActor(Instigator);
+	FVector TraceStart, TraceEnd;
 
 
-	for (int i = 1; i < sub; i++)
+	StartSocket = WeaponMesh->GetSocketLocation(SocketBase);
+	EndSocket = WeaponMesh->GetSocketLocation(SocketTip);
+
+	for (int i = 0; i < AmountToTrace; i++)
 	{
-		FVector tmpBase = FMath::Lerp(curBase, prevBase, i / float(sub));
-		FVector tmpTip = FMath::Lerp(curTip, prevTip, i / float(sub));
-		FVector tmpOff = (tmpTip - tmpBase);
-		tmpOff.Normalize();
-		//DrawDebugLine(GetWorld(), tmpBase, tmpBase + tmpOff*FMath::Lerp(curLength, prevLength, i / float(sub)), FColor::Red, false, 1 / 15.0f * 2);
-	
-		if (GetWorld()->LineTraceSingleByChannel(HitResult, tmpBase, tmpBase + tmpOff*FMath::Lerp(curLength, prevLength, i / float(sub)), ECC_Weapon, *TraceParams))
+
+		TraceStart = FMath::Lerp(StartSocket, EndSocket, i / AmountToTrace);
+		TraceEnd = FMath::Lerp(LastFrameStartSocket, LastFrameEndSocket, i / AmountToTrace);
+
+		if (bDrawDebugLines)
 		{
+			DrawDebugLine(Instigator->GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 5, 0, 2.0);
+		}
+		
+
+		if (GetWorld()->LineTraceSingleByChannel(HitResult,TraceStart,TraceEnd,ECC_Weapon,TraceParams))
+		{
+		
 
 			AXBaseCharacter* Enemy = Cast<AXBaseCharacter>(HitResult.GetActor());
 			//UE_LOG(LogTemp, Warning, TEXT("Enemy: %s"), *HitResult.GetActor()->GetName());
@@ -82,23 +91,25 @@ void AMeleeWeapon::AttackTrace()
 				//Only add enemy to array if not in array
 				if (!EnemiesHit.Contains(Enemy))
 				{
-					
 
-					//Add to array
+					
 					EnemiesHit.Add(Enemy);
-					//Deal damage to enemy
+					//Deal damage to enemy that was added
 					DealDamage(HitResult);
 
 				}
-				//DrawDebugLine(GetWorld(), tmpBase, tmpBase + tmpOff*FMath::Lerp(curLength, prevLength, i / float(sub)), FColor::Red, false, 1 / 15.0f * 2);
+			
 			}
-
 		}
+
 	}
-	prevBase = curBase;
-	prevTip = curTip;
-	//DrawDebugLine(GetWorld(), curBase, curTip, FColor::Green, false, 1 / 15.0f * 2);
+
+	/* Store the location of the previous frame*/
+	LastFrameStartSocket = StartSocket;
+	LastFrameEndSocket = EndSocket;
 }
+
+
 
 void AMeleeWeapon::SetDamage(int32 Value)
 {
@@ -129,6 +140,12 @@ void AMeleeWeapon::DealDamage(const FHitResult & HitResult)
 bool AMeleeWeapon::GetIsAttcking()
 {
 	return bIsAttacking;
+}
+
+void AMeleeWeapon::SetLastSokcetFrame()
+{
+	LastFrameStartSocket = WeaponMesh->GetSocketLocation(SocketBase);
+	LastFrameEndSocket = EndSocket = WeaponMesh->GetSocketLocation(SocketTip);
 }
 
 void AMeleeWeapon::StartTraceAttack()
@@ -172,5 +189,6 @@ void AMeleeWeapon::SetSwordTrailVisibility(bool NewState)
 	}
 
 }
+
 
 

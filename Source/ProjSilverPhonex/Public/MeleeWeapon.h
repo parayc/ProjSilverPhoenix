@@ -45,7 +45,7 @@ public:
 
 	virtual void StopAttack() override;
 
-	void AttackTrace();
+
 
 	void SetDamage(int32 Value);
 
@@ -53,6 +53,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 	bool GetIsAttcking();
+
+	void SetLastSokcetFrame();
 
 	//Starts weapons line trace 
 	void StartTraceAttack();
@@ -75,6 +77,8 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FX")
 	UParticleSystemComponent* SwordTrail;
 
+	void TraceSwing();
+
 protected:
 
 	// Called when the game starts or when spawned
@@ -88,6 +92,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 		FName SocketTip;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+		bool bDrawDebugLines = false;
 
 	UPROPERTY()
 		bool bIsAttacking = false;
@@ -109,6 +116,21 @@ private:
 	FVector prevBase;
 
 	FVector prevTip;
+
+	/*These hold the location of the sockets on the previous frame*/
+	FVector LastFrameStartSocket;
+	FVector LastFrameEndSocket;
+
+	/*The location of the sockets when the swing begun*/
+	FVector StartSocket;
+	FVector EndSocket;
+
+	/* how many traces this weapon will do per swing*/
+	UPROPERTY(EditAnywhere, Category = Trace)
+	float AmountToTrace = 5;
+
+
+	FCollisionQueryParams* TraceParams;
 
 	//UPROPERTY(EditDefaultsOnly, Category = "SetUp")
 	int32 Damage = 0;

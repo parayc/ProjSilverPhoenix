@@ -17,9 +17,16 @@ UInventoryComponent::UInventoryComponent()
 	InventorySlots.SetNum(NumberOfSlots);
 }
 
+
+
 TArray<FInventorySlots> UInventoryComponent::GetInventorySlots() const
 {
 	return InventorySlots;
+}
+
+int32 UInventoryComponent::GetNumberOfSlots() const
+{
+	return NumberOfSlots;
 }
 
 
@@ -328,7 +335,8 @@ void UInventoryComponent::BeginPlay()
 {
 	Super::BeginPlay();
 
-	// ...
+	//Set the size of array
+	InventorySlots.SetNum(NumberOfSlots);
 	
 }
 

@@ -50,6 +50,10 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	TArray<FInventorySlots> GetInventorySlots() const;
 	/*The Number of items the inventory can hold*/
+
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	int32 GetNumberOfSlots() const;
+
 	UPROPERTY(EditAnywhere)
 	int32 NumberOfSlots = 10;
 
