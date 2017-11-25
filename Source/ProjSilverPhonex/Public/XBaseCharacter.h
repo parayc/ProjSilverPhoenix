@@ -18,7 +18,7 @@ struct FCharacterEquipment
 	GENERATED_USTRUCT_BODY()
 
 		UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "Plyaer")
-		class ABaseWeapon* CurrentWeapon;
+		class ABaseWeapon* CurrentWeapon = nullptr;
 
 };
 
@@ -48,6 +48,8 @@ protected:
 	TSubclassOf<class ABaseWeapon> StartingWeaponBlueprint;
 
 public:	
+
+	void AddWeaponToInventory(ABaseWeapon* Weapon);
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
@@ -75,7 +77,7 @@ public:
 	/** Applies damage to the character */
 	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
-	void AddWeaponToOnventory(class ABaseWeapon* NewWeapon);
+	void AddWeaponToCharacterEquipment(class ABaseWeapon* NewWeapon);
 
 	UFUNCTION(BlueprintCallable, Category = "Animations")
 	void AttachWeaponToSocket();

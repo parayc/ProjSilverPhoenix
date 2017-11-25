@@ -10,20 +10,16 @@ ABaseItem::ABaseItem()
 {
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
-	ItemStaticMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Mesh"));
-	RootComponent = ItemStaticMesh;
-	
-	PickUpSphere = CreateDefaultSubobject<USphereComponent>(TEXT("PickUpSphere"));
-	PickUpSphere->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
+
 }
 
-
-void ABaseItem::UseItem()
+/*This will call broadcast the event in each blueprint item */
+void ABaseItem::UseItem(AActor* Owner)
 {
 	
 	InventoryRef->RemoveItemFromIndex(Index, 1);
 	OnUseItemRequest.Broadcast();
-	Destroy();//TODO - update to support items we dont want to destroy once we used it
+
 }
 
 
@@ -39,7 +35,6 @@ void ABaseItem::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	
-	auto Speed = DeltaTime * 90;
-	ItemStaticMesh->AddRelativeRotation(FRotator(0, Speed, 0));
+	
 }
 

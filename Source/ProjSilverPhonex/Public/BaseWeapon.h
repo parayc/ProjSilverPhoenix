@@ -3,13 +3,13 @@
 #pragma once
 
 #include "CoreMinimal.h"
-#include "GameFramework/Actor.h"
+#include "BaseItem.h"
 #include "BaseWeapon.generated.h"
 
 class AXBaseCharacter;
 
 UCLASS()
-class PROJSILVERPHONEX_API ABaseWeapon : public AActor
+class PROJSILVERPHONEX_API ABaseWeapon : public ABaseItem
 {
 	GENERATED_BODY()
 	
@@ -34,6 +34,8 @@ public:
 	virtual void StartAttack();
 
 	virtual void StopAttack();
+
+	virtual void UseItem(AActor* Owner) override;
 
 	void UnEquip();
 

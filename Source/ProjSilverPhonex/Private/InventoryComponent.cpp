@@ -188,6 +188,8 @@ void UInventoryComponent::RemoveItemFromIndex(int32 Index, int32 AmountToRemove)
 			InventorySlots[Index].Amount = InventorySlots[Index].Amount - AmountToRemove;
 			OnUpdateRequest.Broadcast(Index);
 		}
+
+		//TODO - Check whether to spawn item or delete it when removing ti from inventory 
 	}
 }
 
@@ -250,8 +252,9 @@ void UInventoryComponent::UseItemAtIndex(int32 Index)
 		ABaseItem* ItemSpawned = GetWorld()->SpawnActor<ABaseItem>(InventorySlots[Index].ItemClass, FVector(0, 0, -500), FRotator(0, 0, -500));
 		ItemSpawned->InventoryRef = this;
 		ItemSpawned->Index = Index;
+		//Set the items owner of the person who spawned the item 
 		
-		ItemSpawned->UseItem();
+		ItemSpawned->UseItem(GetOwner());
 	}
 }
 

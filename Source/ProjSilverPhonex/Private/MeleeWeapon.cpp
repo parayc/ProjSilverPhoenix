@@ -14,7 +14,7 @@ AMeleeWeapon::AMeleeWeapon()
 	SwordTrail->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
 
-	TraceParams = new FCollisionQueryParams();
+	
 }
 
 void AMeleeWeapon::Tick(float DeltaTime)
@@ -39,6 +39,8 @@ void AMeleeWeapon::BeginPlay()
 		SwordTrail->BeginTrails(SocketBase, SocketTip, ETrailWidthMode::ETrailWidthMode_FromCentre, 1.f);
 		SetSwordTrailVisibility(false);
 	}
+
+	
 }
 
 void AMeleeWeapon::StartAttack()
@@ -60,6 +62,7 @@ void AMeleeWeapon::TraceSwing()
 {
 
 	FHitResult HitResult;
+	FCollisionQueryParams*  TraceParams = new FCollisionQueryParams();
 	TraceParams->AddIgnoredActor(Instigator);
 	FVector TraceStart, TraceEnd;
 

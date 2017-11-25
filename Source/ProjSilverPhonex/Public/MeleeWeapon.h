@@ -104,13 +104,13 @@ private:
 
 		bool bIsAttackTrace = false;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Animations")
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 		TArray<FWeaponAnimation> LightAttackMontage;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Animations")
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 		TArray<FWeaponAnimation> HeavyAttackMontage;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Animations")
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 		TArray<FWeaponAnimation> AirAttackMontage;
 
 	FVector prevBase;
@@ -130,7 +130,7 @@ private:
 	float AmountToTrace = 5;
 
 
-	FCollisionQueryParams* TraceParams;
+	
 
 	//UPROPERTY(EditDefaultsOnly, Category = "SetUp")
 	int32 Damage = 0;

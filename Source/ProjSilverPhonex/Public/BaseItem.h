@@ -11,6 +11,15 @@ class USphereComponent;
 
 DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnUseItemRequest);
 
+
+UENUM(BlueprintType)
+enum class EItemTypes : uint8
+{
+	ET_Consumable UMETA(DisplayName = "Consumable"),
+	ET_QuestItem UMETA(DisplayName = "Quest Item"),
+	ET_Weapon UMETA(DisplayName = "Weapon")
+
+};
 /*Contain Inofrmation on what the item is */
 USTRUCT(BlueprintType)
 struct FItemInfo
@@ -22,6 +31,8 @@ struct FItemInfo
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText Description;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+	EItemTypes ItemTpe;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	UTexture2D* Icon;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	FText UseText;
@@ -29,6 +40,12 @@ struct FItemInfo
 	bool CanBeUsed;
 	UPROPERTY(EditAnywhere, BlueprintReadWrite)
 	bool CanBeStacked;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		UStaticMesh* PickUpMesh;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		FVector MeshScale = FVector(1.1);
+	UPROPERTY(EditAnywhere, BlueprintReadWrite)
+		float InteractRadius = 160;
 
 
 
@@ -51,15 +68,12 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnUseItemRequest OnUseItemRequest;
 
-	void UseItem();
+	//UFUNCTION(BlueprintCallable,BlueprintNativeEvent, Category = "UseItems")
+	virtual void UseItem(AActor* Owner);
 
 	UPROPERTY( BlueprintReadWrite, Category = "Inventory")
 	UInventoryComponent* InventoryRef = nullptr;
-	UPROPERTY(VisibleAnywhere)
-	UStaticMeshComponent* ItemStaticMesh;
-	UPROPERTY(VisibleAnywhere)
-	USphereComponent* PickUpSphere;
-
+	
 	int32 Index;
 
 protected:

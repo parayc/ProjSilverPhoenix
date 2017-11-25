@@ -2,6 +2,7 @@
 
 #include "BaseWeapon.h"
 #include "XBaseCharacter.h"
+#include "SPlayerController.h"
 
 
 // Sets default values
@@ -39,6 +40,28 @@ void ABaseWeapon::StartAttack()
 void ABaseWeapon::StopAttack()
 {
 
+}
+
+void ABaseWeapon::UseItem(AActor* Owner)
+{
+	Super::UseItem(Owner);
+	
+	auto controller = Cast<ASPlayerController>(Owner);
+	if (controller)
+	{
+		auto Player = Cast<AXBaseCharacter>(controller->GetPawn());
+		if (Player)
+		{
+			SetOwningPawn(Player);
+			Player->AddWeaponToCharacterEquipment(this);
+			UE_LOG(LogTemp, Warning, TEXT("Add weapon to hand"))
+		}
+	}
+	
+	
+	
+	
+	
 }
 
 void ABaseWeapon::SetOwningPawn(AXBaseCharacter* NewOwner)

@@ -5,7 +5,8 @@
 #include "CombatComponent.h"
 #include "MeleeAnimInstance.h"
 #include "SPlayer.h"
-
+#include "InventoryComponent.h"
+#include "SPlayerController.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -35,7 +36,7 @@ void AXBaseCharacter::BeginPlay()
 			GetMesh()->GetSocketLocation(WeaponSocketName),
 			GetMesh()->GetSocketRotation(WeaponSocketName));
 
-		AddWeaponToOnventory(Weapon);
+		AddWeaponToCharacterEquipment(Weapon);
 	}
 
 
@@ -154,7 +155,25 @@ bool AXBaseCharacter::IsFlinching() const
 	return CombatStates->GetIsFlinching();
 }
 
-void AXBaseCharacter::AddWeaponToOnventory(ABaseWeapon * NewWeapon)
+void AXBaseCharacter::AddWeaponToInventory(ABaseWeapon* Weapon)
+{
+	auto controller = Cast<ASPlayerController>(GetController());
+	if (controller)
+	{
+		auto Inventory = controller->FindComponentByClass<UInventoryComponent>();
+		if (!ensure(Inventory)) { return; }
+
+		if (Weapon)
+		{
+			Inventory->AddItem(Weapon->GetClass(), 1);
+			Weapon->Destroy();
+		}
+	}
+
+}
+
+
+void AXBaseCharacter::AddWeaponToCharacterEquipment(ABaseWeapon * NewWeapon)
 {
 
 	if (NewWeapon)
@@ -169,7 +188,17 @@ void AXBaseCharacter::AddWeaponToOnventory(ABaseWeapon * NewWeapon)
 		}
 
 		NewWeapon->SetOwningPawn(this);
+
+		//Add the existing weapon back to to the inventory
+		if (CharacterEquipment.CurrentWeapon != nullptr)
+		{
+			AddWeaponToInventory(CharacterEquipment.CurrentWeapon);
+		}
+
 		CharacterEquipment.CurrentWeapon = NewWeapon;
+		
+
+		
 	}
 }
 
