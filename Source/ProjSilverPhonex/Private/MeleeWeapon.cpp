@@ -127,7 +127,7 @@ void AMeleeWeapon::DealDamage(const FHitResult & HitResult)
 	{
 		if (Enemy->GetTeamNumber() != MyPawn->GetTeamNumber())
 		{
-			float DealtDamage = Damage;//Later maybe damage multipler 
+			float DealtDamage = Damage * DamageModifier;
 
 			FPointDamageEvent DamageEvent;
 			DamageEvent.Damage = DealtDamage;
@@ -166,6 +166,11 @@ void AMeleeWeapon::StopTraceAttack()
 void AMeleeWeapon::ClearEnemiesHitArray()
 {
 	EnemiesHit.Empty();
+}
+
+float AMeleeWeapon::GetDamageModifier() const
+{
+	return DamageModifier;
 }
 
 TArray<FWeaponAnimation> AMeleeWeapon::GetLightAttackMontages()

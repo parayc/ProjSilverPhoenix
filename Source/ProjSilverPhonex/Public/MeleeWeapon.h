@@ -45,8 +45,6 @@ public:
 
 	virtual void StopAttack() override;
 
-
-
 	void SetDamage(int32 Value);
 
 	void DealDamage(const FHitResult& HitResult);
@@ -65,6 +63,8 @@ public:
 	//Clears array
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 	void ClearEnemiesHitArray();
+	UFUNCTION(BlueprintCallable, Category = "Setup")
+	float GetDamageModifier() const;
 
 	TArray<FWeaponAnimation> GetLightAttackMontages();
 
@@ -86,7 +86,8 @@ protected:
 private:
 
 	TArray<AXBaseCharacter*> EnemiesHit;
-
+	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+		float DamageModifier = 1.0f;
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 		FName SocketBase;
 
