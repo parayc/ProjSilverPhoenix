@@ -15,6 +15,9 @@ Hack & Slash third person action game with roguelike elements.
 
 * Easy to use drag and drop inventory system
 
+* Lock on system: 
+  - The player can lock on to enemies and change their lock on target
+  
 * AI Minions with features
   - AI patrols around the map 
   - Chase the player until dead or lost out of sight for a duration
@@ -25,6 +28,7 @@ Hack & Slash third person action game with roguelike elements.
 * Item pickups
   - Health potion to restore players health
   - weapons which can be equiped from the inventory
+  - Extandable
 * Movement
   - 360 direction roll to dodge attacks
   -  Double Jump
