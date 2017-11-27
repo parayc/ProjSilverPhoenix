@@ -13,6 +13,7 @@
 class UAnimMontage;
 class UParticleSystemComponent;
 class AEnemyMaster;
+class USoundCue;
 
 USTRUCT(BlueprintType)
 struct FWeaponAnimation
@@ -63,6 +64,7 @@ public:
 	//Clears array
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 	void ClearEnemiesHitArray();
+
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 	float GetDamageModifier() const;
 
@@ -79,11 +81,23 @@ public:
 
 	void TraceSwing();
 
+	void PlaySound(USoundCue* Sound);
+
+	void SpawnHitEffext(FHitResult& Hit);
+
+	void ImpactNoise(FVector& PointOfImpact);
+
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "FX")
+		UParticleSystem* HitFX;
+
 protected:
 
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 private:
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
+	USoundCue* SwordImpactSound;
 
 	TArray<AXBaseCharacter*> EnemiesHit;
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")

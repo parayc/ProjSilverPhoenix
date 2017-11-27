@@ -7,6 +7,7 @@
 #include "XBaseCharacter.h"
 #include "DrawDebugHelpers.h"
 #include "MeleeAnimInstance.h"
+#include "Kismet/GameplayStatics.h"
 
 AMeleeWeapon::AMeleeWeapon()
 {
@@ -85,6 +86,7 @@ void AMeleeWeapon::TraceSwing()
 		if (GetWorld()->LineTraceSingleByChannel(HitResult,TraceStart,TraceEnd,ECC_Weapon,TraceParams))
 		{
 		
+			
 
 			AXBaseCharacter* Enemy = Cast<AXBaseCharacter>(HitResult.GetActor());
 			//UE_LOG(LogTemp, Warning, TEXT("Enemy: %s"), *HitResult.GetActor()->GetName());
@@ -94,7 +96,10 @@ void AMeleeWeapon::TraceSwing()
 				//Only add enemy to array if not in array
 				if (!EnemiesHit.Contains(Enemy))
 				{
-
+					if (HitResult.bBlockingHit)
+					{
+						SpawnHitEffext(HitResult);
+					}
 					
 					EnemiesHit.Add(Enemy);
 					//Deal damage to enemy that was added
@@ -110,6 +115,27 @@ void AMeleeWeapon::TraceSwing()
 	/* Store the location of the previous frame*/
 	LastFrameStartSocket = StartSocket;
 	LastFrameEndSocket = EndSocket;
+}
+
+void AMeleeWeapon::PlaySound(USoundCue * Sound)
+{
+	//UGameplayStatics::PlaySoundAtLocation(GetWorld(), Sound, Location, Rotation, 1, 1, 0);
+	//UGameplayStatics::SpawnSoundAttached(Sound, this->RootComponent);
+}
+
+void AMeleeWeapon::SpawnHitEffext(FHitResult& Hit)
+{
+	FVector Location = Hit.ImpactPoint;
+	FRotator Rotation = Hit.ImpactPoint.Rotation();
+	if (HitFX)
+	{
+		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitFX, Location, Rotation, true);
+	}
+}
+
+void AMeleeWeapon::ImpactNoise(FVector& PointOfImpact)
+{
+	//PlaySound
 }
 
 

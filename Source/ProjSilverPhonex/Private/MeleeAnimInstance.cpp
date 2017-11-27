@@ -105,7 +105,13 @@ void UMeleeAnimInstance::PlayCombo(EAttackType AttackType)
 
 void UMeleeAnimInstance::ResetComboAttack()
 {
-
+	//Reset Character back to walking
+	AXBaseCharacter* CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
+	if (CharacterPawn)
+	{
+		CharacterPawn->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+	}
+	
 	//We reset the combo counter after a period of time to stop the player from attacking immediately after
 	GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &UMeleeAnimInstance::Reset, 0.5f, false);
 	SetAcceptNextCombo(false);
