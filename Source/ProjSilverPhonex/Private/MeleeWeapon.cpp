@@ -14,8 +14,6 @@ AMeleeWeapon::AMeleeWeapon()
 	SwordTrail = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("SpawnTrail"));
 	SwordTrail->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
 
-
-	
 }
 
 void AMeleeWeapon::Tick(float DeltaTime)
@@ -35,11 +33,11 @@ void AMeleeWeapon::BeginPlay()
 	Super::BeginPlay();
 	
 	//Crashes if the socketbase and sockettip is not set
-	if (SwordTrail)
-	{
-		SwordTrail->BeginTrails(SocketBase, SocketTip, ETrailWidthMode::ETrailWidthMode_FromCentre, 1.f);
-		SetSwordTrailVisibility(false);
-	}
+	//if (SwordTrail)
+	//{
+		//SwordTrail->BeginTrails(SocketBase, SocketTip, ETrailWidthMode::ETrailWidthMode_FromCentre, 1.f);
+		//SetSwordTrailVisibility(false);
+//	}
 
 	
 }
@@ -180,13 +178,24 @@ void AMeleeWeapon::SetLastSokcetFrame()
 void AMeleeWeapon::StartTraceAttack()
 {
 	bIsAttackTrace = true;
-	SetSwordTrailVisibility(true);
+	if (SwordTrail)
+	{
+		SwordTrail->BeginTrails(SocketBase, SocketTip, ETrailWidthMode::ETrailWidthMode_FromCentre, 1.f);
+	//	SetSwordTrailVisibility(false);
+	}
+	//SetSwordTrailVisibility(true);
 }
 
 void AMeleeWeapon::StopTraceAttack()
 {
 	bIsAttackTrace = false;
-	SetSwordTrailVisibility(false);
+
+	if (SwordTrail)
+	{
+		SwordTrail->EndTrails();
+		//	SetSwordTrailVisibility(false);
+	}
+	//SetSwordTrailVisibility(false);
 }
 
 void AMeleeWeapon::ClearEnemiesHitArray()
