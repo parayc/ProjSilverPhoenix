@@ -32,14 +32,7 @@ void AMeleeWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	
-	//Crashes if the socketbase and sockettip is not set
-	//if (SwordTrail)
-	//{
-		//SwordTrail->BeginTrails(SocketBase, SocketTip, ETrailWidthMode::ETrailWidthMode_FromCentre, 1.f);
-		//SetSwordTrailVisibility(false);
-//	}
 
-	
 }
 
 void AMeleeWeapon::StartAttack()
@@ -61,8 +54,10 @@ void AMeleeWeapon::TraceSwing()
 {
 
 	FHitResult HitResult;
-	FCollisionQueryParams*  TraceParams = new FCollisionQueryParams();
-	TraceParams->AddIgnoredActor(Instigator);
+	//This doesnt work 
+	FCollisionQueryParams* TraceParams = new FCollisionQueryParams(FName(""),false, Instigator);
+	TraceParams->AddIgnoredActor(MyPawn);
+
 	FVector TraceStart, TraceEnd;
 
 
@@ -81,27 +76,28 @@ void AMeleeWeapon::TraceSwing()
 		}
 		
 
-		if (GetWorld()->LineTraceSingleByChannel(HitResult,TraceStart,TraceEnd,ECC_Weapon,TraceParams))
+		if (GetWorld()->LineTraceSingleByChannel(HitResult,TraceStart,TraceEnd,ECC_Weapon, TraceParams))
 		{
-		
-			
 
 			AXBaseCharacter* Enemy = Cast<AXBaseCharacter>(HitResult.GetActor());
 			//UE_LOG(LogTemp, Warning, TEXT("Enemy: %s"), *HitResult.GetActor()->GetName());
 			if (Enemy)
 			{
-				//UE_LOG(LogTemp, Warning, TEXT("Enemy yh: %s"), *HitResult.GetActor()->GetName());
 				//Only add enemy to array if not in array
-				if (!EnemiesHit.Contains(Enemy))
+				if (!EnemiesHit.Contains(Enemy) && (Enemy != MyPawn))
 				{
-					if (HitResult.bBlockingHit)
-					{
-						SpawnHitEffext(HitResult);
-					}
-					
 					EnemiesHit.Add(Enemy);
 					//Deal damage to enemy that was added
 					DealDamage(HitResult);
+
+					UE_LOG(LogTemp, Warning, TEXT("Enemy: %s CurrentHealth: %f"), *HitResult.GetActor()->GetName(), Enemy->GetCurrentHealth());
+					if (HitResult.bBlockingHit)
+					{
+						SpawnHitEffext(HitResult);
+						PlaySound(SwordImpactSounds);
+					}
+					
+					
 
 				}
 			
@@ -115,10 +111,10 @@ void AMeleeWeapon::TraceSwing()
 	LastFrameEndSocket = EndSocket;
 }
 
-void AMeleeWeapon::PlaySound(USoundCue * Sound)
+void AMeleeWeapon::PlaySound(USoundBase * Sound)
 {
-	//UGameplayStatics::PlaySoundAtLocation(GetWorld(), Sound, Location, Rotation, 1, 1, 0);
-	//UGameplayStatics::SpawnSoundAttached(Sound, this->RootComponent);
+	UGameplayStatics::PlaySoundAtLocation(GetWorld(),Sound,GetActorLocation());
+	
 }
 
 void AMeleeWeapon::SpawnHitEffext(FHitResult& Hit)
@@ -130,12 +126,6 @@ void AMeleeWeapon::SpawnHitEffext(FHitResult& Hit)
 		UGameplayStatics::SpawnEmitterAtLocation(GetWorld(), HitFX, Location, Rotation, true);
 	}
 }
-
-void AMeleeWeapon::ImpactNoise(FVector& PointOfImpact)
-{
-	//PlaySound
-}
-
 
 
 void AMeleeWeapon::SetDamage(int32 Value)
@@ -181,9 +171,7 @@ void AMeleeWeapon::StartTraceAttack()
 	if (SwordTrail)
 	{
 		SwordTrail->BeginTrails(SocketBase, SocketTip, ETrailWidthMode::ETrailWidthMode_FromCentre, 1.f);
-	//	SetSwordTrailVisibility(false);
 	}
-	//SetSwordTrailVisibility(true);
 }
 
 void AMeleeWeapon::StopTraceAttack()
@@ -193,9 +181,7 @@ void AMeleeWeapon::StopTraceAttack()
 	if (SwordTrail)
 	{
 		SwordTrail->EndTrails();
-		//	SetSwordTrailVisibility(false);
 	}
-	//SetSwordTrailVisibility(false);
 }
 
 void AMeleeWeapon::ClearEnemiesHitArray()
@@ -223,15 +209,7 @@ TArray<FWeaponAnimation> AMeleeWeapon::GetAirAttackMontages()
 	return AirAttackMontage;
 }
 
-void AMeleeWeapon::SetSwordTrailVisibility(bool NewState)
-{
-	if (SwordTrail)
-	{
-		//UE_LOG(LogTemp, Warning, TEXT("Set Sword trail: %s"), NewState ? TEXT("true") : TEXT("false"));
-		SwordTrail->SetVisibility(NewState);
-	}
 
-}
 
 
 

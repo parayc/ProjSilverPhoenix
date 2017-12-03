@@ -74,18 +74,14 @@ public:
 
 	TArray<FWeaponAnimation> GetAirAttackMontages();
 
-	void SetSwordTrailVisibility(bool NewState);
-
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "FX")
 	UParticleSystemComponent* SwordTrail;
 
 	void TraceSwing();
 
-	void PlaySound(USoundCue* Sound);
+	void PlaySound(USoundBase * Sound);
 
 	void SpawnHitEffext(FHitResult& Hit);
-
-	void ImpactNoise(FVector& PointOfImpact);
 
 	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "FX")
 		UParticleSystem* HitFX;
@@ -98,6 +94,9 @@ private:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
 	USoundCue* SwordImpactSound;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
+		USoundBase* SwordImpactSounds;
 
 	TArray<AXBaseCharacter*> EnemiesHit;
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")

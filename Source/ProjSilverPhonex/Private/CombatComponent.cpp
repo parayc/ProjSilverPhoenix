@@ -38,7 +38,7 @@ void UCombatComponent::KnockBack(ACharacter * DamageCauser, ACharacter * DamageR
 {
 
 	FVector Direction = DamageReceiver->GetActorLocation() - DamageCauser->GetActorLocation();
-	FVector KnockbackDirection = ((Direction * FVector(1, 1, 0)) * KnockBackAmount) * FVector(1).Z;
+	FVector KnockbackDirection = ((Direction * FVector(1, 1, 0)) * KnockBackAmount) * FVector(2).Z;
 	DamageReceiver->LaunchCharacter(KnockbackDirection, true, false);
 }
 
