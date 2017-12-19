@@ -229,11 +229,16 @@ EPlayerStates AXBaseCharacter::GetCurrentState() const
 
 void AXBaseCharacter::SwitchStats(EPlayerStates NewState)
 {
+
+	//If we are dead dont switch states
+	if (GetIsDead())
+	{
+		return;
+	}
 	CurrentPlayerState = NewState;
+
 	if (CharacterEquipment.CurrentWeapon)
 	{
-
-	
 
 		//If not rolling, flinching play unequip animation
 		if (EPlayerStates::PS_Passive == CurrentPlayerState && CanUnequip())

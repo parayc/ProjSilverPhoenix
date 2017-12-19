@@ -3,11 +3,15 @@
 #include "SPlayerController.h"
 #include "InventoryComponent.h"
 #include "BaseItem.h"
+#include "SPlayerCameraManager.h"
+#include "Kismet/GameplayStatics.h"
 
 
 void ASPlayerController::BeginPlay()
 {
 	Super::BeginPlay();
+
+	PlayerCameraManagerClass = ASPlayerCameraManager::StaticClass();
 
 	PlayersInventory = FindComponentByClass<UInventoryComponent>();
 	if (!ensure(PlayersInventory)) { 
@@ -15,6 +19,7 @@ void ASPlayerController::BeginPlay()
 		return;
 	
 	}
+
 }
 
 void ASPlayerController::AddItemToInventory(TSubclassOf<class ABaseItem> ItemClass, int32 Amount)

@@ -75,7 +75,7 @@ void AEnemyMaster::Tick(float DeltaTime)
 
 
 	/* Check if the last time we sensed a player is beyond the time out value to prevent from endlessly following a player. */
-	if (bSensedTarget && (GetWorld()->TimeSeconds - LastSeenTime) > SenseTimeOut && !GetIsDead())
+	if (bSensedTarget && (GetWorld()->TimeSeconds - LastSeenTime) > SenseTimeOut || GetIsDead())
 	{
 		AEnemyAIController* AIController = Cast<AEnemyAIController>(GetController());
 		if (AIController)
@@ -83,6 +83,7 @@ void AEnemyMaster::Tick(float DeltaTime)
 			bSensedTarget = false;
 			/* Reset */
 			AIController->SetSeenTarget(nullptr);
+			//UE_LOG(LogTemp, Warning, TEXT("Set enemy nullptr"));
 			
 
 		}
@@ -112,10 +113,6 @@ void AEnemyMaster::OnDeath()
 		GameInstance->AddExpPoints(Exp);
 	}
 
-	if (GetController())
-	{
-		GetController()->UnPossess();
-	}
 
 	auto* Player = Cast<ASPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
@@ -157,7 +154,7 @@ void AEnemyMaster::OnseePlayer(APawn * pawn)
 		/* Keep track of the time the player was last sensed in order to clear the target */
 		LastSeenTime = GetWorld()->GetTimeSeconds();
 		bSensedTarget = true;
-
+		
 		ASPlayer* player = Cast<ASPlayer>(pawn);
 		if (player && !player->GetIsDead() && GetIsDead() == false)
 		{
