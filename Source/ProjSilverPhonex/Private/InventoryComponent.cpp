@@ -333,6 +333,21 @@ FItemInfo UInventoryComponent::GetItemInfoAtIndex(int32 index) const
 
 
 
+bool UInventoryComponent::isItemInInventory(TSubclassOf<ABaseItem> ItemClassToFind)
+{
+	int32 index = 0;
+	while (index < InventorySlots.Num())
+	{
+		if ( InventorySlots[index].ItemClass == ItemClassToFind)
+		{
+			return true;
+		}
+		index++;
+	}
+
+	return false;
+}
+
 // Called when the game starts
 void UInventoryComponent::BeginPlay()
 {

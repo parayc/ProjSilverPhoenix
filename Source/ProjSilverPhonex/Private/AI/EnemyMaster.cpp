@@ -11,6 +11,7 @@
 #include "SPlayer.h"
 #include "SPGameInstance.h"
 #include "Components/CapsuleComponent.h"
+#include "ProjSilverPhonexGameModeBase.h"
 
 
 // Sets default values
@@ -112,7 +113,6 @@ void AEnemyMaster::OnDeath()
 	{
 		GameInstance->AddExpPoints(Exp);
 	}
-
 
 	auto* Player = Cast<ASPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
 

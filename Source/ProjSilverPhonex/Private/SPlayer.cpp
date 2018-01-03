@@ -231,7 +231,7 @@ void ASPlayer::RollCoolDown()
 
 void ASPlayer::StartRoll()
 {
-	if (bCanRoll && RollCounter < MaxAmountPlayerCanRoll && !IsFlinching())
+	if (bCanRoll && RollCounter < MaxAmountPlayerCanRoll && !IsFlinching() && GetCharacterMovement()->IsMovingOnGround() == true)
 	{
 		bIsRolling = true;
 		SetCanRoll(false);
@@ -415,13 +415,11 @@ void ASPlayer::AddToLockOnTarget(AEnemyMaster * Target)
 			//add it first to the list
 			LockOnListTarget.Insert(Target, 0);
 			closetTargetDistance = TargetDistance;
-
 		}
 		else
 		{
 			//Add to the end of the list
 			LockOnListTarget.Add(Target);
-
 		}
 
 		//UE_LOG(LogTemp, Warning, TEXT("TargetLeangth: %d"), LockOnListTarget.Num())

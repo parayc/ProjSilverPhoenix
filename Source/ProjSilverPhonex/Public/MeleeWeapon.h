@@ -53,6 +53,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 	bool GetIsAttcking();
 
+
+	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+		TSubclassOf<UDamageType> DamageType;
 	void SetLastSokcetFrame();
 
 	//Starts weapons line trace 
@@ -92,8 +95,6 @@ protected:
 	virtual void BeginPlay() override;
 private:
 
-	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
-	USoundCue* SwordImpactSound;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
 		USoundBase* SwordImpactSounds;

@@ -97,6 +97,8 @@ public:
 
 	UPROPERTY(BlueprintAssignable, Category = "EventDispatchers")
 		FOnUpdateRequest OnUpdateRequest;
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
+	bool isItemInInventory(TSubclassOf<ABaseItem> ItemClassToFind);
 
 protected:
 	// Called when the game starts

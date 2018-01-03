@@ -8,6 +8,7 @@
 #include "DrawDebugHelpers.h"
 #include "MeleeAnimInstance.h"
 #include "Kismet/GameplayStatics.h"
+#include "PhysicsEngine/DestructibleActor.h"
 
 AMeleeWeapon::AMeleeWeapon()
 {
@@ -83,24 +84,35 @@ void AMeleeWeapon::TraceSwing()
 			//UE_LOG(LogTemp, Warning, TEXT("Enemy: %s"), *HitResult.GetActor()->GetName());
 			if (Enemy)
 			{
-				//Only add enemy to array if not in array
-				if (!EnemiesHit.Contains(Enemy) && (Enemy != MyPawn))
+			
+				if (!EnemiesHit.Contains(Enemy) && (Enemy != MyPawn) && !Enemy->GetIsDead())
 				{
 					EnemiesHit.Add(Enemy);
 					//Deal damage to enemy that was added
 					DealDamage(HitResult);
 
-					UE_LOG(LogTemp, Warning, TEXT("Enemy: %s CurrentHealth: %f"), *HitResult.GetActor()->GetName(), Enemy->GetCurrentHealth());
+					//UE_LOG(LogTemp, Warning, TEXT("Enemy: %s CurrentHealth: %f"), *HitResult.GetActor()->GetName(), Enemy->GetCurrentHealth());
 					if (HitResult.bBlockingHit)
 					{
 						SpawnHitEffext(HitResult);
 						PlaySound(SwordImpactSounds);
 					}
-					
-					
-
 				}
 			
+			}
+			else if(ADestructibleActor* DA = Cast<ADestructibleActor>(HitResult.GetActor()))
+			{
+
+				UE_LOG(LogTemp, Warning, TEXT("Hit box"));
+				FVector EyeLocation;
+				FRotator EyeRotation;
+				MyPawn->GetActorEyesViewPoint(EyeLocation, EyeRotation);
+
+				FVector AttackDirection = EyeRotation.Vector();
+				TArray<AActor*> AllActors;
+				UGameplayStatics::GetAllActorsOfClass(GetWorld(), AXBaseCharacter::StaticClass(), AllActors);
+				UGameplayStatics::ApplyRadialDamage(GetWorld(), 10.f, HitResult.GetActor()->GetActorLocation(), 30.f, DamageType, AllActors, this, MyPawn->GetInstigatorController(), ECC_Weapon);
+				
 			}
 		}
 
