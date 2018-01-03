@@ -104,6 +104,8 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Combat")
 	bool IsFlinching() const;
 
+	bool GetIsInvincible();
+
 protected:
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayerState")

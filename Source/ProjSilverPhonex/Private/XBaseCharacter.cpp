@@ -155,6 +155,11 @@ bool AXBaseCharacter::IsFlinching() const
 	return CombatStates->GetIsFlinching();
 }
 
+bool AXBaseCharacter::GetIsInvincible()
+{
+	return CombatStates->GetBattleState() == EBattleState::PS_Invincible;
+}
+
 void AXBaseCharacter::AddWeaponToInventory(ABaseWeapon* Weapon)
 {
 	auto controller = Cast<ASPlayerController>(GetController());

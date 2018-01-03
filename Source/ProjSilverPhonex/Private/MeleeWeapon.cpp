@@ -9,6 +9,7 @@
 #include "MeleeAnimInstance.h"
 #include "Kismet/GameplayStatics.h"
 #include "PhysicsEngine/DestructibleActor.h"
+#include "CombatComponent.h"
 
 AMeleeWeapon::AMeleeWeapon()
 {
@@ -81,21 +82,23 @@ void AMeleeWeapon::TraceSwing()
 		{
 
 			AXBaseCharacter* Enemy = Cast<AXBaseCharacter>(HitResult.GetActor());
-			//UE_LOG(LogTemp, Warning, TEXT("Enemy: %s"), *HitResult.GetActor()->GetName());
+			
 			if (Enemy)
 			{
-			
-				if (!EnemiesHit.Contains(Enemy) && (Enemy != MyPawn) && !Enemy->GetIsDead())
+				
+
+				//We check if we hit the enemy already in the same swing and not hit ourself
+				if (!EnemiesHit.Contains(Enemy) && (Enemy != MyPawn))
 				{
 					EnemiesHit.Add(Enemy);
 					//Deal damage to enemy that was added
 					DealDamage(HitResult);
 
-					//UE_LOG(LogTemp, Warning, TEXT("Enemy: %s CurrentHealth: %f"), *HitResult.GetActor()->GetName(), Enemy->GetCurrentHealth());
+					
 					if (HitResult.bBlockingHit)
 					{
 						SpawnHitEffext(HitResult);
-						PlaySound(SwordImpactSounds);
+					
 					}
 				}
 			
@@ -103,7 +106,6 @@ void AMeleeWeapon::TraceSwing()
 			else if(ADestructibleActor* DA = Cast<ADestructibleActor>(HitResult.GetActor()))
 			{
 
-				UE_LOG(LogTemp, Warning, TEXT("Hit box"));
 				FVector EyeLocation;
 				FRotator EyeRotation;
 				MyPawn->GetActorEyesViewPoint(EyeLocation, EyeRotation);
@@ -111,7 +113,8 @@ void AMeleeWeapon::TraceSwing()
 				FVector AttackDirection = EyeRotation.Vector();
 				TArray<AActor*> AllActors;
 				UGameplayStatics::GetAllActorsOfClass(GetWorld(), AXBaseCharacter::StaticClass(), AllActors);
-				UGameplayStatics::ApplyRadialDamage(GetWorld(), 10.f, HitResult.GetActor()->GetActorLocation(), 30.f, DamageType, AllActors, this, MyPawn->GetInstigatorController(), ECC_Weapon);
+				//I use radial damage on destructible actors to give it an explode effect
+				UGameplayStatics::ApplyRadialDamage(GetWorld(), 10.f, HitResult.GetActor()->GetActorLocation(), 30.f, DamageType, AllActors,this, MyPawn->GetInstigatorController(),true, ECC_Weapon);
 				
 			}
 		}
@@ -158,7 +161,7 @@ void AMeleeWeapon::DealDamage(const FHitResult & HitResult)
 			FPointDamageEvent DamageEvent;
 			DamageEvent.Damage = DealtDamage;
 			DamageEvent.HitInfo = HitResult;
-
+			PlaySound(SwordImpactSounds);
 			Enemy->TakeDamage(DealtDamage, DamageEvent, Instigator->GetController(), MyPawn);
 			//UE_LOG(LogTemp, Warning, TEXT("Enemy: %s"), *Enemy->GetName());
 		}
