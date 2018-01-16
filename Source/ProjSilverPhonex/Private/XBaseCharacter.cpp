@@ -278,7 +278,6 @@ void AXBaseCharacter::OnDeath()
 		CharacterComp->SetComponentTickEnabled(false);
 	}
 
-
 	CharacterEquipment.CurrentWeapon->DestroyWeapon();
 	
 	bIsDead = true;

@@ -122,8 +122,9 @@ void AEnemyMaster::OnDeath()
 		Player->FindLockOnTargets();
 	}
 
-	GetWorld()->GetTimerManager().SetTimer(DeathTimerHandle, this, &AEnemyMaster::HandleDeath, 10.0f, false);
-
+	//GetWorld()->GetTimerManager().SetTimer(DeathTimerHandle, this, &AEnemyMaster::HandleDeath, 10.0f, false);
+	DetachFromControllerPendingDestroy();
+	SetLifeSpan(5.f);
 }
 
 void AEnemyMaster::SetTargetIconDirection()
