@@ -47,6 +47,7 @@ void AEnemyMaster::BeginPlay()
 	CurrentHealth = MaxHealth;
 	
 
+
 	if (PawnSensingComp)
 	{
 
@@ -72,8 +73,8 @@ void AEnemyMaster::BeginPlay()
 void AEnemyMaster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-	SetTargetIconDirection();
 
+	SetTargetIconDirection();
 
 	/* Check if the last time we sensed a player is beyond the time out value to prevent from endlessly following a player. */
 	if (bSensedTarget && (GetWorld()->TimeSeconds - LastSeenTime) > SenseTimeOut || GetIsDead())
@@ -94,11 +95,6 @@ void AEnemyMaster::Tick(float DeltaTime)
 }
 
 
-void AEnemyMaster::HandleDeath()
-{
-	GetWorld()->GetTimerManager().ClearTimer(DeathTimerHandle);
-	Destroy();
-}
 
 void AEnemyMaster::OnDeath() 
 {
@@ -106,6 +102,7 @@ void AEnemyMaster::OnDeath()
 
 	USPGameInstance* GameInstance = Cast<USPGameInstance>(GetGameInstance());
 
+	//Remove the enemies collision
 	GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	GetCapsuleComponent()->SetCollisionResponseToAllChannels(ECR_Ignore);
 
@@ -122,7 +119,8 @@ void AEnemyMaster::OnDeath()
 		Player->FindLockOnTargets();
 	}
 
-	//GetWorld()->GetTimerManager().SetTimer(DeathTimerHandle, this, &AEnemyMaster::HandleDeath, 10.0f, false);
+	TimeSinceLastDeath = GetWorld()->TimeSeconds;
+
 	DetachFromControllerPendingDestroy();
 	SetLifeSpan(5.f);
 }

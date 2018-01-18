@@ -28,7 +28,7 @@ protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-
+	float TimeSinceLastDeath;
 
 public:	
 	// Called every frame
@@ -46,7 +46,6 @@ public:
 	FTimerHandle DeathTimerHandle;
 	virtual void OnDeath() override;
 
-	void HandleDeath();
 
 	void SetTargetIconDirection();
 
@@ -81,6 +80,5 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "SetUp")
 	int32 Exp;
 
-	//bool bIsDead = false;
 
 };

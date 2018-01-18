@@ -25,6 +25,23 @@ void ASKFootSoldier::SetIsAttacking(bool NewState)
 void ASKFootSoldier::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
+
+	if (GetIsDead())
+	{
+		float amount = GetWorld()->TimeSeconds - TimeSinceLastDeath;
+
+		float DissolveAmount = amount / DissolveLength;
+		if (PrimeMatInst)
+		{
+			PrimeMatInst->SetScalarParameterValue("Amount", DissolveAmount);
+		}
+
+		if (SecondaryMatInst)
+		{
+			SecondaryMatInst->SetScalarParameterValue("Amount", DissolveAmount);
+		}
+	}
+
 	
 }
 
@@ -32,12 +49,15 @@ void ASKFootSoldier::BeginPlay()
 {
 	Super::BeginPlay();
 
-		if (AttackSphere)
-		{
+	PrimeMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamicFromMaterial(0, GetMesh()->GetMaterial(0));
+	SecondaryMatInst = GetMesh()->CreateAndSetMaterialInstanceDynamicFromMaterial(1, GetMesh()->GetMaterial(1));
+
+	if (AttackSphere)
+	{
 			
 			AttackSphere->OnComponentBeginOverlap.AddDynamic(this, &ASKFootSoldier::OnEnemyEnterDamageBox);
 			AttackSphere->OnComponentEndOverlap.AddDynamic(this, &ASKFootSoldier::OnEnemyLeavesDamageBox);
-		}
+	}
 		
 }
 

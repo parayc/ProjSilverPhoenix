@@ -132,8 +132,8 @@ protected:
 
 private:
 
-	UPROPERTY(Category = "SetUp", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		int32 TeamNumber = 0;
+	UPROPERTY(Category = "Setup", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		uint8 TeamNumber = 255;
 
 	bool bIsDead = false;
 

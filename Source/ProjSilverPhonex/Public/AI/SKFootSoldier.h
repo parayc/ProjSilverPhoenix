@@ -46,11 +46,19 @@ protected:
 	UFUNCTION(BlueprintCallable, Category = "Attack")
 		void ResetEnemyAttackList();
 
+	UMaterialInstanceDynamic* PrimeMatInst;
+
+	UMaterialInstanceDynamic* SecondaryMatInst;
+
+	/*This is how long the dissolve effect last */
+	UPROPERTY(EditAnywhere, Category = "Effects")
+		float DissolveLength = 3;
 
 private:
+
 	ASKFootSoldier();
 
-	UPROPERTY(EditDefaultsOnly, Category = "SetUp")
+	UPROPERTY(VisibleDefaultsOnly, Category = "Components")
 	USphereComponent* AttackSphere;
 
 	bool bIsAttacking = false;

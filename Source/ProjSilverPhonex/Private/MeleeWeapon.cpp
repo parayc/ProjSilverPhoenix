@@ -83,23 +83,22 @@ void AMeleeWeapon::TraceSwing()
 
 			AXBaseCharacter* Enemy = Cast<AXBaseCharacter>(HitResult.GetActor());
 			
-			if (Enemy)
+			//Check is the actor we hit is alive
+			if (Enemy && !Enemy->GetIsDead())
 			{
-				
 
 				//We check if we hit the enemy already in the same swing and not hit ourself
-				if (!EnemiesHit.Contains(Enemy) && (Enemy != MyPawn))
+				if (!EnemiesHit.Contains(Enemy) && (Enemy != MyPawn) )
 				{
 					EnemiesHit.Add(Enemy);
 					//Deal damage to enemy that was added
 					DealDamage(HitResult);
 
 					
-					if (HitResult.bBlockingHit)
-					{
-						SpawnHitEffext(HitResult);
+				
+					SpawnHitEffext(HitResult);
 					
-					}
+				
 				}
 			
 			}
