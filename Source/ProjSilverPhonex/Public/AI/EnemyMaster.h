@@ -46,9 +46,6 @@ public:
 	FTimerHandle DeathTimerHandle;
 	virtual void OnDeath() override;
 
-
-	void SetTargetIconDirection();
-
 	void SetTargetIconVisibility(bool NewState);
 
 	

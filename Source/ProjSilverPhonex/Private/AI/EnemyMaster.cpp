@@ -74,7 +74,7 @@ void AEnemyMaster::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	SetTargetIconDirection();
+	//SetTargetIconDirection();
 
 	/* Check if the last time we sensed a player is beyond the time out value to prevent from endlessly following a player. */
 	if (bSensedTarget && (GetWorld()->TimeSeconds - LastSeenTime) > SenseTimeOut || GetIsDead())
@@ -125,19 +125,6 @@ void AEnemyMaster::OnDeath()
 	SetLifeSpan(5.f);
 }
 
-void AEnemyMaster::SetTargetIconDirection()
-{
-	auto* Player = Cast<AXBaseCharacter>(GetWorld()->GetFirstPlayerController()->GetPawn());
-
-	if (Player)
-	{
-		auto Cameralocation = GetWorld()->GetFirstPlayerController()->PlayerCameraManager->GetCameraLocation();
-		auto IconLocation = TargetIcon->K2_GetComponentLocation();
-		auto NewRotation = UKismetMathLibrary::FindLookAtRotation(IconLocation, Cameralocation);
-		TargetIcon->SetWorldRotation(NewRotation);
-	}
-
-}
 
 //TODO - Chnage name of function
 void AEnemyMaster::SetTargetIconVisibility(bool NewState)

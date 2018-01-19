@@ -11,6 +11,7 @@
 #include "ProjSilverPhonex.h"
 #include "BaseWeapon.h"
 #include "Components/CapsuleComponent.h"
+#include "DrawDebugHelpers.h"
 
 ASPlayer::ASPlayer()
 {
@@ -376,11 +377,17 @@ void ASPlayer::CheckTargetsWithinSight(TArray<FHitResult> ActorsHit)
 			FHitResult Hit;
 			FCollisionQueryParams TraceParams;
 			TraceParams.AddIgnoredActor(this);
+			
+			FVector StartTrace = this->GetActorLocation();
+			StartTrace.Z += 80.f; // Offset the line trace to start it from the players head 
+
+			FVector EndTrace = NewTarget->GetActorLocation();
+			EndTrace.Z += 80.f;
 			//Check Whether the enemy is within sight 
-			if (GetWorld()->LineTraceSingleByChannel(Hit, this->GetActorLocation(), NewTarget->GetActorLocation(), ECC_TargetSystem, TraceParams))
+			if (GetWorld()->LineTraceSingleByChannel(Hit, StartTrace, EndTrace, ECC_TargetSystem, TraceParams))
 			{
 
-				//DrawDebugLine(GetWorld(), this->GetActorLocation(), NewTarget->GetActorLocation(), FColor(255, 0, 0), true, 10.f);
+				//DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
 				AEnemyMaster *target = Cast<AEnemyMaster>(Hit.GetActor());
 				if (target && !LockOnListTarget.Contains(target))//Check to see if enemy is in the list already and type checking target
 				{
@@ -389,12 +396,11 @@ void ASPlayer::CheckTargetsWithinSight(TArray<FHitResult> ActorsHit)
 
 			}
 
-
 		}
 
 	}
 
-	//Checks if target list is empty, if not set thr first target icon visible 
+	//if target list is nor empty,  set the first target icon in the list visible 
 	if (LockOnListTarget.Num() > 0)
 	{
 		LockOnListTarget[0]->SetTargetIconVisibility(false);
