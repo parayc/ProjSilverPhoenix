@@ -42,11 +42,11 @@ void ABaseWeapon::StopAttack()
 
 }
 
-void ABaseWeapon::UseItem(AActor* Owner)
+void ABaseWeapon::UseItem(AActor* OwnerController)
 {
-	Super::UseItem(Owner);
+	Super::UseItem(OwnerController);
 	
-	auto controller = Cast<ASPlayerController>(Owner);
+	auto controller = Cast<ASPlayerController>(OwnerController);
 	if (controller)
 	{
 		auto Player = Cast<AXBaseCharacter>(controller->GetPawn());
@@ -57,11 +57,7 @@ void ABaseWeapon::UseItem(AActor* Owner)
 			UE_LOG(LogTemp, Warning, TEXT("Add weapon to hand"))
 		}
 	}
-	
-	
-	
-	
-	
+
 }
 
 void ABaseWeapon::SetOwningPawn(AXBaseCharacter* NewOwner)

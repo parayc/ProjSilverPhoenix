@@ -3,6 +3,7 @@
 #include "BaseItem.h"
 #include "InventoryComponent.h"
 #include "Components/SphereComponent.h"
+#include "TimerManager.h"
 
 
 // Sets default values
@@ -13,14 +14,6 @@ ABaseItem::ABaseItem()
 
 }
 
-/*This will call broadcast the event in each blueprint item */
-void ABaseItem::UseItem(AActor* Owner)
-{
-	
-	InventoryRef->RemoveItemFromIndex(Index, 1);
-	OnUseItemRequest.Broadcast();
-
-}
 
 
 // Called when the game starts or when spawned
@@ -28,6 +21,43 @@ void ABaseItem::BeginPlay()
 {
 	Super::BeginPlay();
 	
+}
+
+/* This will call the item BP implmenentation */
+void ABaseItem::UseItem(AActor* OwnerController)
+{
+
+	//InventoryRef->RemoveItemFromIndex(Index, 1);
+	//OnUseItemRequest.Broadcast();
+
+	//Call blueprint 
+	OnActivited(OwnerController, InventoryRef);
+
+	if (TickInterval <= 0.0f)
+	{
+		OnTickPowerup();
+	}
+	else
+	{
+		GetWorldTimerManager().SetTimer(TimerHandle_ItemTick, this, &ABaseItem::OnTickPowerup, TickInterval, true);
+	}
+}
+
+
+
+void ABaseItem::OnTickPowerup()
+{
+	TicksCounter++;
+
+	//Implmenetation is done in blueprints
+	/*Allows the designer to make the items do some function every tick*/
+	OnItemTick();
+
+	if (TicksCounter >= TotalNumberOfTicks)
+	{
+		OnExpired();
+		GetWorldTimerManager().ClearTimer(TimerHandle_ItemTick);
+	}
 }
 
 // Called every frame

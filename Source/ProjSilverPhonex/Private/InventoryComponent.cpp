@@ -190,6 +190,14 @@ void UInventoryComponent::RemoveItemFromIndex(int32 Index, int32 AmountToRemove)
 		}
 
 		//TODO - Check whether to spawn item or delete it when removing ti from inventory 
+		
+		for (int i = 0; i < AmountToRemove; i++)
+		{
+			//FActorSpawnParameters SpawnParams;
+			//SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+
+			//ABaseItem* ItemSpawned = GetWorld()->SpawnActor<ABaseItem>(InventorySlots[Index].ItemClass, FVector(0, 0, -500), FRotator(0, 0, -500), SpawnParams);
+		}
 	}
 }
 
@@ -249,12 +257,18 @@ void UInventoryComponent::UseItemAtIndex(int32 Index)
 	{
 		//GetWorld()->SpawnActor<ABaseItem>()
 		//Would crash if the player walks over the item that they spawned to use
-		ABaseItem* ItemSpawned = GetWorld()->SpawnActor<ABaseItem>(InventorySlots[Index].ItemClass, FVector(0, 0, -500), FRotator(0, 0, -500));
+
+		FActorSpawnParameters SpawnParams;
+		SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
+		
+		//Spawn the item under the level
+		ABaseItem* ItemSpawned = GetWorld()->SpawnActor<ABaseItem>(InventorySlots[Index].ItemClass, FVector(0, 0, -500), FRotator(0, 0, -500), SpawnParams);
 		ItemSpawned->InventoryRef = this;
 		ItemSpawned->Index = Index;
-		//Set the items owner of the person who spawned the item 
-		
+	
+		RemoveItemFromIndex(Index, 1);
 		ItemSpawned->UseItem(GetOwner());
+		
 	}
 }
 

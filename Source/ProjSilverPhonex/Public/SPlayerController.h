@@ -17,12 +17,7 @@ class PROJSILVERPHONEX_API ASPlayerController : public APlayerController
 {
 	GENERATED_BODY()
 
-
-	
 public:
-
-	UFUNCTION(BlueprintCallable, Category = "Inventory")
-	void AddItemToInventory(TSubclassOf<class ABaseItem> ItemClass,int32 Amount);
 
 	UInventoryComponent* PlayersInventory;
 

@@ -22,11 +22,3 @@ void ASPlayerController::BeginPlay()
 
 }
 
-void ASPlayerController::AddItemToInventory(TSubclassOf<class ABaseItem> ItemClass, int32 Amount)
-{
-	if (ItemClass)
-	{
-		PlayersInventory->AddItem(ItemClass, Amount);
-	}
-	
-}

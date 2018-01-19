@@ -60,6 +60,7 @@ public:
 	UPROPERTY(EditAnywhere)
 	int32 MaxStackSize = 50;
 
+	UFUNCTION(BlueprintCallable, Category = "Inventory")
 	void AddItem(TSubclassOf<class ABaseItem> Item, int32 AmountToAdd);
 
 	UFUNCTION(BlueprintCallable, Category = "Inventory")

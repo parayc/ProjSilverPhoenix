@@ -64,7 +64,7 @@ public:
 	float GetMaxHealth() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Character Condition")
-	void SetAddCurrentHealth(float Value);
+	void Heal(float Value);
 
 	UFUNCTION(BlueprintCallable, Category = "Character Condition")
 	void SetAddMaxHealth(float Value);

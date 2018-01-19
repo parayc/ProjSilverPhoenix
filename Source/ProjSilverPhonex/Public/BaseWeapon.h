@@ -35,7 +35,7 @@ public:
 
 	virtual void StopAttack();
 
-	virtual void UseItem(AActor* Owner) override;
+	virtual void UseItem(AActor* OwnerController) override;
 
 	void UnEquip();
 

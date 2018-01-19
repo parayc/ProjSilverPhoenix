@@ -90,7 +90,7 @@ float AXBaseCharacter::GetMaxHealth() const
 	return MaxHealth;
 }
 
-void AXBaseCharacter::SetAddCurrentHealth(float Value)
+void AXBaseCharacter::Heal(float Value)
 {
 	if (CurrentHealth + Value < MaxHealth)
 	{
