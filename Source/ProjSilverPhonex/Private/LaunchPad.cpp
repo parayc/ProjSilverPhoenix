@@ -5,6 +5,7 @@
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "XBaseCharacter.h"
+#include "Sound/SoundCue.h"
 
 // Sets default values
 ALaunchPad::ALaunchPad()
@@ -31,6 +32,7 @@ void ALaunchPad::BeginPlay()
 
 void ALaunchPad::HanleOverlapped(UPrimitiveComponent * OverlappedComponent, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult)
 {
+	
 	FRotator LaunchDirection = GetActorRotation();
 	LaunchDirection.Pitch += LaunchPitAngle;
 	FVector LaunchVelocity = LaunchDirection.Vector() * LaunchStrength;
@@ -39,8 +41,10 @@ void ALaunchPad::HanleOverlapped(UPrimitiveComponent * OverlappedComponent, AAct
 	auto BaseCharacter = Cast<ACharacter>(OtherActor);
 	if (BaseCharacter)
 	{
+		UGameplayStatics::SpawnSoundAttached(LaunchPadSound, RootComponent);
 		BaseCharacter->LaunchCharacter(LaunchVelocity,true,true);
 		UGameplayStatics::SpawnEmitterAtLocation(this, LaunchPadEffect,GetActorLocation());
+	
 	}
 }
 

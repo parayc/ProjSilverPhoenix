@@ -6,7 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "LaunchPad.generated.h"
 class UBoxComponent;
-
+class USoundCue;
 
 UCLASS()
 class PROJSILVERPHONEX_API ALaunchPad : public AActor
@@ -31,6 +31,9 @@ protected:
 		int32 LaunchStrength = 1000;
 	UPROPERTY(EditInstanceOnly, Category = "LaunchPad")
 		float LaunchPitAngle = 35.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
+		USoundCue* LaunchPadSound;
 
 	UFUNCTION()
 	void HanleOverlapped(UPrimitiveComponent* OverlappedComponent, AActor* OtherActor, UPrimitiveComponent* OtherComp, int32 OtherBodyIndex, bool bFromSweep, const FHitResult & SweepResult);
