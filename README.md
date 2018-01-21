@@ -3,7 +3,7 @@
 Hack & Slash third person action game with roguelike elements. 
 
 ## Game features
-* A robust weapon system, that can easily be extended and maintined. Can be shared between the player and AI
+* A robust weapon system, that can easily be extended and maintained. Can be shared between the player and AI
 
 * Created my own sword collision to handle fast combat
 
@@ -28,7 +28,7 @@ Hack & Slash third person action game with roguelike elements.
 * Item pickups
   - Health potion to restore players health
   - weapons which can be equiped from the inventory
-  - Extandable
+  - Extendable
 * Movement
   - 360 direction roll to dodge attacks
   -  Double Jump
