@@ -27,7 +27,7 @@ Hack & Slash third person action game with roguelike elements.
 
 * Item pickups
   - Health potion to restore players health
-  - weapons which can be equiped from the inventory
+  - weapons which can be equipped from the inventory
   - Extendable
 * Movement
   - 360 direction roll to dodge attacks
