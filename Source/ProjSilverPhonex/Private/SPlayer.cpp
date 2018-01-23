@@ -558,6 +558,8 @@ void ASPlayer::Attack()
 	if (GetIsRolling() == true ||  IsFlinching() == true) { return; }
 	if (CharacterEquipment.CurrentWeapon)
 	{
+		
+
 		CharacterEquipment.CurrentWeapon->StartAttack();
 		if (EPlayerStates::PS_Passive == CurrentPlayerState)
 		{

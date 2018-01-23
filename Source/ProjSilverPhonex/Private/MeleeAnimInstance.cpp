@@ -8,6 +8,9 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "GameFramework/CharacterMovementComponent.h"
 #include "SPlayer.h"
+#include "SPlayerController.h"
+#include "EnemyMaster.h"
+#include "DrawDebugHelpers.h"
 
 
 void UMeleeAnimInstance::Attack(EAttackType AttackType)
@@ -84,6 +87,8 @@ void UMeleeAnimInstance::PlayCombo(EAttackType AttackType)
 			
 				//change direction after each attack montage
 				ChangeDirection();
+				//Once i change my direction i want to check whether Enemy in target assist range
+				TargetAssists();
 
 				PlayAnimation(Montages[ComboCounter].MeleeAttackMontages);
 				//Depening on the animtion being played we set the damage of the sword
@@ -177,6 +182,63 @@ void UMeleeAnimInstance::ChangeDirection()
 
 	}
 }
+
+//Help orientate the player in the direction of the enemy if they are sligly off;
+void UMeleeAnimInstance::TargetAssists()
+{
+
+	auto* CharacterPawn = Cast<ASPlayer>(TryGetPawnOwner());
+	if (CharacterPawn == nullptr || CharacterPawn->GetIsLockedOn())
+	{
+		return; // If we are locked on no need to target assists
+	}
+
+	FHitResult HitResults;
+	FVector Start = TryGetPawnOwner()->GetActorLocation();
+	FVector End = Start + (TryGetPawnOwner()->GetActorForwardVector() * 300);
+
+	//We only look for pawn objects
+	ECollisionChannel ECC = ECollisionChannel::ECC_Pawn;
+
+	FCollisionShape CollionShape;
+	CollionShape.ShapeType = ECollisionShape::Sphere;
+	CollionShape.SetSphere(80.f);
+
+	FCollisionQueryParams CollParam;
+	CollParam.AddIgnoredActor(TryGetPawnOwner());
+
+	
+	auto PC = Cast<ASPlayerController>(TryGetPawnOwner()->GetController());
+	if (PC == nullptr) return;
+	
+	//Checks if the Ai is in range of the player 
+	if (GetWorld()->SweepSingleByObjectType(HitResults, Start, End, FQuat::FQuat(), ECC, CollionShape, CollParam))
+	{
+		
+		//DrawDebugSphere(GetWorld(), End, 70.f, 12, FColor::Yellow, false, 2.f);
+		//DrawDebugLine(GetWorld(), Start, End, FColor::Red, false, 2.f);
+		auto Target = Cast<AEnemyMaster>(HitResults.GetActor());
+		if (Target)
+		{
+		
+			FVector EyeLocation;
+			FRotator EyeRotation;
+			PC->GetActorEyesViewPoint(EyeLocation, EyeRotation);
+			//Check If we can see the actor hit
+			if (PC->LineOfSightTo(HitResults.GetActor(), EyeLocation)) 
+			{
+				//rotate owner in direction of the target
+				FVector Direction = Target->GetActorLocation() - TryGetPawnOwner()->GetActorLocation();
+				auto DesiredLookDir = UKismetMathLibrary::MakeRotFromX(Direction);
+				FRotator LookDirection = FRotator(0.f, DesiredLookDir.Yaw , 0.f);//All we need is the yaw to rotate the player in direction of the target
+				TryGetPawnOwner()->SetActorRotation(LookDirection);
+
+			}
+		}
+		
+	}
+}
+
 /*This is called in the blurptint notifiy when to start tracing when it gets to a certain point in the attack animation */
 void UMeleeAnimInstance::StartAttackingTrace()
 {

@@ -38,6 +38,8 @@ public:
 
 	void ChangeDirection();
 
+	void TargetAssists();
+
 	/*Called in the anim instance using BP notifies - this stops the line trace  */
 	UFUNCTION(BlueprintCallable, Category = "WeaponSetup")
 	void StopAttackingTrace();
