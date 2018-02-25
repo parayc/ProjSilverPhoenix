@@ -3,6 +3,7 @@
 #include "BaseWeapon.h"
 #include "XBaseCharacter.h"
 #include "SPlayerController.h"
+#include "TimerManager.h"
 
 
 // Sets default values
@@ -106,6 +107,7 @@ void ABaseWeapon::EquipingFinished()
 {
 	//Allow the player to attack once animation is over 
 	MyPawn->SetCanAttack(true);
+	GetWorldTimerManager().ClearTimer(EquipFinishedTimerHandle);
 }
 
 void ABaseWeapon::DestroyWeapon()

@@ -30,22 +30,22 @@ public:
 
 	EBattleState GetBattleState() const;
 
+	UFUNCTION(BlueprintCallable, Category = "CombatComponent")
 	void SetBattleState(EBattleState BattleState);
 
 	void KnockBack(ACharacter* DamageCauser, ACharacter* DamageReceiver);
 
-	UPROPERTY(EditDefaultsOnly, Category = "SetUp")
+	UPROPERTY(EditDefaultsOnly, Category = "CombatComponent")
 		float KnockBackAmount = 5;
-
 
 	//Play flinch 
 	void Flinch();
 
 	void StopFlinch();
 
+	UFUNCTION(BlueprintCallable, Category = "CombatComponent")
 	bool GetIsFlinching() const;
 
-	
 
 private: 
 	FTimerHandle FlinchHandleTimer;
@@ -54,7 +54,7 @@ private:
 
 	bool IsFlinching = false;
 
-	UPROPERTY(EditAnywhere, Category = "SetUp")
+	UPROPERTY(EditAnywhere, Category = "CombatComponent")
 		UAnimMontage* FlinchAnimation;
 
 protected:

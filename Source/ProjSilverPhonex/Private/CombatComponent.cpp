@@ -7,10 +7,7 @@
 // Sets default values for this component's properties
 UCombatComponent::UCombatComponent()
 {
-	// Set this component to be initialized when the game starts, and to be ticked every frame.  You can turn these features
-	// off to improve performance if you don't need them.
-	PrimaryComponentTick.bCanEverTick = true;
-
+	
 	// ...
 }
 
@@ -45,7 +42,7 @@ void UCombatComponent::KnockBack(ACharacter * DamageCauser, ACharacter * DamageR
 void UCombatComponent::Flinch()
 {
 	ACharacter* Owner = Cast<ACharacter>(GetOwner());
-
+	
 	if (Owner)
 	{
 		IsFlinching = true;

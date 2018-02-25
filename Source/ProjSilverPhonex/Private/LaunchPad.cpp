@@ -41,7 +41,7 @@ void ALaunchPad::HanleOverlapped(UPrimitiveComponent * OverlappedComponent, AAct
 	auto BaseCharacter = Cast<ACharacter>(OtherActor);
 	if (BaseCharacter)
 	{
-		UGameplayStatics::SpawnSoundAttached(LaunchPadSound, RootComponent);
+		UGameplayStatics::SpawnSoundAttached(LaunchPadSound, BoxComp);
 		BaseCharacter->LaunchCharacter(LaunchVelocity,true,true);
 		UGameplayStatics::SpawnEmitterAtLocation(this, LaunchPadEffect,GetActorLocation());
 	
