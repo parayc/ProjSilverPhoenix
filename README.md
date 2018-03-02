@@ -1,4 +1,4 @@
-# ProjSilverPhonex
+# ProjSilverPhoenix
 
 Hack & Slash third person action game with roguelike elements. 
 
