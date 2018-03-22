@@ -99,7 +99,7 @@ protected:
 	UPROPERTY(EditDefaultsOnly, category = "Powerurps")
 	float TickInterval;
 
-	/*Total times we apply the power up affact*/
+	/*Total times we apply the power up affact and the amount the amount the power up will last in seconds */
 	UPROPERTY(EditDefaultsOnly, category = "Powerurps")
 	int32 TotalNumberOfTicks;
 

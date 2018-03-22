@@ -266,11 +266,12 @@ void ASPlayer::RollDircetion()
 	}
 	
 	float Duration = 0.f;
+	UE_LOG(LogTemp, Warning, TEXT("Roll: %f"), GetMoveForward())
 	if (!GetIsLockedOn())
 	{
 		//Play montage 
 		Duration = AnimInst->PlayAnimation(ForwardRoll);
-		//UE_LOG(LogTemp, Warning, TEXT("Roll"))
+		
 	}
 	else
 	{

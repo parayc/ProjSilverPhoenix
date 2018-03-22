@@ -153,8 +153,17 @@ void AMeleeWeapon::DealDamage(const FHitResult & HitResult)
 
 	if (Enemy)
 	{
-		if (Enemy->GetTeamNumber() != MyPawn->GetTeamNumber())
+		UCombatComponent* CombatComp = Cast<UCombatComponent>(Enemy->GetComponentByClass(UCombatComponent::StaticClass()));
+
+		if (Enemy->GetTeamNumber() != MyPawn->GetTeamNumber() && CombatComp)
 		{
+			//If we hit a immune enemy just end here
+			if (CombatComp->GetBattleState() == EBattleState::PS_Invincible)
+			{
+				return;
+			}
+			
+
 			float DealtDamage = Damage * DamageModifier;
 
 			FPointDamageEvent DamageEvent;
@@ -162,7 +171,7 @@ void AMeleeWeapon::DealDamage(const FHitResult & HitResult)
 			DamageEvent.HitInfo = HitResult;
 			PlaySound(SwordImpactSounds);
 			Enemy->TakeDamage(DealtDamage, DamageEvent, Instigator->GetController(), MyPawn);
-			//UE_LOG(LogTemp, Warning, TEXT("Enemy: %s"), *Enemy->GetName());
+			UE_LOG(LogTemp, Warning, TEXT("Damage: %f"), DealtDamage);
 		}
 	
 	}
@@ -206,6 +215,13 @@ void AMeleeWeapon::ClearEnemiesHitArray()
 float AMeleeWeapon::GetDamageModifier() const
 {
 	return DamageModifier;
+}
+
+
+
+void AMeleeWeapon::SetDamageModifier(float newDamage) 
+{
+	DamageModifier = newDamage;
 }
 
 TArray<FWeaponAnimation> AMeleeWeapon::GetLightAttackMontages()

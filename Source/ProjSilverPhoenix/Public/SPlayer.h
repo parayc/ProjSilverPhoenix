@@ -130,7 +130,7 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnDeathRequest OnDeathRequest;
 
-	
+
 	
 protected:
 	// Called when the game starts or when spawned

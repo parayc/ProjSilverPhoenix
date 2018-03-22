@@ -68,8 +68,11 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 	void ClearEnemiesHitArray();
 
-	UFUNCTION(BlueprintCallable, Category = "Setup")
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	float GetDamageModifier() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void SetDamageModifier(float newDamage);
 
 	TArray<FWeaponAnimation> GetLightAttackMontages();
 
