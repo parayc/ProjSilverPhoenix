@@ -11,6 +11,7 @@
 class ABaseWeapon;
 class UCombatComponent;
 class UAnimMontage;
+class UHealthComponent;
 
 USTRUCT(BlueprintType)
 struct FCharacterEquipment
@@ -47,6 +48,9 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Setup | Weapon")
 	TSubclassOf<class ABaseWeapon> StartingWeaponBlueprint;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UHealthComponent* HealthComponent;
+
 public:	
 
 	void AddWeaponToInventory(ABaseWeapon* Weapon);
@@ -57,25 +61,7 @@ public:
 
 	float GetWalkDirection();
 
-	UFUNCTION(BlueprintCallable, Category = "Character Condition")
-	float GetCurrentHealth() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Character Condition")
-	float GetMaxHealth() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Character Condition")
-	void Heal(float Value);
-
-	UFUNCTION(BlueprintCallable, Category = "Character Condition")
-	void SetAddMaxHealth(float Value);
-
-
-
-
 	/*Equipent & Attacking*/
-
-	/** Applies damage to the character */
-	virtual float TakeDamage(float Damage, struct FDamageEvent const& DamageEvent, AController* EventInstigator, AActor* DamageCauser) override;
 
 	void AddWeaponToCharacterEquipment(class ABaseWeapon* NewWeapon);
 
@@ -97,16 +83,14 @@ public:
 
 	virtual void OnDeath();
 
-	int32 GetTeamNumber();
-
 	bool CanUnequip() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Combat")
-	bool IsFlinching() const;
-
-	bool GetIsInvincible();
+	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
+	TArray<UAnimMontage*>  DeathMontages; 
 
 protected:
+
+	UFUNCTION()
+	void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayerState")
 		EPlayerStates CurrentPlayerState;
@@ -117,12 +101,6 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Setup | Weapon")
 	FName BackSocketName;
 
-	UPROPERTY(VisibleAnywhere, Category = "Character Condition")
-	float CurrentHealth;
-
-	UPROPERTY(EditAnywhere, Category = "Character Condition")
-	float MaxHealth = 100.f;
-
 	bool bCanAttack = true;
 
 	UPROPERTY(Category = "SetUp", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
@@ -132,11 +110,10 @@ protected:
 
 private:
 
-	UPROPERTY(Category = "Setup", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-		uint8 TeamNumber = 255;
+	//UPROPERTY(Category = "Setup", EditAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
+		//uint8 TeamNumber = 255;
 
 	bool bIsDead = false;
-
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | Movement")
 		float BackwardsWalkSpeed;

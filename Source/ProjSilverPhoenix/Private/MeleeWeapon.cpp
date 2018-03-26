@@ -10,6 +10,7 @@
 #include "Kismet/GameplayStatics.h"
 #include "PhysicsEngine/DestructibleActor.h"
 #include "CombatComponent.h"
+#include "HealthComponent.h"
 
 AMeleeWeapon::AMeleeWeapon()
 {
@@ -57,8 +58,10 @@ void AMeleeWeapon::TraceSwing()
 
 	FHitResult HitResult;
 	//This doesnt work 
-	FCollisionQueryParams* TraceParams = new FCollisionQueryParams(FName(""),false, Instigator);
-	TraceParams->AddIgnoredActor(MyPawn);
+	FCollisionQueryParams TraceParams;
+	TraceParams.AddIgnoredActor(MyPawn);
+	TraceParams.AddIgnoredActor(this);
+	TraceParams.bTraceComplex = true;
 
 	FVector TraceStart, TraceEnd;
 
@@ -78,31 +81,23 @@ void AMeleeWeapon::TraceSwing()
 		}
 		
 
-		if (GetWorld()->LineTraceSingleByChannel(HitResult,TraceStart,TraceEnd,ECC_Weapon, TraceParams))
+		if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Weapon, TraceParams))
 		{
-
-			AXBaseCharacter* Enemy = Cast<AXBaseCharacter>(HitResult.GetActor());
-			
-			//Check is the actor we hit is alive
-			if (Enemy && !Enemy->GetIsDead())
+			AActor* HitActor = HitResult.GetActor();
+			//We check if we hit the enemy already in the same swing and not hit ourself
+			if (HitActor && !EnemiesHit.Contains(HitActor) && HitActor != MyPawn)
 			{
-
-				//We check if we hit the enemy already in the same swing and not hit ourself
-				if (!EnemiesHit.Contains(Enemy) && (Enemy != MyPawn) )
+				EnemiesHit.Add(HitActor);
+				UHealthComponent* HealthComp = HitActor->FindComponentByClass<UHealthComponent>();
+				if (HealthComp)
 				{
-					EnemiesHit.Add(Enemy);
 					//Deal damage to enemy that was added
 					DealDamage(HitResult);
-
-					
-				
-					SpawnHitEffext(HitResult);
-					
-				
 				}
-			
-			}
-			else if(ADestructibleActor* DA = Cast<ADestructibleActor>(HitResult.GetActor()))
+				
+				SpawnHitEffext(HitResult);
+
+			}else if (ADestructibleActor* DA = Cast<ADestructibleActor>(HitResult.GetActor()))
 			{
 
 				FVector EyeLocation;
@@ -113,17 +108,24 @@ void AMeleeWeapon::TraceSwing()
 				TArray<AActor*> AllActors;
 				UGameplayStatics::GetAllActorsOfClass(GetWorld(), AXBaseCharacter::StaticClass(), AllActors);
 				//I use radial damage on destructible actors to give it an explode effect
-				UGameplayStatics::ApplyRadialDamage(GetWorld(), 10.f, HitResult.GetActor()->GetActorLocation(), 30.f, DamageType, AllActors,this, MyPawn->GetInstigatorController(),true, ECC_Weapon);
-				
+				UGameplayStatics::ApplyRadialDamage(GetWorld(), 10.f, HitResult.GetActor()->GetActorLocation(), 30.f, DamageType, AllActors, this, MyPawn->GetInstigatorController(), true, ECC_Weapon);
+
 			}
+			
+		
 		}
+		//ELSE if ...
+
 
 	}
 
 	/* Store the location of the previous frame*/
 	LastFrameStartSocket = StartSocket;
 	LastFrameEndSocket = EndSocket;
+
 }
+
+
 
 void AMeleeWeapon::PlaySound(USoundBase * Sound)
 {
@@ -149,30 +151,32 @@ void AMeleeWeapon::SetDamage(int32 Value)
 
 void AMeleeWeapon::DealDamage(const FHitResult & HitResult)
 {
-	AXBaseCharacter* Enemy = Cast<AXBaseCharacter>(HitResult.GetActor());
+	
+	UHealthComponent* HealthComp = Cast<UHealthComponent>(HitResult.GetActor()->GetComponentByClass(UHealthComponent::StaticClass()));
+	UCombatComponent* CombatComp = Cast<UCombatComponent>(HitResult.GetActor()->GetComponentByClass(UCombatComponent::StaticClass()));
 
-	if (Enemy)
+	//If we hit a immune enemy just end here
+	if (CombatComp && CombatComp->GetBattleState() == EBattleState::PS_Invincible)
 	{
-		UCombatComponent* CombatComp = Cast<UCombatComponent>(Enemy->GetComponentByClass(UCombatComponent::StaticClass()));
+		return;
+	}
+	
+	if (HealthComp)
+	{
 
-		if (Enemy->GetTeamNumber() != MyPawn->GetTeamNumber() && CombatComp)
+		if (UHealthComponent::IsFriendly(MyPawn, HitResult.GetActor()))
 		{
-			//If we hit a immune enemy just end here
-			if (CombatComp->GetBattleState() == EBattleState::PS_Invincible)
-			{
-				return;
-			}
-			
+			return;
+		}
 
 			float DealtDamage = Damage * DamageModifier;
-
 			FPointDamageEvent DamageEvent;
 			DamageEvent.Damage = DealtDamage;
 			DamageEvent.HitInfo = HitResult;
+			TSubclassOf<UDamageType> p;
 			PlaySound(SwordImpactSounds);
-			Enemy->TakeDamage(DealtDamage, DamageEvent, Instigator->GetController(), MyPawn);
-			UE_LOG(LogTemp, Warning, TEXT("Damage: %f"), DealtDamage);
-		}
+			UGameplayStatics::ApplyDamage(HitResult.GetActor(), DealtDamage, MyPawn->GetInstigatorController(), this, p);
+
 	
 	}
 }

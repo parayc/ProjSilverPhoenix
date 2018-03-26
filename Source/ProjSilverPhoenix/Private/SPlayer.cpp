@@ -12,6 +12,7 @@
 #include "BaseWeapon.h"
 #include "Components/CapsuleComponent.h"
 #include "DrawDebugHelpers.h"
+#include "TimerManager.h"
 
 ASPlayer::ASPlayer()
 {
@@ -90,12 +91,11 @@ void ASPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
 }
 
 
-
 void ASPlayer::MoveForward(float Value)
 {
 	//Needs to be called outside if statement to reset it back to zero
 	MoveForwardAxisValue = Value;
-	if ((Controller != NULL) && (Value != 0.0f) && !IsFlinching() )
+	if ((Controller != NULL) && (Value != 0.0f) && !CombatStates->GetIsFlinching())
 	{
 		// find out which way is forward
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -113,7 +113,7 @@ void ASPlayer::MoveRight(float Value)
 {
 	//Needs to be called outside if statement to reset it back to zero
 	MoveRightAxisValue = Value;
-	if ((Controller != NULL) && (Value != 0.0f) && !IsFlinching())
+	if ((Controller != NULL) && (Value != 0.0f) && !CombatStates->GetIsFlinching())
 	{
 		// find out which way is right
 		const FRotator Rotation = Controller->GetControlRotation();
@@ -141,7 +141,7 @@ void ASPlayer::LookUp(float Rate)
 
 void ASPlayer::StartJump()
 {
-	if (!IsFlinching() && GetIsRolling() != true)
+	if (!CombatStates->GetIsFlinching() && GetIsRolling() != true)
 	{
 		SetIsJumping(true);
 	}
@@ -232,7 +232,7 @@ void ASPlayer::RollCoolDown()
 
 void ASPlayer::StartRoll()
 {
-	if (bCanRoll && RollCounter < MaxAmountPlayerCanRoll && !IsFlinching() && GetCharacterMovement()->IsMovingOnGround() == true)
+	if (bCanRoll && RollCounter < MaxAmountPlayerCanRoll && !CombatStates->GetIsFlinching() && GetCharacterMovement()->IsMovingOnGround() == true)
 	{
 		bIsRolling = true;
 		SetCanRoll(false);
@@ -556,7 +556,7 @@ bool ASPlayer::GetIsLockedOn() const
 void ASPlayer::Attack()
 {
 	//Stop the player from attacking if rolling
-	if (GetIsRolling() == true ||  IsFlinching() == true) { return; }
+	if (GetIsRolling() == true || CombatStates->GetIsFlinching() == true) { return; }
 	if (CharacterEquipment.CurrentWeapon)
 	{
 		

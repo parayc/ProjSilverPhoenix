@@ -31,12 +31,21 @@ void UCombatComponent::SetBattleState(EBattleState BattleState)
 	CurrentBattleState = BattleState;
 }
 
-void UCombatComponent::KnockBack(ACharacter * DamageCauser, ACharacter * DamageReceiver)
+void UCombatComponent::KnockBack(AActor * DamageCauser, AActor * DamageReceiver)
 {
+	if (DamageCauser == nullptr || DamageReceiver == nullptr)
+	{
+		return;
+	}
 
 	FVector Direction = DamageReceiver->GetActorLocation() - DamageCauser->GetActorLocation();
 	FVector KnockbackDirection = ((Direction * FVector(1, 1, 0)) * KnockBackAmount) * FVector(2).Z;
-	DamageReceiver->LaunchCharacter(KnockbackDirection, true, false);
+	ACharacter* CharDamageReceiver = Cast<ACharacter>(DamageReceiver);
+	if (CharDamageReceiver)
+	{
+		CharDamageReceiver->LaunchCharacter(KnockbackDirection, true, false);
+	}
+	
 }
 
 void UCombatComponent::Flinch()

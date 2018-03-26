@@ -34,18 +34,12 @@ AEnemyMaster::AEnemyMaster()
 	PawnSensingComp->HearingThreshold = 600;//how far it can hear
 	PawnSensingComp->LOSHearingThreshold = 1200;
 	
-
-	CombatStates = CreateDefaultSubobject<UCombatComponent>(TEXT("Combat States"));
-
 }
 
 // Called when the game starts or when spawned
 void AEnemyMaster::BeginPlay()
 {
 	Super::BeginPlay();
-	
-	CurrentHealth = MaxHealth;
-	
 
 
 	if (PawnSensingComp)
@@ -54,12 +48,6 @@ void AEnemyMaster::BeginPlay()
 		PawnSensingComp->OnHearNoise.AddDynamic(this, &AEnemyMaster::OnHearNoise);
 		PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyMaster::OnseePlayer);
 		
-		
-	}
-	
-	if (CombatStates)
-	{
-		CombatStates->SetBattleState(EBattleState::PS_Normal);
 	}
 
 	if (TargetIcon)

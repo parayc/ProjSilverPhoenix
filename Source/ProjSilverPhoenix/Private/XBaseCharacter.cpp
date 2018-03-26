@@ -7,6 +7,8 @@
 #include "SPlayer.h"
 #include "InventoryComponent.h"
 #include "SPlayerController.h"
+#include "HealthComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/CharacterMovementComponent.h"
 
 
@@ -16,17 +18,13 @@ AXBaseCharacter::AXBaseCharacter()
  	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+
 }
 
 // Called when the game starts or when spawned
 void AXBaseCharacter::BeginPlay()
 {
 	Super::BeginPlay();
-
-	//Todo - set back to normal
-	CurrentHealth = MaxHealth - 10.f;
-
-	//CurrentPlayerState = EPlayerStates::PS_Passive;
 
 	if (StartingWeaponBlueprint)
 	{
@@ -39,12 +37,21 @@ void AXBaseCharacter::BeginPlay()
 		AddWeaponToCharacterEquipment(Weapon);
 	}
 
+	HealthComponent = this->FindComponentByClass<UHealthComponent>();
+
+	if (HealthComponent)
+	{
+		HealthComponent->OnHealthChange.AddDynamic(this, &AXBaseCharacter::OnHealthChanged);
+	}
 
 	CombatStates = this->FindComponentByClass<UCombatComponent>();
+
 	if (CombatStates)
 	{
 		CombatStates->SetBattleState(EBattleState::PS_Normal);
 	}
+
+
 }
 
 // Called every frame
@@ -79,86 +86,79 @@ float AXBaseCharacter::GetWalkDirection()
 	return FVector::DotProduct(GetVelocity().GetSafeNormal2D(), GetActorRotation().Vector());
 }
 
-
-float AXBaseCharacter::GetCurrentHealth() const
+void AXBaseCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
 {
-	return CurrentHealth;
-}
+	//If We heal or do no damage just return
+	if (HealthDelta <= 0) { return; }
 
-float AXBaseCharacter::GetMaxHealth() const
-{
-	return MaxHealth;
-}
-
-void AXBaseCharacter::Heal(float Value)
-{
-	if (CurrentHealth + Value < MaxHealth)
+	if (Health <= 0 && !bIsDead)
 	{
-		CurrentHealth += Value;
-	}
-	else
-	{
-		CurrentHealth = MaxHealth;
-	}
-	
-}
-
-void AXBaseCharacter::SetAddMaxHealth(float Value)
-{
-	MaxHealth = Value;
-}
-
-float AXBaseCharacter::TakeDamage(float Damage, FDamageEvent const & DamageEvent, AController * EventInstigator, AActor * DamageCauser)
-{
-
-	if (bIsDead == true || CombatStates->GetBattleState() == EBattleState::PS_Invincible)
-	{
-		return CurrentHealth;
-	}
-
-	CurrentHealth -= Damage;
-
-	if (CurrentHealth <= 0)
-	{
+		UE_LOG(LogTemp, Log, TEXT("Health Change Death "))
+		//Death
+		bIsDead = true;
 		OnDeath();
-		return CurrentHealth;
+		//DetachFromControllerPendingDestroy();
+
+		return; 
+
 	}
 
-	
-	if (!ensure(CombatStates)) { return CurrentHealth; }
+	if (!ensure(CombatStates) ) { return ; }
 
 	if (CombatStates->GetBattleState() == EBattleState::PS_Normal)
 	{
+		UE_LOG(LogTemp, Warning, TEXT("Combat Comp"))
 		//Reset combo if we get hit
 		UMeleeAnimInstance* PlayerAnimation = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
 		if (PlayerAnimation)
 		{
-			PlayerAnimation->ResetComboAttack();
+				PlayerAnimation->ResetComboAttack();
 		}
 
-		auto DamageInstigator = Cast<ACharacter>(DamageCauser);
-		if (DamageInstigator)
-		{
+		CombatStates->KnockBack(DamageCauser, this);
+		CombatStates->Flinch();
 
-			CombatStates->KnockBack(DamageInstigator, this);
-			CombatStates->Flinch();
-
-		}
 	}
 
-
-	return CurrentHealth;
 }
 
-bool AXBaseCharacter::IsFlinching() const
+void AXBaseCharacter::OnDeath()
 {
-	return CombatStates->GetIsFlinching();
+
+	//Play Death Montage
+	AXBaseCharacter* OwnerPawn = Cast<AXBaseCharacter>(this);
+	if (OwnerPawn)
+	{
+		if (DeathMontages.Num() > 0)
+		{
+			auto MontageToPlay = DeathMontages[FMath::RandRange(0, DeathMontages.Num() - 1 )];
+			if (MontageToPlay)
+			{
+				OwnerPawn->PlayAnimMontage(MontageToPlay, 1.0f);
+			}
+			
+		}
+		 
+	}
+
+	UCharacterMovementComponent* CharacterComp = Cast<UCharacterMovementComponent>(GetMovementComponent());
+	if (CharacterComp)
+	{
+		GetCapsuleComponent()->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+		CharacterComp->StopMovementImmediately();
+		CharacterComp->DisableMovement();
+		CharacterComp->SetComponentTickEnabled(false);
+	}
+	SetLifeSpan(10.f);
+	if (CharacterEquipment.CurrentWeapon)
+	{
+		CharacterEquipment.CurrentWeapon->DestroyWeapon();
+	}
+	
+
+
 }
 
-bool AXBaseCharacter::GetIsInvincible()
-{
-	return CombatStates->GetBattleState() == EBattleState::PS_Invincible;
-}
 
 void AXBaseCharacter::AddWeaponToInventory(ABaseWeapon* Weapon)
 {
@@ -201,9 +201,7 @@ void AXBaseCharacter::AddWeaponToCharacterEquipment(ABaseWeapon * NewWeapon)
 		}
 
 		CharacterEquipment.CurrentWeapon = NewWeapon;
-		
 
-		
 	}
 }
 
@@ -267,31 +265,12 @@ bool AXBaseCharacter::GetIsDead() const
 	return bIsDead;
 }
 
-void AXBaseCharacter::OnDeath()
-{
-	
-	UCharacterMovementComponent* CharacterComp = Cast<UCharacterMovementComponent>(GetMovementComponent());
-	if (CharacterComp)
-	{
-		CharacterComp->StopMovementImmediately();
-		CharacterComp->DisableMovement();
-		CharacterComp->SetComponentTickEnabled(false);
-	}
 
-	CharacterEquipment.CurrentWeapon->DestroyWeapon();
-	
-	bIsDead = true;
 
-}
-
-int32 AXBaseCharacter::GetTeamNumber()
-{
-	return TeamNumber;
-}
 
 bool AXBaseCharacter::CanUnequip() const
 {
 	auto Player = Cast<ASPlayer>(this);
-	return  Player->GetIsRolling() != true && Player->GetIsJumping() != true && Player->IsFlinching() != true && Player->GetIsDead() != true;
+	return  Player->GetIsRolling() != true && Player->GetIsJumping() != true && CombatStates->GetIsFlinching() != true && Player->GetIsDead() != true;
 }
 

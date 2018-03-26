@@ -3,6 +3,8 @@
 #include "BattleCircle.h"
 #include "AIController.h"
 #include "XBaseCharacter.h"
+#include "GameFramework/Character.h"
+#include "CombatComponent.h"
 
 EBTNodeResult::Type UBattleCircle::ExecuteTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMemory)
 {
@@ -29,7 +31,10 @@ void UBattleCircle::TickTask(UBehaviorTreeComponent & OwnerComp, uint8 * NodeMem
 	auto AIPawn = Cast<AXBaseCharacter>(OwnerComp.GetAIOwner()->GetPawn());
 	if (AIPawn)
 	{
-		if (!AIPawn->IsFlinching())
+
+		UCombatComponent* CombatComp = Cast<UCombatComponent>(AIPawn->GetComponentByClass(UCombatComponent::StaticClass()));
+
+		if (CombatComp && !CombatComp->GetIsFlinching())
 		{
 			if (RandomNumber == 1)
 			{

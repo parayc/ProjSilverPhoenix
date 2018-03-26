@@ -33,7 +33,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "CombatComponent")
 	void SetBattleState(EBattleState BattleState);
 
-	void KnockBack(ACharacter* DamageCauser, ACharacter* DamageReceiver);
+	void KnockBack(AActor * DamageCauser, AActor * DamageReceiver);
 
 	UPROPERTY(EditDefaultsOnly, Category = "CombatComponent")
 		float KnockBackAmount = 5;

@@ -102,7 +102,7 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
 		USoundBase* SwordImpactSounds;
 
-	TArray<AXBaseCharacter*> EnemiesHit;
+	TArray<AActor*> EnemiesHit;
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 		float DamageModifier = 1.0f;
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")

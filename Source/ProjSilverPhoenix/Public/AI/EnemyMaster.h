@@ -52,8 +52,6 @@ public:
 
 private:
 
-	//UPROPERTY(Category = "SetUp", VisibleAnywhere, BlueprintReadOnly, meta = (AllowPrivateAccess = "true"))
-	//	UCombatComponent* CombatStates = nullptr;
 
 	UFUNCTION()
 	void OnseePlayer(APawn* pawn);
