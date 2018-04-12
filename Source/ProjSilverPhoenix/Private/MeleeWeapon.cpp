@@ -89,13 +89,14 @@ void AMeleeWeapon::TraceSwing()
 			{
 				EnemiesHit.Add(HitActor);
 				UHealthComponent* HealthComp = HitActor->FindComponentByClass<UHealthComponent>();
-				if (HealthComp)
+				if (HealthComp && HealthComp->GetHealth() > 0.0f)
 				{
 					//Deal damage to enemy that was added
 					DealDamage(HitResult);
+					SpawnHitEffext(HitResult);
 				}
 				
-				SpawnHitEffext(HitResult);
+				
 
 			}else if (ADestructibleActor* DA = Cast<ADestructibleActor>(HitResult.GetActor()))
 			{

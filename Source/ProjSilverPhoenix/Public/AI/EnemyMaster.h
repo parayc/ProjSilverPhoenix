@@ -40,6 +40,9 @@ public:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	UWidgetComponent* TargetIcon;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
+	UWidgetComponent* HealthWidget;
+
 	UPROPERTY(VisibleAnywhere, Category = "Setup")
 	UPawnSensingComponent* PawnSensingComp;
 

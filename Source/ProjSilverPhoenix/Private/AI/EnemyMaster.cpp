@@ -26,8 +26,10 @@ AEnemyMaster::AEnemyMaster()
 	TargetIcon->SetDrawSize(FVector2D(20, 15));
 	TargetIcon->bVisible = true;
 	
-	TargetIcon->SetHiddenInGame(false);
-
+	HealthWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Health Widget"));
+	HealthWidget->SetupAttachment(GetMesh());
+	HealthWidget->SetDrawSize(FVector2D(60, 15));
+	HealthWidget->bVisible = true;
 
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComp"));
 	PawnSensingComp->SetPeripheralVisionAngle(40.f);
@@ -73,9 +75,6 @@ void AEnemyMaster::Tick(float DeltaTime)
 			bSensedTarget = false;
 			/* Reset */
 			AIController->SetSeenTarget(nullptr);
-			//UE_LOG(LogTemp, Warning, TEXT("Set enemy nullptr"));
-			
-
 		}
 	}
 
@@ -87,6 +86,11 @@ void AEnemyMaster::Tick(float DeltaTime)
 void AEnemyMaster::OnDeath() 
 {
 	Super::OnDeath();
+
+	if (HealthWidget)
+	{
+		HealthWidget->SetHiddenInGame(true);
+	}
 
 	USPGameInstance* GameInstance = Cast<USPGameInstance>(GetGameInstance());
 

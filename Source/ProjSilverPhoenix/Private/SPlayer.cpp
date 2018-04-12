@@ -266,7 +266,6 @@ void ASPlayer::RollDircetion()
 	}
 	
 	float Duration = 0.f;
-	UE_LOG(LogTemp, Warning, TEXT("Roll: %f"), GetMoveForward())
 	if (!GetIsLockedOn())
 	{
 		//Play montage 
@@ -405,7 +404,7 @@ void ASPlayer::CheckTargetsWithinSight(TArray<FHitResult> ActorsHit)
 	if (LockOnListTarget.Num() > 0)
 	{
 		LockOnListTarget[0]->SetTargetIconVisibility(false);
-		//UE_LOG(LogTemp, Warning, TEXT("SetTargetIcon"))
+	
 	}
 }
 
@@ -500,50 +499,66 @@ void ASPlayer::NextTarget()
 
 	if (LockOnListTarget.Num() == 0 || LockOnListTarget.Num() == 1) return;
 
-	if (bIsLockedOn)
+	//Check how much time has elasped since the last time the player tried to change  target
+	float timeSincseLastPressed = GetWorld()->GetTimeSeconds() - LastTimePressed;
+	if (0.5f < timeSincseLastPressed)
 	{
-		//If we Reached the end of the list go back to the start
+		LastTimePressed = GetWorld()->GetTimeSeconds();
+		if (bIsLockedOn)
+		{
 
-		//Remove the current target icon 
-		if (LockOnListTarget[TargetIndex])
-		{
-			LockOnListTarget[TargetIndex]->SetTargetIconVisibility(true);
-		}
+			//If we Reached the end of the list go back to the start
 
-		//set the new icon 
-		if (TargetIndex == LockOnListTarget.Num() - 1)
-		{
-			TargetIndex = 0;
-			LockOnListTarget[TargetIndex]->SetTargetIconVisibility(false);
-		}
-		else
-		{
-			TargetIndex++;
-			LockOnListTarget[TargetIndex]->SetTargetIconVisibility(false);
+			//Remove the current target icon 
+			if (LockOnListTarget[TargetIndex])
+			{
+				LockOnListTarget[TargetIndex]->SetTargetIconVisibility(true);
+			}
+
+			//set the new icon 
+			if (TargetIndex == LockOnListTarget.Num() - 1)
+			{
+				TargetIndex = 0;
+				LockOnListTarget[TargetIndex]->SetTargetIconVisibility(false);
+			}
+			else
+			{
+				TargetIndex++;
+				LockOnListTarget[TargetIndex]->SetTargetIconVisibility(false);
+			}
 		}
 	}
+	
+	
 }
 
 void ASPlayer::PrevTarget()
 {
 	if (LockOnListTarget.Num() == 0 || LockOnListTarget.Num() == 1) return;
 
-	if (bIsLockedOn)
+	//Check how much time has elasped since the last time the player tried to change  target
+	float timeSincseLastPressed = GetWorld()->GetTimeSeconds() - LastTimePressed;
+	
+	if (0.5f < timeSincseLastPressed)
 	{
-
-		//Remove the current target icon 
-		LockOnListTarget[TargetIndex]->SetTargetIconVisibility(true);
-
-		//if at the start of the list go to the end of the list 
-		if (LockOnListTarget[TargetIndex] == LockOnListTarget[0])
+		LastTimePressed = GetWorld()->GetTimeSeconds();
+		if (bIsLockedOn)
 		{
-			TargetIndex = LockOnListTarget.Num() - 1;
-			LockOnListTarget[TargetIndex]->SetTargetIconVisibility(false);
-		}
-		else
-		{
-			TargetIndex--;
-			LockOnListTarget[TargetIndex]->SetTargetIconVisibility(false);
+
+			//Remove the current target icon 
+			LockOnListTarget[TargetIndex]->SetTargetIconVisibility(true);
+
+			//if at the start of the list go to the end of the list 
+			if (LockOnListTarget[TargetIndex] == LockOnListTarget[0])
+			{
+				TargetIndex = LockOnListTarget.Num() - 1;
+				LockOnListTarget[TargetIndex]->SetTargetIconVisibility(false);
+			}
+			else
+			{
+				TargetIndex--;
+				LockOnListTarget[TargetIndex]->SetTargetIconVisibility(false);
+			}
 		}
 	}
 }

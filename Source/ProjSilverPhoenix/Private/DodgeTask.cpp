@@ -37,7 +37,6 @@ EBTNodeResult::Type UDodgeTask::ExecuteTask(UBehaviorTreeComponent & OwnerComp, 
 	FHitResult Hit;
 	FCollisionQueryParams TraceParams;
 	TraceParams.AddIgnoredActor(PawnOnwer);
-	UE_LOG(LogTemp, Warning, TEXT("Called still"))
 	if (GetWorld()->LineTraceSingleByChannel(Hit, startLocation, GoalDestination, ECollisionChannel::ECC_Visibility, TraceParams))
 	{
 		//Move to location

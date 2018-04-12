@@ -130,6 +130,8 @@ public:
 	UPROPERTY(BlueprintAssignable)
 	FOnDeathRequest OnDeathRequest;
 
+	float LastTimePressed = 0.0f;
+
 
 	
 protected:

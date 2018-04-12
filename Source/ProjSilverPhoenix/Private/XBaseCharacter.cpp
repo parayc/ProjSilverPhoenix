@@ -93,12 +93,10 @@ void AXBaseCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, float
 
 	if (Health <= 0 && !bIsDead)
 	{
-		UE_LOG(LogTemp, Log, TEXT("Health Change Death "))
 		//Death
 		bIsDead = true;
 		OnDeath();
-		//DetachFromControllerPendingDestroy();
-
+		
 		return; 
 
 	}
@@ -107,7 +105,6 @@ void AXBaseCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, float
 
 	if (CombatStates->GetBattleState() == EBattleState::PS_Normal)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Combat Comp"))
 		//Reset combo if we get hit
 		UMeleeAnimInstance* PlayerAnimation = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
 		if (PlayerAnimation)
