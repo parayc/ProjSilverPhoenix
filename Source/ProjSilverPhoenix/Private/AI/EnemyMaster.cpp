@@ -93,7 +93,6 @@ void AEnemyMaster::Tick(float DeltaTime)
 
 }
 
-
 void AEnemyMaster::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
 {
 	//If We heal or do no damage just return
@@ -131,9 +130,6 @@ void AEnemyMaster::OnHealthChanged(UHealthComponent * OwningHealthComp, float He
 	}
 }
 
-
-
-
 void AEnemyMaster::OnDeath() 
 {
 	Super::OnDeath();
@@ -156,7 +152,7 @@ void AEnemyMaster::OnDeath()
 
 	auto* Player = Cast<ASPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
-	if (Player && Player->GetIsLockedOn())
+	if (Player)
 	{
 		Player->LockOff();
 		Player->RemoveEnemyFromTargeting(this);
@@ -169,11 +165,11 @@ void AEnemyMaster::OnDeath()
 	SetLifeSpan(5.f);
 }
 
-
-void AEnemyMaster::SetTargetIconVisibility(bool NewState)
+void AEnemyMaster::SetTargetIconHidden(bool NewState)
 {
 	TargetIcon->SetHiddenInGame(NewState);
 }
+
 
 void AEnemyMaster::OnseePlayer(APawn * pawn)
 {

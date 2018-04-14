@@ -77,7 +77,7 @@ void AMeleeWeapon::TraceSwing()
 
 		if (bDrawDebugLines)
 		{
-			DrawDebugLine(Instigator->GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 5, 0, 2.0);
+			DrawDebugLine(Instigator->GetWorld(), TraceStart, TraceEnd, FColor::Red, false, 1, 0, 2.0);
 		}
 		
 

@@ -31,9 +31,6 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 		class UCameraComponent* Camera;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-		class USphereComponent* TargetSphere; 
-
 	UFUNCTION()
 	void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
@@ -117,21 +114,11 @@ public:
 	void PrevTarget();
 
 	UFUNCTION(BlueprintCallable, Category = "SetUp")
-		bool GetIsLockedOn() const;
-
-	void RemoveLockTarget(AEnemyMaster* TargetToRemove);
-
-	//void FindLockOnTargets();
+	bool GetIsLockedOn() const;
 
 	void LockOn();
 
 	void LockOff();
-
-	UFUNCTION()
-	void EnemyInRange(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFomSweep, const FHitResult & SweepResult);
-
-	UFUNCTION()
-	void EnemyOutOfRange(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex);
 
 	void RemoveEnemyFromTargeting(AEnemyMaster* Target);
 
@@ -181,7 +168,6 @@ private:
 
 	FTimerHandle RollCoolDownHandle;
 
-	
 	int RollCounter = 0;
 	/*This is the maximum amount the player can roll immediately after they performed a roll*/
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | Movement")
@@ -222,13 +208,14 @@ private:
 
 	TArray<AEnemyMaster*> EnemiesInRange;
 
+	void IsEnemyInRange();
+
+	bool IsTargetWithinSight(AActor* Target);
+
 	void LockOnCamera(float DeltaSec);
 
-	void CheckTargetsWithinSight(TArray<FHitResult> ActorsHit);
-
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | LockOnSystem")
-		float LockOnSphereRadius = 600.f;
-
+	float LockOnSphereRadius = 1000.f;
 
 	float closetTargetDistance;
 
