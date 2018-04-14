@@ -13,7 +13,17 @@ class UStaticMeshComponent;
 class UPawnSensingComponent;
 class UBehaviorTree;
 class UAnimMontage;
+class UHealthComponent;
 //class UCombatComponent;
+
+UENUM(BlueprintType)
+enum class EAIStates : uint8
+{
+	Passive,
+	suspicious,
+	Alerted
+
+};
 
 UCLASS()
 class PROJSILVERPHOENIX_API AEnemyMaster : public AXBaseCharacter
@@ -29,6 +39,15 @@ protected:
 	virtual void BeginPlay() override;
 
 	float TimeSinceLastDeath;
+
+	UFUNCTION()
+	void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UHealthComponent* HealthComponent;
+
+	EAIStates AIStates; 
 
 public:	
 	// Called every frame
@@ -51,7 +70,6 @@ public:
 
 	void SetTargetIconVisibility(bool NewState);
 
-	
 
 private:
 

@@ -37,13 +37,7 @@ void AXBaseCharacter::BeginPlay()
 		AddWeaponToCharacterEquipment(Weapon);
 	}
 
-	HealthComponent = this->FindComponentByClass<UHealthComponent>();
-
-	if (HealthComponent)
-	{
-		HealthComponent->OnHealthChange.AddDynamic(this, &AXBaseCharacter::OnHealthChanged);
-	}
-
+	
 	CombatStates = this->FindComponentByClass<UCombatComponent>();
 
 	if (CombatStates)
@@ -86,37 +80,10 @@ float AXBaseCharacter::GetWalkDirection()
 	return FVector::DotProduct(GetVelocity().GetSafeNormal2D(), GetActorRotation().Vector());
 }
 
-void AXBaseCharacter::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
+
+void AXBaseCharacter::SetIsDead(bool isDead)
 {
-	//If We heal or do no damage just return
-	if (HealthDelta <= 0) { return; }
-
-	if (Health <= 0 && !bIsDead)
-	{
-		//Death
-		bIsDead = true;
-		OnDeath();
-		
-		return; 
-
-	}
-
-	if (!ensure(CombatStates) ) { return ; }
-
-	if (CombatStates->GetBattleState() == EBattleState::PS_Normal)
-	{
-		//Reset combo if we get hit
-		UMeleeAnimInstance* PlayerAnimation = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
-		if (PlayerAnimation)
-		{
-				PlayerAnimation->ResetComboAttack();
-		}
-
-		CombatStates->KnockBack(DamageCauser, this);
-		CombatStates->Flinch();
-
-	}
-
+	bIsDead = isDead;
 }
 
 void AXBaseCharacter::OnDeath()

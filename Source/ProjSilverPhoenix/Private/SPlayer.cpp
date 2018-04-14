@@ -11,8 +11,11 @@
 #include "ProjSilverPhoenix.h"
 #include "BaseWeapon.h"
 #include "Components/CapsuleComponent.h"
+#include "Components/SphereComponent.h"
 #include "DrawDebugHelpers.h"
 #include "TimerManager.h"
+#include "HealthComponent.h"
+
 
 ASPlayer::ASPlayer()
 {
@@ -35,7 +38,8 @@ ASPlayer::ASPlayer()
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
 
-	
+	TargetSphere = CreateDefaultSubobject<USphereComponent>(TEXT("TargetSphere"));
+	TargetSphere->SetupAttachment(RootComponent, USpringArmComponent::SocketName);
 
 	
 }
@@ -49,6 +53,18 @@ void ASPlayer::BeginPlay()
 	//This restricts the players Camera movmevent from going to high or low 
 	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMax = 70;
 	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMin = -70;
+
+	HealthComponent = this->FindComponentByClass<UHealthComponent>();
+
+	if (HealthComponent)
+	{
+		HealthComponent->OnHealthChange.AddDynamic(this, &ASPlayer::OnHealthChanged);
+	}
+
+	TargetSphere->OnComponentBeginOverlap.AddDynamic(this, &ASPlayer::EnemyInRange);
+	TargetSphere->OnComponentEndOverlap.AddDynamic(this, &ASPlayer::EnemyOutOfRange);
+
+	//TargetSphere->SetSphereRadius(1000);
 	
 }
 
@@ -82,13 +98,46 @@ void ASPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
 	PlayerInputComponent->BindAction("LightAttack", IE_Pressed, this, &ASPlayer::Attack);
 	PlayerInputComponent->BindAction("HeavyAttack", IE_Pressed, this, &ASPlayer::HeavyAttack);
 
-	PlayerInputComponent->BindAction("LockOn", IE_Pressed, this, &ASPlayer::FindLockOnTargets);
+	PlayerInputComponent->BindAction("LockOn", IE_Pressed, this, &ASPlayer::LockOn);
 	PlayerInputComponent->BindAction("LockOn", IE_Released, this, &ASPlayer::LockOff);
 
 	PlayerInputComponent->BindAction("NextTarget", IE_Pressed, this, &ASPlayer::NextTarget);
 	PlayerInputComponent->BindAction("PrevTarget", IE_Pressed, this, &ASPlayer::PrevTarget);
 
 }
+
+void ASPlayer::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
+{
+	//If We heal or do no damage just return
+	if (HealthDelta <= 0) { return; }
+
+	if (Health <= 0 && !GetIsDead())
+	{
+		//Death
+		SetIsDead(true);
+		OnDeath();
+
+		return;
+
+	}
+
+	if (!ensure(CombatStates)) { return; }
+
+	if (CombatStates->GetBattleState() == EBattleState::PS_Normal)
+	{
+		//Reset combo if we get hit
+		UMeleeAnimInstance* PlayerAnimation = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
+		if (PlayerAnimation)
+		{
+			PlayerAnimation->ResetComboAttack();
+		}
+
+		CombatStates->KnockBack(DamageCauser, this);
+		CombatStates->Flinch();
+
+	}
+}
+
 
 
 void ASPlayer::MoveForward(float Value)
@@ -391,7 +440,7 @@ void ASPlayer::CheckTargetsWithinSight(TArray<FHitResult> ActorsHit)
 				AEnemyMaster *target = Cast<AEnemyMaster>(Hit.GetActor());
 				if (target && !LockOnListTarget.Contains(target))//Check to see if enemy is in the list already and type checking target
 				{
-					AddToLockOnTarget(target);
+					//AddToLockOnTarget(target);
 				}
 
 			}
@@ -400,72 +449,57 @@ void ASPlayer::CheckTargetsWithinSight(TArray<FHitResult> ActorsHit)
 
 	}
 
-	//if target list is nor empty,  set the first target icon in the list visible 
-	if (LockOnListTarget.Num() > 0)
-	{
-		LockOnListTarget[0]->SetTargetIconVisibility(false);
 	
-	}
 }
 
-void ASPlayer::AddToLockOnTarget(AEnemyMaster * Target)
+void ASPlayer::LockOn()
 {
-	//Stops the enemy from geting re-added just in case they are dead
-	if (!Target->GetIsDead())
-	{
-		auto TargetDistance = GetDistanceTo(Target);
-		//UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), TargetDistance)
-
-		if (TargetDistance < closetTargetDistance)
-		{
-			//add it first to the list
-			LockOnListTarget.Insert(Target, 0);
-			closetTargetDistance = TargetDistance;
-		}
-		else
-		{
-			//Add to the end of the list
-			LockOnListTarget.Add(Target);
-		}
-
-		//UE_LOG(LogTemp, Warning, TEXT("TargetLeangth: %d"), LockOnListTarget.Num())
-		bIsLockedOn = true;
-
-		//Make player face in the same direction as the camera
-		bUseControllerRotationYaw = true;
-		GetCharacterMovement()->bUseControllerDesiredRotation = false;
-	}
-}
+	if (LockOnListTarget.Num() <= 0) return;
 
 
-
-void ASPlayer::RemoveLockTarget(AEnemyMaster * TargetToRemove)
-{
-	LockOnListTarget.RemoveAt(TargetIndex);
-	TargetIndex = 0;
-}
-
-void ASPlayer::FindLockOnTargets()
-{
-	TArray<FHitResult> HitResults;
+	FHitResult HitResults;
 	FVector Start = GetActorLocation();
-	FVector End = Start + FVector(0, 0, 250);//Line trace a sphere around the player
+	FVector End = Start + (GetActorForwardVector() * 500);
 
-											 //Setting the collision details
-	FCollisionShape CollionShape;
-	CollionShape.ShapeType = ECollisionShape::Sphere;
-	CollionShape.SetSphere(LockOnSphereRadius);
-
-	FCollisionQueryParams CollParam;
-	CollParam.AddIgnoredActor(this);//Ignore ourself
-
-									//We only look for pawn objects
+	//We only look for pawn objects
 	ECollisionChannel ECC = ECollisionChannel::ECC_Pawn;
 
-	if (GetWorld()->SweepMultiByObjectType(HitResults, Start, End, FQuat::FQuat(), ECC, CollionShape, CollParam))
+	FCollisionShape CollionShape;
+	CollionShape.ShapeType = ECollisionShape::Box;
+	CollionShape.Box.HalfExtentX = 10.f;
+	CollionShape.Box.HalfExtentY = 10.f;
+	CollionShape.Box.HalfExtentZ = 10.f;
+
+	FCollisionQueryParams CollParam;
+	CollParam.AddIgnoredActor(this);
+
+	//ToDO -  Check distance of all targets and sort it 
+
+	//I choose ECC_Weapon as it would always be blocking the enemy 
+	if (GetWorld()->SweepSingleByChannel(HitResults,Start,End, FQuat::FQuat(),ECC_Weapon, CollionShape,CollParam))
 	{
-		CheckTargetsWithinSight(HitResults);
+		auto Enemy = Cast<AEnemyMaster>(HitResults.GetActor());
+		if (Enemy)
+		{
+				LockOnListTarget.Find(Enemy, TargetIndex);
+				LockOnListTarget[TargetIndex]->SetTargetIconVisibility(false);
+			
+		}
+
 	}
+	else 
+	{
+		
+		LockOnListTarget[0]->SetTargetIconVisibility(false);
+	}
+
+	
+	bIsLockedOn = true;
+
+	//Make player face in the same direction as the camera
+	bUseControllerRotationYaw = true;
+	GetCharacterMovement()->bUseControllerDesiredRotation = false;
+
 }
 
 void ASPlayer::LockOff()
@@ -480,7 +514,7 @@ void ASPlayer::LockOff()
 		bIsLockedOn = false;
 
 
-		//Check to see if the enemy is dead
+		//Check to see if the enemy is not dead
 		if (LockOnListTarget[TargetIndex] != nullptr)
 		{
 			//Remove the target icon 
@@ -488,10 +522,88 @@ void ASPlayer::LockOff()
 		}
 
 		//Empty the array
-		LockOnListTarget.Empty();
+		//LockOnListTarget.Empty();
 
 		TargetIndex = 0;
 	}
+}
+
+
+
+void ASPlayer::EnemyInRange(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFomSweep, const FHitResult & SweepResult)
+{
+	auto Enemy = Cast<AEnemyMaster>(OtherActor);
+	if (Enemy)
+	{
+
+		FHitResult Hit;
+		FCollisionQueryParams TraceParams;
+		TraceParams.AddIgnoredActor(this);
+
+		FVector StartTrace = this->GetActorLocation();
+		StartTrace.Z += 80.f; // Offset the line trace to start it from the players head 
+
+		FVector EndTrace = Enemy->GetActorLocation();
+		EndTrace.Z += 80.f;
+		//Check Whether the enemy is within sight 
+		if (GetWorld()->LineTraceSingleByChannel(Hit, StartTrace, EndTrace, ECC_TargetSystem, TraceParams))
+		{
+
+			//DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
+			AEnemyMaster* target = Cast<AEnemyMaster>(Hit.GetActor());
+			if (target && !LockOnListTarget.Contains(target))//Check to see if enemy is in the list already and type checking target
+			{
+				LockOnListTarget.Add(target);
+				//Also make sure the collision is ignored once in the target list
+				if (UCapsuleComponent* PrimitiveComponent = target->FindComponentByClass<UCapsuleComponent>())
+				{
+					UE_LOG(LogTemp, Warning, TEXT("Primitive"))
+					PrimitiveComponent->SetCollisionResponseToChannel(ECC_TargetSystem, ECollisionResponse::ECR_Ignore);
+				}
+			}
+
+		}
+	}
+}
+
+void ASPlayer::EnemyOutOfRange(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex)
+{
+	auto Enemy = Cast<AEnemyMaster>(OtherActor);
+	if (Enemy && LockOnListTarget.Contains(Enemy))
+	{
+		//Check if we are locked on 
+		if (!bIsLockedOn)
+		{
+			RemoveEnemyFromTargeting(Enemy);
+		}
+		else
+		{
+			//Check if target we are locked on has left range
+			if (LockOnListTarget[TargetIndex] == Enemy)
+			{
+				//We could 
+				LockOff();
+			}
+			RemoveEnemyFromTargeting(Enemy);
+		}
+
+		if (UCapsuleComponent* PrimitiveComponent = Enemy->FindComponentByClass<UCapsuleComponent>())
+		{
+			PrimitiveComponent->SetCollisionResponseToChannel(ECC_TargetSystem, ECollisionResponse::ECR_Block);
+		}
+	}
+}
+
+void ASPlayer::RemoveEnemyFromTargeting(AEnemyMaster * Target)
+{
+	LockOnListTarget.Remove(Target);
+}
+
+
+void ASPlayer::RemoveLockTarget(AEnemyMaster * TargetToRemove)
+{
+	LockOnListTarget.RemoveAt(TargetIndex);
+	TargetIndex = 0;
 }
 
 void ASPlayer::NextTarget()

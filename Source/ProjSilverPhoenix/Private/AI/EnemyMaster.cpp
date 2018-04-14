@@ -12,6 +12,8 @@
 #include "SPGameInstance.h"
 #include "Components/CapsuleComponent.h"
 #include "ProjSilverPhoenixGameModeBase.h"
+#include "HealthComponent.h"
+#include "MeleeAnimInstance.h"
 
 
 // Sets default values
@@ -29,7 +31,7 @@ AEnemyMaster::AEnemyMaster()
 	HealthWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Health Widget"));
 	HealthWidget->SetupAttachment(GetMesh());
 	HealthWidget->SetDrawSize(FVector2D(60, 15));
-	HealthWidget->bVisible = true;
+	HealthWidget->SetVisibility(false);
 
 	PawnSensingComp = CreateDefaultSubobject<UPawnSensingComponent>(TEXT("PawnSensingComp"));
 	PawnSensingComp->SetPeripheralVisionAngle(40.f);
@@ -43,13 +45,17 @@ void AEnemyMaster::BeginPlay()
 {
 	Super::BeginPlay();
 
+	HealthComponent = this->FindComponentByClass<UHealthComponent>();
 
+	if (HealthComponent)
+	{
+		HealthComponent->OnHealthChange.AddDynamic(this, &AEnemyMaster::OnHealthChanged);
+	}
+	
 	if (PawnSensingComp)
 	{
-
 		PawnSensingComp->OnHearNoise.AddDynamic(this, &AEnemyMaster::OnHearNoise);
 		PawnSensingComp->OnSeePawn.AddDynamic(this, &AEnemyMaster::OnseePlayer);
-		
 	}
 
 	if (TargetIcon)
@@ -72,14 +78,59 @@ void AEnemyMaster::Tick(float DeltaTime)
 		AEnemyAIController* AIController = Cast<AEnemyAIController>(GetController());
 		if (AIController)
 		{
+
+			if (HealthWidget)
+			{
+				HealthWidget->SetVisibility(false);
+			}
+			
 			bSensedTarget = false;
+
 			/* Reset */
 			AIController->SetSeenTarget(nullptr);
 		}
 	}
 
-	
 }
+
+
+void AEnemyMaster::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
+{
+	//If We heal or do no damage just return
+	if (HealthDelta <= 0) { return; }
+
+	if (HealthWidget)
+	{
+		HealthWidget->SetVisibility(true);
+	}
+
+	if (Health <= 0 && !GetIsDead())
+	{
+		//Death
+		SetIsDead(true);
+		OnDeath();
+
+		return;
+
+	}
+
+	if (!ensure(CombatStates)) { return; }
+
+	if (CombatStates->GetBattleState() == EBattleState::PS_Normal)
+	{
+		//Reset combo if we get hit
+		UMeleeAnimInstance* PlayerAnimation = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
+		if (PlayerAnimation)
+		{
+			PlayerAnimation->ResetComboAttack();
+		}
+
+		CombatStates->KnockBack(DamageCauser, this);
+		CombatStates->Flinch();
+
+	}
+}
+
 
 
 
@@ -108,7 +159,8 @@ void AEnemyMaster::OnDeath()
 	if (Player && Player->GetIsLockedOn())
 	{
 		Player->LockOff();
-		Player->FindLockOnTargets();
+		Player->RemoveEnemyFromTargeting(this);
+		
 	}
 
 	TimeSinceLastDeath = GetWorld()->TimeSeconds;
@@ -118,7 +170,6 @@ void AEnemyMaster::OnDeath()
 }
 
 
-//TODO - Chnage name of function
 void AEnemyMaster::SetTargetIconVisibility(bool NewState)
 {
 	TargetIcon->SetHiddenInGame(NewState);
@@ -141,7 +192,6 @@ void AEnemyMaster::OnseePlayer(APawn * pawn)
 		else
 		{
 			AIController->SetSeenTarget(nullptr);
-		
 		}
 		
 

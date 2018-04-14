@@ -46,7 +46,6 @@ void ASKFootSoldier::Tick(float DeltaTime)
 }
 
 
-
 void ASKFootSoldier::BeginPlay()
 {
 	Super::BeginPlay();

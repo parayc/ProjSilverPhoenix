@@ -48,8 +48,8 @@ protected:
 	UPROPERTY(EditDefaultsOnly, Category = "Setup | Weapon")
 	TSubclassOf<class ABaseWeapon> StartingWeaponBlueprint;
 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UHealthComponent* HealthComponent;
+	//UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	//UHealthComponent* HealthComponent;
 
 public:	
 
@@ -81,6 +81,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Animations")
 	bool GetIsDead() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Animations")
+	void SetIsDead(bool isDead);
+
 	virtual void OnDeath();
 
 	bool CanUnequip() const;
@@ -89,8 +92,8 @@ public:
 
 protected:
 
-	UFUNCTION()
-	void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+	//UFUNCTION()
+	//void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayerState")
 		EPlayerStates CurrentPlayerState;

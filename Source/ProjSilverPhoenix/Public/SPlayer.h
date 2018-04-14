@@ -16,6 +16,8 @@ class AEnemyMaster;
 class UCameraComponent;
 class AEnemyMaster;
 class UCombatComponent;
+class UHealthComponent;
+
 
 UCLASS()
 class PROJSILVERPHOENIX_API ASPlayer : public AXBaseCharacter
@@ -28,6 +30,16 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
 		class UCameraComponent* Camera;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+		class USphereComponent* TargetSphere; 
+
+	UFUNCTION()
+	void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UHealthComponent* HealthComponent;
+
 public:
 
 	ASPlayer();
@@ -50,7 +62,6 @@ public:
 
 	void LookUp(float Rate);
 
-	
 	/*Jumping*/
 	void StartJump();
 
@@ -110,10 +121,19 @@ public:
 
 	void RemoveLockTarget(AEnemyMaster* TargetToRemove);
 
-	void FindLockOnTargets();
+	//void FindLockOnTargets();
+
+	void LockOn();
 
 	void LockOff();
 
+	UFUNCTION()
+	void EnemyInRange(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex, bool bFomSweep, const FHitResult & SweepResult);
+
+	UFUNCTION()
+	void EnemyOutOfRange(UPrimitiveComponent * OverlappedComp, AActor * OtherActor, UPrimitiveComponent * OtherComp, int32 OtherBodyIndex);
+
+	void RemoveEnemyFromTargeting(AEnemyMaster* Target);
 
 	/*Equipent & Attacking*/
 
@@ -200,11 +220,11 @@ private:
 
 	TArray<AEnemyMaster*> LockOnListTarget;
 
+	TArray<AEnemyMaster*> EnemiesInRange;
+
 	void LockOnCamera(float DeltaSec);
 
 	void CheckTargetsWithinSight(TArray<FHitResult> ActorsHit);
-
-	void AddToLockOnTarget(AEnemyMaster* Target);
 
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | LockOnSystem")
 		float LockOnSphereRadius = 600.f;
