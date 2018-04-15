@@ -63,6 +63,7 @@ void ASPlayer::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 	IsEnemyInRange();
+	IsEnemyOutOfRange();
 	if (bIsLockedOn)
 	{
 		LockOnCamera(DeltaTime);
@@ -471,6 +472,24 @@ void ASPlayer::LockOnCamera(float DeltaSec)
 		}
 
 	}
+}
+
+//Removes enemy from lock on list if they are out of sight or far from the player
+void ASPlayer::IsEnemyOutOfRange()
+{
+	if (LockOnListTarget.Num() <= 0 || bIsLockedOn) return;
+
+	for (int i = 0; i < LockOnListTarget.Num(); i++)
+	{
+		auto Target = LockOnListTarget[i];
+		float Distance = (Target->GetActorLocation() - GetActorLocation()).Size();
+		if (LockOnSphereRadius < Distance || !IsTargetWithinSight(Target))
+		{
+			LockOnListTarget.Remove(Target);
+			UE_LOG(LogTemp, Warning, TEXT("Remove enemy"))
+		}
+	}
+
 }
 
 

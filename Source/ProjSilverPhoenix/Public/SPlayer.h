@@ -217,6 +217,6 @@ private:
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | LockOnSystem")
 	float LockOnSphereRadius = 1000.f;
 
-	float closetTargetDistance;
+	void IsEnemyOutOfRange();
 
 };
