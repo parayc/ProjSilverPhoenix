@@ -108,7 +108,6 @@ void AEnemyMaster::OnHealthChanged(UHealthComponent * OwningHealthComp, float He
 		//Death
 		SetIsDead(true);
 		OnDeath();
-
 		return;
 
 	}
