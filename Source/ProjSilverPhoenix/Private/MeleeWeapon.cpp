@@ -8,7 +8,8 @@
 #include "DrawDebugHelpers.h"
 #include "MeleeAnimInstance.h"
 #include "Kismet/GameplayStatics.h"
-#include "PhysicsEngine/DestructibleActor.h"
+//#include "PhysicsEngine/DestructibleActor.h"
+#include "DestructibleComponent.h"
 #include "CombatComponent.h"
 #include "HealthComponent.h"
 
@@ -98,20 +99,20 @@ void AMeleeWeapon::TraceSwing()
 				
 				
 
-			}else if (ADestructibleActor* DA = Cast<ADestructibleActor>(HitResult.GetActor()))
-			{
+			}//else if (ADestructibleActor* DA = Cast<ADestructibleActor>(HitResult.GetActor()))
+			//{
 
-				FVector EyeLocation;
-				FRotator EyeRotation;
-				MyPawn->GetActorEyesViewPoint(EyeLocation, EyeRotation);
+			//	FVector EyeLocation;
+			//	FRotator EyeRotation;
+			//	MyPawn->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 
-				FVector AttackDirection = EyeRotation.Vector();
-				TArray<AActor*> AllActors;
-				UGameplayStatics::GetAllActorsOfClass(GetWorld(), AXBaseCharacter::StaticClass(), AllActors);
-				//I use radial damage on destructible actors to give it an explode effect
-				UGameplayStatics::ApplyRadialDamage(GetWorld(), 10.f, HitResult.GetActor()->GetActorLocation(), 30.f, DamageType, AllActors, this, MyPawn->GetInstigatorController(), true, ECC_Weapon);
+			//	FVector AttackDirection = EyeRotation.Vector();
+			//	TArray<AActor*> AllActors;
+			//	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AXBaseCharacter::StaticClass(), AllActors);
+			//	//I use radial damage on destructible actors to give it an explode effect
+			//	UGameplayStatics::ApplyRadialDamage(GetWorld(), 10.f, HitResult.GetActor()->GetActorLocation(), 30.f, DamageType, AllActors, this, MyPawn->GetInstigatorController(), true, ECC_Weapon);
 
-			}
+			//}
 			
 		
 		}
