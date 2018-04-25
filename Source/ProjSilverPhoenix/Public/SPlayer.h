@@ -206,8 +206,6 @@ private:
 
 	TArray<AEnemyMaster*> LockOnListTarget;
 
-	TArray<AEnemyMaster*> EnemiesInRange;
-
 	void IsEnemyInRange();
 
 	bool IsTargetWithinSight(AActor* Target);

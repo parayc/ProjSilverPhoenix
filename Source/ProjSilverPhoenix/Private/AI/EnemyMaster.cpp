@@ -73,19 +73,17 @@ void AEnemyMaster::Tick(float DeltaTime)
 	//SetTargetIconDirection();
 
 	/* Check if the last time we sensed a player is beyond the time out value to prevent from endlessly following a player. */
-	if (bSensedTarget && (GetWorld()->TimeSeconds - LastSeenTime) > SenseTimeOut || GetIsDead())
+	if (LastTimeSensePlayer())
 	{
 		AEnemyAIController* AIController = Cast<AEnemyAIController>(GetController());
 		if (AIController)
 		{
-
 			if (HealthWidget)
 			{
 				HealthWidget->SetVisibility(false);
 			}
 			
 			bSensedTarget = false;
-
 			/* Reset */
 			AIController->SetSeenTarget(nullptr);
 		}
@@ -151,7 +149,8 @@ void AEnemyMaster::OnDeath()
 
 	auto* Player = Cast<ASPlayer>(GetWorld()->GetFirstPlayerController()->GetPawn());
 
-	if (Player)
+	//TODO - check if we are lock on to this actor 
+	if (Player && Player->GetIsLockedOn())
 	{
 		Player->LockOff();
 		Player->RemoveEnemyFromTargeting(this);
@@ -182,14 +181,14 @@ void AEnemyMaster::OnseePlayer(APawn * pawn)
 		ASPlayer* player = Cast<ASPlayer>(pawn);
 		if (player && !player->GetIsDead() && GetIsDead() == false)
 		{
-			AIController->SetSeenTarget(pawn);
+			EnemyRef = player;
+			AIController->SetSeenTarget(EnemyRef);
 		}
 		else
 		{
 			AIController->SetSeenTarget(nullptr);
 		}
 		
-
 	}
 }
 
@@ -200,7 +199,13 @@ void AEnemyMaster::OnHearNoise(APawn * PawnInstigator, const FVector & Location,
 	if (AIController)
 	{
 		AIController->SetHeardLocation(Location);
-
 	}
+}
+
+bool AEnemyMaster::LastTimeSensePlayer()
+{
+
+	return bSensedTarget && (GetWorld()->TimeSeconds - LastSeenTime) > SenseTimeOut ||
+		GetIsDead() || (EnemyRef && EnemyRef->GetIsDead());
 }
 

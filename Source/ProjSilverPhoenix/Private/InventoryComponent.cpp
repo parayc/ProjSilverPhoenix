@@ -33,7 +33,7 @@ int32 UInventoryComponent::GetNumberOfSlots() const
 void UInventoryComponent::AddItem(TSubclassOf<class ABaseItem> Item, int32 AmountToAdd)
 {
 
-	UE_LOG(LogTemp, Warning, TEXT("Add Item: %d"), AmountToAdd)
+	//UE_LOG(LogTemp, Warning, TEXT("Add Item: %d"), AmountToAdd)
 	if (Item.GetDefaultObject()->ItemInfo.CanBeStacked)
 	{
 
@@ -157,13 +157,11 @@ int32 UInventoryComponent::SearchFreeStack(TSubclassOf<class ABaseItem> Item)
 	{
 		if (InventorySlots[i].ItemClass == Item && InventorySlots[i].Amount < MaxStackSize)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Stack Space found"))
 			Index = i;
 			return Index;
 		}
 	}  
 
-	UE_LOG(LogTemp, Warning, TEXT("No Stack Space found"))
 	return Index;
 	
 
@@ -276,7 +274,7 @@ bool UInventoryComponent::AddToIndex(int32 FromIndex, int32 ToIndex)
 {
 	if (InventorySlots[FromIndex].ItemClass == InventorySlots[ToIndex].ItemClass && InventorySlots[ToIndex].Amount < MaxStackSize && GetItemInfoAtIndex(FromIndex).CanBeStacked)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Add to index"))
+
 		if (MaxStackSize - GetAmountAtIndex(ToIndex) >= GetAmountAtIndex(FromIndex))
 		{
 			InventorySlots[ToIndex].Amount = GetAmountAtIndex(FromIndex) + GetAmountAtIndex(ToIndex);

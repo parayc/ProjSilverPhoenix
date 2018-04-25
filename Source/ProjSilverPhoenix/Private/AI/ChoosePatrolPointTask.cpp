@@ -21,7 +21,6 @@ EBTNodeResult::Type UChoosePatrolPointTask::ExecuteTask(UBehaviorTreeComponent& 
 	//check is patrol points is empety
 	if (PatrolPoints.Num() == 0)
 	{
-		//UE_LOG(LogTemp, Warning, TEXT("AI: %s has no patrol point"), *ControlledPawn->GetName());
 		return EBTNodeResult::Failed;
 
 	}

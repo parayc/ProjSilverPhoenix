@@ -174,7 +174,7 @@ void AXBaseCharacter::AttachWeaponToSocket()
 	if (EPlayerStates::PS_Combat == CurrentPlayerState)
 	{//SnapToTargetIncludingScale
 		CharacterEquipment.CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);
-		//UE_LOG(LogTemp, Warning, TEXT("hand socket"));
+		
 	}
 	else
 	{
@@ -228,9 +228,6 @@ bool AXBaseCharacter::GetIsDead() const
 {
 	return bIsDead;
 }
-
-
-
 
 bool AXBaseCharacter::CanUnequip() const
 {

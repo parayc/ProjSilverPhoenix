@@ -73,6 +73,7 @@ public:
 
 private:
 
+	AXBaseCharacter* EnemyRef;
 
 	UFUNCTION()
 	void OnseePlayer(APawn* pawn);
@@ -87,6 +88,8 @@ private:
 	bool bIsTargeted = false;
 
 	float LastSeenTime;
+
+	bool LastTimeSensePlayer();
 
 	/*This is how long the AI will follow the enemy when there are not in their line of sight */
 	UPROPERTY(EditDefaultsOnly, Category = "SetUp")

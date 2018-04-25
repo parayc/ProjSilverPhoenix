@@ -263,8 +263,6 @@ bool ASPlayer::GetIsDoubleJumping() const
 	return bIsDoubleJump;
 }
 
-
-
 void ASPlayer::RollCoolDown()
 {
 	RollCounter = 0;
@@ -320,8 +318,8 @@ void ASPlayer::RollDircetion()
 		auto PlayersForwardDirection = GetActorForwardVector().GetSafeNormal();
 
 		//DotProduct
-		auto DotDirection = FVector::DotProduct(PlayersVelocity, PlayersForwardDirection);
-		auto CrossDirection = FVector::CrossProduct(PlayersForwardDirection, PlayersVelocity).Z;
+		//auto DotDirection = FVector::DotProduct(PlayersVelocity, PlayersForwardDirection);
+		//auto CrossDirection = FVector::CrossProduct(PlayersForwardDirection, PlayersVelocity).Z;
 
 
 		if (GetMoveRight() >= 0.5)
@@ -346,7 +344,6 @@ void ASPlayer::RollDircetion()
 		}
 		
 	}
-
 
 
 	/*This calls the method once the animation is played*/
@@ -408,7 +405,7 @@ void ASPlayer::IsEnemyInRange()
 			
 			if (Enemy && !LockOnListTarget.Contains(Enemy) && IsTargetWithinSight(Enemy) && !Enemy->GetIsDead())
 			{
-				UE_LOG(LogTemp, Warning, TEXT("Add enemy"))
+				//UE_LOG(LogTemp, Warning, TEXT("Add enemy"))
 				LockOnListTarget.Add(Enemy);
 
 				//Also make sure the collision is ignored once in the target list
@@ -486,7 +483,6 @@ void ASPlayer::IsEnemyOutOfRange()
 		if (LockOnSphereRadius < Distance || !IsTargetWithinSight(Target))
 		{
 			LockOnListTarget.Remove(Target);
-			UE_LOG(LogTemp, Warning, TEXT("Remove enemy"))
 		}
 	}
 
@@ -508,9 +504,9 @@ void ASPlayer::LockOn()
 
 	FCollisionShape CollionShape;
 	CollionShape.ShapeType = ECollisionShape::Box;
-	CollionShape.Box.HalfExtentX = 10.f;
-	CollionShape.Box.HalfExtentY = 10.f;
-	CollionShape.Box.HalfExtentZ = 10.f;
+	CollionShape.Box.HalfExtentX = 20.f;
+	CollionShape.Box.HalfExtentY = 20.f;
+	CollionShape.Box.HalfExtentZ = 20.f;
 
 	FCollisionQueryParams CollParam;
 	CollParam.AddIgnoredActor(this);
@@ -525,9 +521,13 @@ void ASPlayer::LockOn()
 		{
 			if (LockOnListTarget.Find(Enemy, TargetIndex))
 			{
-				LockOnListTarget[TargetIndex]->SetTargetIconHidden(false);
+				LockOnListTarget[TargetIndex]->SetTargetIconHidden(false); 
 			}
 				
+		}
+		else
+		{
+			LockOnListTarget[0]->SetTargetIconHidden(false);
 		}
 
 	}
@@ -574,7 +574,6 @@ void ASPlayer::RemoveEnemyFromTargeting(AEnemyMaster * Target)
 {
 	if(Target)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Removed"))
 		LockOnListTarget.Remove(Target);
 	}
 

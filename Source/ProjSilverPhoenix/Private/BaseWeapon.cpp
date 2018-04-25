@@ -55,7 +55,6 @@ void ABaseWeapon::UseItem(AActor* OwnerController)
 		{
 			SetOwningPawn(Player);
 			Player->AddWeaponToCharacterEquipment(this);
-			//UE_LOG(LogTemp, Warning, TEXT("Add weapon to hand"))
 		}
 	}
 

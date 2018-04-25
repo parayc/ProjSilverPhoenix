@@ -69,7 +69,6 @@ void AEnemyAIController::SetEnemyInRnage(bool NewState)
 	if (BlackboardComp)
 	{
 		BlackboardComp->SetValueAsBool(EnemyInRange, NewState);
-		//UE_LOG(LogTemp, Warning, TEXT("Enemy in range"))
 	}
 }
 

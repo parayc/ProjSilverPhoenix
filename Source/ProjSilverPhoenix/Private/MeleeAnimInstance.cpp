@@ -54,7 +54,6 @@ void UMeleeAnimInstance::PlayCombo(EAttackType AttackType)
 		TArray<FWeaponAnimation> Montages;
 		if (AttackType == EAttackType::PS_Light)
 		{
-			//	UE_LOG(LogTemp, Warning, TEXT("Montage light"));
 			Montages = Melee->GetLightAttackMontages();
 		}
 		else if (AttackType == EAttackType::PS_Heavy)
