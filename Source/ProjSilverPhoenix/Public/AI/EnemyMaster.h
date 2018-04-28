@@ -5,6 +5,7 @@
 #include "CoreMinimal.h"
 #include "GameFramework/Character.h"
 #include "XBaseCharacter.h"
+#include "ProjSilverPhoenix.h"
 #include "EnemyMaster.generated.h"
 
 
@@ -16,14 +17,7 @@ class UAnimMontage;
 class UHealthComponent;
 //class UCombatComponent;
 
-UENUM(BlueprintType)
-enum class EAIStates : uint8
-{
-	Passive,
-	suspicious,
-	Alerted
 
-};
 
 UCLASS()
 class PROJSILVERPHOENIX_API AEnemyMaster : public AXBaseCharacter
@@ -49,6 +43,9 @@ protected:
 
 	EAIStates AIStates; 
 
+	void SetGuradState(EAIStates NewState);
+
+
 public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
@@ -70,6 +67,7 @@ public:
 
 	void SetTargetIconHidden(bool NewState);
 
+	
 
 private:
 

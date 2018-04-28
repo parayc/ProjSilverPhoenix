@@ -37,6 +37,8 @@ AEnemyMaster::AEnemyMaster()
 	PawnSensingComp->SetPeripheralVisionAngle(40.f);
 	PawnSensingComp->HearingThreshold = 600;//how far it can hear
 	PawnSensingComp->LOSHearingThreshold = 1200;
+
+	AIStates = EAIStates::Passive;
 	
 }
 
@@ -62,6 +64,8 @@ void AEnemyMaster::BeginPlay()
 	{
 		TargetIcon->SetHiddenInGame(true);
 	}
+
+	SetGuradState(AIStates);
 	
 }
 
@@ -75,6 +79,8 @@ void AEnemyMaster::Tick(float DeltaTime)
 	/* Check if the last time we sensed a player is beyond the time out value to prevent from endlessly following a player. */
 	if (LastTimeSensePlayer())
 	{
+		SetGuradState(EAIStates::Passive);
+
 		AEnemyAIController* AIController = Cast<AEnemyAIController>(GetController());
 		if (AIController)
 		{
@@ -121,9 +127,22 @@ void AEnemyMaster::OnHealthChanged(UHealthComponent * OwningHealthComp, float He
 			PlayerAnimation->ResetComboAttack();
 		}
 
-		CombatStates->KnockBack(DamageCauser, this);
+		CombatStates->KnockBack(InstigatedBy->GetPawn(), this);
 		CombatStates->Flinch();
 
+	}
+}
+
+void AEnemyMaster::SetGuradState(EAIStates NewState)
+{
+	if (NewState == AIStates) return;
+
+	AIStates = NewState;
+
+	AEnemyAIController* AIController = Cast<AEnemyAIController>(GetController());
+	if (AIController)
+	{
+		AIController->SetAIState(AIStates);
 	}
 }
 
@@ -183,6 +202,7 @@ void AEnemyMaster::OnseePlayer(APawn * pawn)
 		{
 			EnemyRef = player;
 			AIController->SetSeenTarget(EnemyRef);
+			SetGuradState(EAIStates::Alerted);
 		}
 		else
 		{
@@ -194,12 +214,18 @@ void AEnemyMaster::OnseePlayer(APawn * pawn)
 
 void AEnemyMaster::OnHearNoise(APawn * PawnInstigator, const FVector & Location, float Volume)
 {
-	
+	if (AIStates == EAIStates::Alerted)
+	{
+		return;
+	}
+
 	AEnemyAIController* AIController = Cast<AEnemyAIController>(GetController());
 	if (AIController)
 	{
 		AIController->SetHeardLocation(Location);
 	}
+
+	SetGuradState(EAIStates::Suspicious);
 }
 
 bool AEnemyMaster::LastTimeSensePlayer()

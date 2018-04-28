@@ -4,13 +4,25 @@
 
 #include "CoreMinimal.h"
 #include "AIController.h"
+#include "ProjSilverPhoenix.h"
 #include "EnemyAIController.generated.h"
 
 class AActor;
+class AEnemyMaster;
 
 /**
  * 
  */
+
+
+UENUM(BlueprintType)
+enum class Etest : uint8
+{
+	Passive,
+	Suspicious,
+	Alerted
+
+};
 UCLASS()
 class PROJSILVERPHOENIX_API AEnemyAIController : public AAIController
 {
@@ -21,6 +33,8 @@ class PROJSILVERPHOENIX_API AEnemyAIController : public AAIController
 	class UBlackboardComponent* BlackboardComp;
 
 public:
+
+	
 
 	AEnemyAIController();
 
@@ -34,6 +48,8 @@ public:
 
 	void SetEnemyInRnage(bool NewState);
 
+	void SetAIState(EAIStates newState);
+
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName Enemy;
 
@@ -41,10 +57,14 @@ public:
 	FName EnemyInRange;
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
-		FName NoiseLocation;
+	FName NoiseLocation;
+
+	UPROPERTY(EditDefaultsOnly, Category = AI)
+	FName AIState;
 
 	UFUNCTION(BlueprintCallable)
 	AActor* GetEnemyRef() const;
+
 	
 private:
 

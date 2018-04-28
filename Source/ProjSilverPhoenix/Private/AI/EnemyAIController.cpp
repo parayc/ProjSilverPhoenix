@@ -3,6 +3,7 @@
 #include "EnemyAIController.h"
 #include "EnemyMaster.h"
 #include "BehaviorTree/BehaviorTree.h"
+#include "BehaviorTree/Blackboard/BlackboardKeyType_Enum.h"
 #include "BehaviorTree/BehaviorTreeComponent.h"
 #include "BehaviorTree/BlackboardComponent.h"
 
@@ -17,7 +18,8 @@ AEnemyAIController::AEnemyAIController()
 
 	Enemy = "Enemy";
 	EnemyInRange = "EnemyInRange";
-	NoiseLocation = "NoiseLocation";
+	NoiseLocation = "TargetDestination";
+	AIState = "AIState";
 }
 
 void AEnemyAIController::Possess(APawn * pawn)
@@ -58,8 +60,6 @@ void AEnemyAIController::SetHeardLocation(FVector Location)
 	if (BlackboardComp)
 	{
 		BlackboardComp->SetValueAsVector(NoiseLocation, Location);
-		
-
 	}
 }
 
@@ -69,6 +69,14 @@ void AEnemyAIController::SetEnemyInRnage(bool NewState)
 	if (BlackboardComp)
 	{
 		BlackboardComp->SetValueAsBool(EnemyInRange, NewState);
+	}
+}
+
+void AEnemyAIController::SetAIState(EAIStates newState)
+{
+	if (BlackboardComp)
+	{
+		BlackboardComp->SetValue<UBlackboardKeyType_Enum>(AIState, static_cast<UBlackboardKeyType_Enum::FDataType>(newState));
 	}
 }
 
