@@ -46,7 +46,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "CombatComponent")
 	bool GetIsFlinching() const;
 
-
 private: 
 	FTimerHandle FlinchHandleTimer;
 

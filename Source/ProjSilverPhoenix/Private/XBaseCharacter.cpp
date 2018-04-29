@@ -172,7 +172,7 @@ void AXBaseCharacter::AddWeaponToCharacterEquipment(ABaseWeapon * NewWeapon)
 void AXBaseCharacter::AttachWeaponToSocket()
 {
 	if (EPlayerStates::PS_Combat == CurrentPlayerState)
-	{//SnapToTargetIncludingScale
+	{
 		CharacterEquipment.CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);
 		
 	}
@@ -194,14 +194,15 @@ EPlayerStates AXBaseCharacter::GetCurrentState() const
 	return CurrentPlayerState;
 }
 
+//TODO Rewrite this method
 void AXBaseCharacter::SwitchStats(EPlayerStates NewState)
 {
-
 	//If we are dead dont switch states
 	if (GetIsDead())
 	{
 		return;
 	}
+	//Update new state
 	CurrentPlayerState = NewState;
 
 	if (CharacterEquipment.CurrentWeapon)
@@ -211,11 +212,17 @@ void AXBaseCharacter::SwitchStats(EPlayerStates NewState)
 		if (EPlayerStates::PS_Passive == CurrentPlayerState && CanUnequip())
 		{
 			CharacterEquipment.CurrentWeapon->UnEquip();
+			//UE_LOG(LogTemp, Warning, TEXT("Animation"));
 		}
-		else//If we are rolling just attach weapon to back
+		else if (EPlayerStates::PS_Passive == CurrentPlayerState)//If is not appropriate to play animation just attach to back
 		{
 			AttachWeaponToSocket();
 		}
+		else if (EPlayerStates::PS_Combat == CurrentPlayerState)
+		{
+			AttachWeaponToSocket();
+		}
+
 	}
 	else
 	{

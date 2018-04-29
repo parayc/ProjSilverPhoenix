@@ -139,7 +139,6 @@ public:
 
 	float LastTimePressed = 0.0f;
 
-
 	
 protected:
 	// Called when the game starts or when spawned
@@ -167,6 +166,8 @@ private:
 	FTimerHandle DJumpResetHandle;
 
 	FTimerHandle RollCoolDownHandle;
+
+	FTimerHandle UnequipHandle;
 
 	int RollCounter = 0;
 	/*This is the maximum amount the player can roll immediately after they performed a roll*/

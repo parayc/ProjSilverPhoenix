@@ -157,30 +157,30 @@ void AMeleeWeapon::DealDamage(const FHitResult & HitResult)
 	UHealthComponent* HealthComp = Cast<UHealthComponent>(HitResult.GetActor()->GetComponentByClass(UHealthComponent::StaticClass()));
 	UCombatComponent* CombatComp = Cast<UCombatComponent>(HitResult.GetActor()->GetComponentByClass(UCombatComponent::StaticClass()));
 
+	if (CombatComp == nullptr || HealthComp == nullptr) return;
+
 	//If we hit a immune enemy just end here
-	if (CombatComp && CombatComp->GetBattleState() == EBattleState::PS_Invincible)
+	if (CombatComp->GetBattleState() == EBattleState::PS_Invincible)
 	{
 		return;
 	}
 	
-	if (HealthComp)
+	if (UHealthComponent::IsFriendly(MyPawn, HitResult.GetActor()))
 	{
-
-		if (UHealthComponent::IsFriendly(MyPawn, HitResult.GetActor()))
-		{
 			return;
-		}
+	}
 
-			float DealtDamage = Damage * DamageModifier;
-			FPointDamageEvent DamageEvent;
-			DamageEvent.Damage = DealtDamage;
-			DamageEvent.HitInfo = HitResult;
-			TSubclassOf<UDamageType> p;
-			PlaySound(SwordImpactSounds);
-			UGameplayStatics::ApplyDamage(HitResult.GetActor(), DealtDamage, MyPawn->GetInstigatorController(), this, p);
+	float DealtDamage = Damage * DamageModifier;
+	FPointDamageEvent DamageEvent;
+	DamageEvent.Damage = DealtDamage;
+	DamageEvent.HitInfo = HitResult;
+	TSubclassOf<UDamageType> p;
+	PlaySound(SwordImpactSounds);
+	UGameplayStatics::ApplyDamage(HitResult.GetActor(), DealtDamage, MyPawn->GetInstigatorController(), this, p);
+	
+
 
 	
-	}
 }
 
 bool AMeleeWeapon::GetIsAttcking()

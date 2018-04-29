@@ -33,7 +33,7 @@ EBTNodeResult::Type UAttackTask::ExecuteTask(UBehaviorTreeComponent & OwnerComp,
 		Weapon->SetDamage(Weapon->GetLightAttackMontages()[RanValue].DamagePerAnimation);
 		
 	}
-	UE_LOG(LogTemp, Warning, TEXT("InProgress"))
+	
 	return EBTNodeResult::InProgress;
 	
 }
@@ -47,7 +47,7 @@ void UAttackTask::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory,
 
 	if (Duration <= 0.0f)
 	{
-		UE_LOG(LogTemp, Warning, TEXT("Succes"))
+		
 		FinishLatentTask(OwnerComp, EBTNodeResult::Succeeded);
 	}
 }

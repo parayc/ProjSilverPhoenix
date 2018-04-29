@@ -41,7 +41,6 @@ ASPlayer::ASPlayer()
 }
 
 
-
 void ASPlayer::BeginPlay()
 {
 	Super::BeginPlay();
@@ -64,6 +63,7 @@ void ASPlayer::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 	IsEnemyInRange();
 	IsEnemyOutOfRange();
+
 	if (bIsLockedOn)
 	{
 		LockOnCamera(DeltaTime);
@@ -262,6 +262,7 @@ bool ASPlayer::GetIsDoubleJumping() const
 {
 	return bIsDoubleJump;
 }
+
 
 void ASPlayer::RollCoolDown()
 {
@@ -659,7 +660,6 @@ void ASPlayer::Attack()
 	if (GetIsRolling() == true || CombatStates->GetIsFlinching() == true) { return; }
 	if (CharacterEquipment.CurrentWeapon)
 	{
-		
 
 		CharacterEquipment.CurrentWeapon->StartAttack();
 		if (EPlayerStates::PS_Passive == CurrentPlayerState)
