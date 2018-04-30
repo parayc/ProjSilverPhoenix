@@ -8,7 +8,6 @@
 #include "DrawDebugHelpers.h"
 #include "MeleeAnimInstance.h"
 #include "Kismet/GameplayStatics.h"
-//#include "PhysicsEngine/DestructibleActor.h"
 #include "DestructibleComponent.h"
 #include "CombatComponent.h"
 #include "HealthComponent.h"
@@ -84,35 +83,44 @@ void AMeleeWeapon::TraceSwing()
 
 		if (GetWorld()->LineTraceSingleByChannel(HitResult, TraceStart, TraceEnd, ECC_Weapon, TraceParams))
 		{
+			
 			AActor* HitActor = HitResult.GetActor();
+			if (!HitActor) return;
+
+			UDestructibleComponent* DestructComp = HitActor->FindComponentByClass<UDestructibleComponent>();
+			UHealthComponent* HealthComp = HitActor->FindComponentByClass<UHealthComponent>();
 			//We check if we hit the enemy already in the same swing and not hit ourself
-			if (HitActor && !EnemiesHit.Contains(HitActor) && HitActor != MyPawn)
+			if (!EnemiesHit.Contains(HitActor) && HitActor != MyPawn)
 			{
-				EnemiesHit.Add(HitActor);
-				UHealthComponent* HealthComp = HitActor->FindComponentByClass<UHealthComponent>();
+				
+				
 				if (HealthComp && HealthComp->GetHealth() > 0.0f)
 				{
+					EnemiesHit.Add(HitActor);
 					//Deal damage to enemy that was added
 					DealDamage(HitResult);
 					SpawnHitEffext(HitResult);
 				}
+				else if (DestructComp)
+				{
+					EnemiesHit.Add(HitActor);
+					SpawnHitEffext(HitResult);
+					PlaySound(SwordImpactSounds);
+					FVector EyeLocation;
+					FRotator EyeRotation;
+					MyPawn->GetActorEyesViewPoint(EyeLocation, EyeRotation);
+
+					FVector AttackDirection = EyeRotation.Vector();
+					TArray<AActor*> AllActors;
+					UGameplayStatics::GetAllActorsOfClass(GetWorld(), AXBaseCharacter::StaticClass(), AllActors);
+					//I use radial damage on destructible actors to give it an explode effect
+					UGameplayStatics::ApplyRadialDamage(GetWorld(), 0.1f, HitResult.GetActor()->GetActorLocation(), 30.f, DamageType, AllActors, this, MyPawn->GetInstigatorController(), true, ECC_Weapon);
+
+				}
 				
-				
-
-			}//else if (ADestructibleActor* DA = Cast<ADestructibleActor>(HitResult.GetActor()))
-			//{
-
-			//	FVector EyeLocation;
-			//	FRotator EyeRotation;
-			//	MyPawn->GetActorEyesViewPoint(EyeLocation, EyeRotation);
-
-			//	FVector AttackDirection = EyeRotation.Vector();
-			//	TArray<AActor*> AllActors;
-			//	UGameplayStatics::GetAllActorsOfClass(GetWorld(), AXBaseCharacter::StaticClass(), AllActors);
-			//	//I use radial damage on destructible actors to give it an explode effect
-			//	UGameplayStatics::ApplyRadialDamage(GetWorld(), 10.f, HitResult.GetActor()->GetActorLocation(), 30.f, DamageType, AllActors, this, MyPawn->GetInstigatorController(), true, ECC_Weapon);
-
-			//}
+		
+			}
+			
 			
 		
 		}
@@ -157,10 +165,10 @@ void AMeleeWeapon::DealDamage(const FHitResult & HitResult)
 	UHealthComponent* HealthComp = Cast<UHealthComponent>(HitResult.GetActor()->GetComponentByClass(UHealthComponent::StaticClass()));
 	UCombatComponent* CombatComp = Cast<UCombatComponent>(HitResult.GetActor()->GetComponentByClass(UCombatComponent::StaticClass()));
 
-	if (CombatComp == nullptr || HealthComp == nullptr) return;
+	if (HealthComp == nullptr) return;
 
 	//If we hit a immune enemy just end here
-	if (CombatComp->GetBattleState() == EBattleState::PS_Invincible)
+	if (CombatComp && CombatComp->GetBattleState() == EBattleState::PS_Invincible)
 	{
 		return;
 	}
