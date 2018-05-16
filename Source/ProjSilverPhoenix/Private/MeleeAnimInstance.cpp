@@ -105,6 +105,7 @@ void UMeleeAnimInstance::PlayCombo(EAttackType AttackType)
 
 }
 
+
 void UMeleeAnimInstance::ResetComboAttack()
 {
 	//Reset Character back to walking
@@ -147,7 +148,6 @@ void UMeleeAnimInstance::ResetStance()
 
 void UMeleeAnimInstance::ChangeDirection()
 {
-	
 
 	auto* CharacterPawn = Cast<ASPlayer>(TryGetPawnOwner());
 	//If player is locked on we dont allow the player to change direction

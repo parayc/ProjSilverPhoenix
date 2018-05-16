@@ -128,8 +128,6 @@ void AEnemyMaster::OnHealthChanged(UHealthComponent * OwningHealthComp, float He
 		}
 
 		CombatStates->KnockBack(InstigatedBy->GetPawn(), this);
-		CombatStates->Flinch();
-
 	}
 }
 

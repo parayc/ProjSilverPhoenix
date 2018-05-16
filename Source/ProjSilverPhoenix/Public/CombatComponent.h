@@ -38,8 +38,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "CombatComponent")
 		float KnockBackAmount = 5;
 
-	//Play flinch 
-	void Flinch();
+	void Flinch(const FHitResult& HitResult);
 
 	void StopFlinch();
 
@@ -54,7 +53,16 @@ private:
 	bool IsFlinching = false;
 
 	UPROPERTY(EditAnywhere, Category = "CombatComponent")
-		UAnimMontage* FlinchAnimation;
+	UAnimMontage* FrontFlinchAnim;
+
+	UPROPERTY(EditAnywhere, Category = "CombatComponent")
+	UAnimMontage* BackFlinchAnim;
+
+	UPROPERTY(EditAnywhere, Category = "CombatComponent")
+	UAnimMontage* LeftFlinchAnim;
+
+	UPROPERTY(EditAnywhere, Category = "CombatComponent")
+	UAnimMontage* RightFlinchAnim;
 
 protected:
 	// Called when the game starts

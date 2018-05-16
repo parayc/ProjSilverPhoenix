@@ -35,7 +35,6 @@ void AMeleeWeapon::BeginPlay()
 {
 	Super::BeginPlay();
 	
-
 }
 
 void AMeleeWeapon::StartAttack()
@@ -178,14 +177,19 @@ void AMeleeWeapon::DealDamage(const FHitResult & HitResult)
 			return;
 	}
 
+	FVector EyeLocation;
+	FRotator EyeRotation;
+	MyPawn->GetActorEyesViewPoint(EyeLocation, EyeRotation);
+	FVector ShotDirection = EyeRotation.Vector();
 	float DealtDamage = Damage * DamageModifier;
 	FPointDamageEvent DamageEvent;
 	DamageEvent.Damage = DealtDamage;
 	DamageEvent.HitInfo = HitResult;
 	TSubclassOf<UDamageType> p;
 	PlaySound(SwordImpactSounds);
-	UGameplayStatics::ApplyDamage(HitResult.GetActor(), DealtDamage, MyPawn->GetInstigatorController(), this, p);
-	
+	//UGameplayStatics::ApplyDamage(HitResult.GetActor(), DealtDamage, MyPawn->GetInstigatorController(), this, p);
+	UGameplayStatics::ApplyPointDamage(HitResult.GetActor(), DealtDamage, ShotDirection, HitResult, MyPawn->GetInstigatorController(), this, p);
+	CombatComp->Flinch(HitResult);
 
 
 	
@@ -205,6 +209,7 @@ void AMeleeWeapon::SetLastSokcetFrame()
 void AMeleeWeapon::StartTraceAttack()
 {
 	bIsAttackTrace = true;
+	bIsAttacking = true;
 	if (SwordTrail)
 	{
 		SwordTrail->BeginTrails(SocketBase, SocketTip, ETrailWidthMode::ETrailWidthMode_FromCentre, 1.f);
@@ -214,6 +219,7 @@ void AMeleeWeapon::StartTraceAttack()
 void AMeleeWeapon::StopTraceAttack()
 {
 	bIsAttackTrace = false;
+	bIsAttacking = false;
 
 	if (SwordTrail)
 	{

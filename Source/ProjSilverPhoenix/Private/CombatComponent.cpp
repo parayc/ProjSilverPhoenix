@@ -1,4 +1,4 @@
-// Copyright Project Silver Phoneix
+ // Copyright Project Silver Phoneix
 
 #include "CombatComponent.h"
 #include "Animation/AnimMontage.h"
@@ -50,63 +50,68 @@ void UCombatComponent::KnockBack(AActor * DamageCauser, AActor * DamageReceiver)
 	
 }
 
-//void UCombatComponent::Reaction(const FHitResult HitResult)
-//{
-//	FVector hitpoint = HitResult.Location;
-//	DrawDebugSphere(GetWorld(), hitpoint, 10.f, 14, FColor::Red, false, 1.f, 0, 1.f);
-//	AXBaseCharacter* player = Cast<AXBaseCharacter>(HitResult.GetActor());
-//	
-//	//player->GetMesh()->GetComponentRotation().GetRightVector();
-//	//FVector LookDir = HitResult.GetActor()->GetActorLocation() - (HitResult.GetActor()->GetActorLocation() + HitResult.GetActor()->GetActorRightVector());
-//
-//	return;
-//	FVector LookDir = HitResult.GetActor()->GetActorRightVector();
-//	float num = FVector::DotProduct(hitpoint.GetSafeNormal(), LookDir.GetSafeNormal());
-//	float CrossNum = FVector::CrossProduct(hitpoint.GetSafeNormal(), LookDir.GetSafeNormal()).Z;
-//
-//	if (num >= -1.0f && num < -0.7f)
-//	{
-//		UE_LOG(LogTemp, Warning, TEXT("Back"));
-//	}
-//	else if (num >= 0.7 && num <= 1.0f)
-//	{
-//		UE_LOG(LogTemp, Warning, TEXT("Front"));
-//
-//	}
-//	else if (num >= -0.7 && num <= 0.7)
-//	{
-//		if (CrossNum < 0)
-//		{
-//			UE_LOG(LogTemp, Warning, TEXT("Right"));
-//		}
-//		else if(CrossNum > 0)
-//		{
-//			UE_LOG(LogTemp, Warning, TEXT("Left"));
-//		}
-//
-//	}
-//	UE_LOG(LogTemp, Warning, TEXT("Direction %f : Crossnum: %f"), num, CrossNum);
-//
-//}
- 
-void UCombatComponent::Flinch()
+void UCombatComponent::Flinch(const FHitResult& HitResult)
 {
-	ACharacter* Owner = Cast<ACharacter>(GetOwner());
 	
-	if (Owner)
+	if (GetBattleState() != EBattleState::PS_Normal) return;
+	AXBaseCharacter* Owner = Cast<AXBaseCharacter>(GetOwner());
+	if (Owner && !Owner->GetIsDead())
 	{
+	
+		FVector HitPoint = HitResult.ImpactPoint;
+		//DrawDebugSphere(GetWorld(), HitPoint, 10.f, 14, FColor::Yellow, false, 1.f, 0, 1.f);
+
+		FVector ForwardDir = Owner->GetActorForwardVector();
+		FVector Dir = Owner->GetActorLocation() - HitPoint;
+		float DotNum = FVector::DotProduct(Dir.GetSafeNormal(), ForwardDir.GetSafeNormal());
+		float CrossNum = FVector::CrossProduct(Dir.GetSafeNormal(), ForwardDir.GetSafeNormal()).Z;
 		IsFlinching = true;
-		float Duration = 0.f; 
-		//Play animation when hit
-		if (FlinchAnimation)
+		float Duration = 0.f;
+
+		if (DotNum >= -1.0f && DotNum < -0.7f)
 		{
-			Duration =  Owner->PlayAnimMontage(FlinchAnimation);
-			//Stop from attacking and reset everything when hit
+			if (FrontFlinchAnim)
+			{
+				Duration = Owner->PlayAnimMontage(FrontFlinchAnim);
+			}
+			
 		}
-		
+		else if (DotNum >= 0.7 && DotNum <= 1.0f)
+		{
+			if (BackFlinchAnim)
+			{
+				Duration = Owner->PlayAnimMontage(BackFlinchAnim);
+			}
+	
+		}
+		else if (DotNum >= -0.7 && DotNum <= 0.7)
+		{
+			if (CrossNum < 0)
+			{
+				if (LeftFlinchAnim)
+				{
+					Duration = Owner->PlayAnimMontage(LeftFlinchAnim);
+				}
+				
+			}
+			else if (CrossNum > 0)
+			{
+				if (RightFlinchAnim)
+				{
+					Duration = Owner->PlayAnimMontage(RightFlinchAnim);
+					
+				}
+	
+			}
+
+		}
+		//UE_LOG(LogTemp, Warning, TEXT("Direction %f : Crossnum: %f"), DotNum, CrossNum);
 		GetWorld()->GetTimerManager().SetTimer(FlinchHandleTimer, this, &UCombatComponent::StopFlinch, Duration, false);
 	}
+	
+
 }
+ 
 
 void UCombatComponent::StopFlinch()
 {

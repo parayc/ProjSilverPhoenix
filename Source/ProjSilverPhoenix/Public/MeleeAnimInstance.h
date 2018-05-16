@@ -29,7 +29,7 @@ public:
 	void Attack(EAttackType AttackType);
 
 	void PlayCombo(EAttackType AttackType);
-	
+	UFUNCTION(BlueprintCallable, Category = "WeaponSetup")
 	void ResetComboAttack();
 
 	void Reset();

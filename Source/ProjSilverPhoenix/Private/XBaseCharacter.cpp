@@ -54,12 +54,12 @@ void AXBaseCharacter::Tick(float DeltaTime)
 	Super::Tick(DeltaTime);
 
 
-	if (GetWalkDirection() > 0.8f)//Check if walking forward
+	if (GetWalkDirection() >= 0.7f)//Check if walking forward
 	{
 		SetWalkSpeed(WalkSpeed);
 
 	}
-	else if (GetWalkDirection() < 0.8f && GetWalkDirection()  > -0.6f)//starfing
+	else if (GetWalkDirection() < 0.7f && GetWalkDirection()  > -0.6f)//starfing
 	{
 		SetWalkSpeed(StrafingSpeed);
 	}
@@ -140,7 +140,6 @@ void AXBaseCharacter::AddWeaponToInventory(ABaseWeapon* Weapon)
 	}
 
 }
-
 
 void AXBaseCharacter::AddWeaponToCharacterEquipment(ABaseWeapon * NewWeapon)
 {

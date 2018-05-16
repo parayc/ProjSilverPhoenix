@@ -88,8 +88,7 @@ float ABaseWeapon::PlayWeaponAnimation(UAnimMontage * Animation, float InPlayRat
 
 void ABaseWeapon::UnEquip()
 {
-	//Stop the player from attacking during the animation
-	//MyPawn->SetCanAttack(false);
+	
 	float Duration = PlayWeaponAnimation(UnEquipAnimation);
 
 	if (Duration <= 0.f)

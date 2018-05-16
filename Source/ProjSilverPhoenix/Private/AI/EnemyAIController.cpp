@@ -25,10 +25,11 @@ AEnemyAIController::AEnemyAIController()
 void AEnemyAIController::Possess(APawn * pawn)
 {
 	Super::Possess(pawn);
-
+	if (!BlackboardComp || !BehaviorComp) return;
 	//Initialize its blackboard and start it behaviour
 	if (auto AICharacter = Cast<AEnemyMaster>(pawn))
 	{
+		if (!AICharacter->BehaviorTree) return;
 		if (AICharacter->BehaviorTree->BlackboardAsset != nullptr)
 		{
 

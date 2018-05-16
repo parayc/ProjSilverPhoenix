@@ -115,6 +115,7 @@ void ASPlayer::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health
 
 	if (!ensure(CombatStates)) { return; }
 
+	//TODO - Move to melee sword
 	if (CombatStates->GetBattleState() == EBattleState::PS_Normal)
 	{
 		//Reset combo if we get hit
@@ -125,7 +126,6 @@ void ASPlayer::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health
 		}
 
 		CombatStates->KnockBack(DamageCauser, this);
-		CombatStates->Flinch();
 
 	}
 }
@@ -171,11 +171,13 @@ void ASPlayer::MoveRight(float Value)
 
 void ASPlayer::TurnRate(float Rate)
 {
+	if (bIsLockedOn) return;
 	AddControllerYawInput(Rate * BaseTurnRate * GetWorld()->GetDeltaSeconds());
 }
 
 void ASPlayer::LookUp(float Rate)
 {
+	if (bIsLockedOn) return;
 	AddControllerPitchInput(Rate * BasePitchRate * GetWorld()->GetDeltaSeconds());
 }
 
@@ -350,6 +352,7 @@ void ASPlayer::RollDircetion()
 	/*This calls the method once the animation is played*/
 	GetWorld()->GetTimerManager().SetTimer(RollResetHandle, this, &ASPlayer::EndRoll, Duration - 0.3f, false);
 
+	//Stops the player from tracing if they roll
 	AnimInst->ResetComboAttack();
 	
 
