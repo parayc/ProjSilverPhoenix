@@ -29,7 +29,6 @@ void UMeleeAnimInstance::Attack(EAttackType AttackType)
 
 		if (AttackType == EAttackType::PS_Light)
 		{
-			
 			PlayCombo(EAttackType::PS_Light);
 		}
 		else if (AttackType == EAttackType::PS_Heavy)
@@ -37,6 +36,13 @@ void UMeleeAnimInstance::Attack(EAttackType AttackType)
 			
 			PlayCombo(EAttackType::PS_Heavy);
 		}
+		else  
+		{
+
+			PlayCombo(EAttackType::PS_Air);
+			
+		}
+
 
 	}
 
@@ -60,12 +66,17 @@ void UMeleeAnimInstance::PlayCombo(EAttackType AttackType)
 		{
 			Montages = Melee->GetHeavyAttackMontages();
 		}
+		else if (AttackType == EAttackType::PS_Air)
+		{
+			
+			Montages = Melee->GetAirAttackMontages();
+		}
 
 		if (0 == Montages.Num()) { return; }
 
 		
 		// ComboCounter == 0 - This bypass the base cass
-
+		UE_LOG(LogTemp, Warning, TEXT("ComboCounter : %d"), ComboCounter)
 		if (bAcceptNextCombo || ComboCounter == 0)
 		{
 			
@@ -98,11 +109,55 @@ void UMeleeAnimInstance::PlayCombo(EAttackType AttackType)
 				//This sets  back to passive if the player hasnt attack in 10 seconds
 				GetWorld()->GetTimerManager().SetTimer(ResetStanceHandle, this, &UMeleeAnimInstance::ResetStance, 5.0f, false);
 			}
+	
 
+		}
+		else
+		{
+			//UE_LOG(LogTemp, Warning, TEXT("next combo"))
 		}
 	}
 
 
+}
+
+/*This is called in the blurptint notifiy when to start tracing when it gets to a certain point in the attack animation */
+void UMeleeAnimInstance::StartAttackingTrace()
+{
+
+	AXBaseCharacter* CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
+	ABaseWeapon* Weapon = CharacterPawn->CharacterEquipment.CurrentWeapon;
+	AMeleeWeapon* Melee = Cast<AMeleeWeapon>(Weapon);
+
+
+	if (CharacterPawn && Weapon)
+	{
+		if (Melee)
+		{
+			//Clear the array of enemies hit everytime we start a new attack trace 
+			Melee->ClearEnemiesHitArray();
+			Melee->StartTraceAttack();
+		}
+	}
+
+}
+
+/*This is called in the blurptint notifiy when to stop tracing when it gets to a certain point in the attack animation */
+void UMeleeAnimInstance::StopAttackingTrace()
+{
+
+	AXBaseCharacter* CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
+	ABaseWeapon* Weapon = CharacterPawn->CharacterEquipment.CurrentWeapon;
+	AMeleeWeapon* Melee = Cast<AMeleeWeapon>(Weapon);
+
+	if (CharacterPawn && Weapon)
+	{
+		if (Melee)
+		{
+			Melee->StopTraceAttack();
+
+		}
+	}
 }
 
 
@@ -113,10 +168,10 @@ void UMeleeAnimInstance::ResetComboAttack()
 	if (CharacterPawn)
 	{
 		CharacterPawn->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+
 	}
-	
 	//We reset the combo counter after a period of time to stop the player from attacking immediately after
-	GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &UMeleeAnimInstance::Reset, 0.5f, false);
+	GetWorld()->GetTimerManager().SetTimer(ComboTimerHandle, this, &UMeleeAnimInstance::Reset, 0.3f, false);
 	SetAcceptNextCombo(false);
 
 	//If we take take damage or roll we need to stop the tracing on the sword as this will not get called if the attack animation doesnt complete
@@ -126,7 +181,19 @@ void UMeleeAnimInstance::ResetComboAttack()
 
 void UMeleeAnimInstance::Reset()
 {
+	AXBaseCharacter* CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
+	if (CharacterPawn)
+	{
+	
+		//Set weapon back to not attacking
+		AMeleeWeapon* Melee = Cast<AMeleeWeapon>(CharacterPawn->CharacterEquipment.CurrentWeapon);
+		if (Melee)
+		{
+			UE_LOG(LogTemp, Warning, TEXT("Stop Attacking"))
+				Melee->StopAttack();
+		}
 
+	}
 	ComboCounter = 0;
 	GetWorld()->GetTimerManager().ClearTimer(ComboTimerHandle);
 	
@@ -235,45 +302,6 @@ void UMeleeAnimInstance::TargetAssists()
 			}
 		}
 		
-	}
-}
-
-/*This is called in the blurptint notifiy when to start tracing when it gets to a certain point in the attack animation */
-void UMeleeAnimInstance::StartAttackingTrace()
-{
-
-	AXBaseCharacter* CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
-	ABaseWeapon* Weapon = CharacterPawn->CharacterEquipment.CurrentWeapon;
-	AMeleeWeapon* Melee = Cast<AMeleeWeapon>(Weapon);
-
-
-	if (CharacterPawn && Weapon)
-	{
-		if (Melee)
-		{
-			//Clear the array of enemies hit everytime we start a new attack trace 
-			Melee->ClearEnemiesHitArray();
-			Melee->StartTraceAttack();
-		}
-	}
-
-}
-
-/*This is called in the blurptint notifiy when to stop tracing when it gets to a certain point in the attack animation */
-void UMeleeAnimInstance::StopAttackingTrace()
-{
-
-	AXBaseCharacter* CharacterPawn = Cast<AXBaseCharacter>(TryGetPawnOwner());
-	ABaseWeapon* Weapon = CharacterPawn->CharacterEquipment.CurrentWeapon;
-	AMeleeWeapon* Melee = Cast<AMeleeWeapon>(Weapon);
-
-	if (CharacterPawn && Weapon)
-	{
-		if (Melee)
-		{
-			Melee->StopTraceAttack();
-			
-		}
 	}
 }
 

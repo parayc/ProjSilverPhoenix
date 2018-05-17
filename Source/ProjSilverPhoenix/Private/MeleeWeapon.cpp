@@ -11,6 +11,8 @@
 #include "DestructibleComponent.h"
 #include "CombatComponent.h"
 #include "HealthComponent.h"
+#include "GameFramework/NavMovementComponent.h"
+#include "GameFramework/PawnMovementComponent.h"
 
 AMeleeWeapon::AMeleeWeapon()
 {
@@ -41,8 +43,19 @@ void AMeleeWeapon::StartAttack()
 {
 
 	UMeleeAnimInstance* AnimInstance = Cast<UMeleeAnimInstance>(MyPawn->GetMesh()->GetAnimInstance());
-	AnimInstance->Attack(EAttackType::PS_Light);
+	bIsAttacking = true;
+	bool IsInAir = MyPawn->GetMovementComponent()->IsFalling();
+	if (IsInAir)
+	{
+		AnimInstance->Attack(EAttackType::PS_Air);
+	}
+	else
+	{
+		AnimInstance->Attack(EAttackType::PS_Light);
+	}
+	
 
+	 
 	SetLastSokcetFrame();
 
 }
@@ -191,11 +204,9 @@ void AMeleeWeapon::DealDamage(const FHitResult & HitResult)
 	UGameplayStatics::ApplyPointDamage(HitResult.GetActor(), DealtDamage, ShotDirection, HitResult, MyPawn->GetInstigatorController(), this, p);
 	CombatComp->Flinch(HitResult);
 
-
-	
 }
 
-bool AMeleeWeapon::GetIsAttcking()
+bool AMeleeWeapon::GetIsAttcking() const
 {
 	return bIsAttacking;
 }
@@ -209,7 +220,7 @@ void AMeleeWeapon::SetLastSokcetFrame()
 void AMeleeWeapon::StartTraceAttack()
 {
 	bIsAttackTrace = true;
-	bIsAttacking = true;
+	//bIsAttacking = true;
 	if (SwordTrail)
 	{
 		SwordTrail->BeginTrails(SocketBase, SocketTip, ETrailWidthMode::ETrailWidthMode_FromCentre, 1.f);
@@ -219,7 +230,7 @@ void AMeleeWeapon::StartTraceAttack()
 void AMeleeWeapon::StopTraceAttack()
 {
 	bIsAttackTrace = false;
-	bIsAttacking = false;
+	//bIsAttacking = false;
 
 	if (SwordTrail)
 	{
@@ -236,8 +247,6 @@ float AMeleeWeapon::GetDamageModifier() const
 {
 	return DamageModifier;
 }
-
-
 
 void AMeleeWeapon::SetDamageModifier(float newDamage) 
 {

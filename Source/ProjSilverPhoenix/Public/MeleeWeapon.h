@@ -51,7 +51,7 @@ public:
 	void DealDamage(const FHitResult& HitResult);
 
 	UFUNCTION(BlueprintCallable, Category = "Setup")
-	bool GetIsAttcking();
+	bool GetIsAttcking() const;
 
 
 	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")

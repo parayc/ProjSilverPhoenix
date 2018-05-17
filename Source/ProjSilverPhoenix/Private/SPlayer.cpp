@@ -10,6 +10,7 @@
 #include "MeleeAnimInstance.h"
 #include "ProjSilverPhoenix.h"
 #include "BaseWeapon.h"
+#include "MeleeWeapon.h"
 #include "Components/CapsuleComponent.h"
 #include "Components/SphereComponent.h"
 #include "DrawDebugHelpers.h"
@@ -184,6 +185,12 @@ void ASPlayer::LookUp(float Rate)
 
 void ASPlayer::StartJump()
 {
+
+	auto meleeweapon = Cast<AMeleeWeapon>(CharacterEquipment.CurrentWeapon);
+	//UE_LOG(LogTemp, Warning, TEXT("Start Jump"))
+	if (meleeweapon->GetIsAttcking()) { return; }
+//	UE_LOG(LogTemp, Warning, TEXT("Jump"))
+	
 	if (!CombatStates->GetIsFlinching() && GetIsRolling() != true)
 	{
 		SetIsJumping(true);
