@@ -26,7 +26,7 @@ void UMeleeAnimInstance::Attack(EAttackType AttackType)
 
 	if (CharacterPawn && Melee2)
 	{
-
+		
 		if (AttackType == EAttackType::PS_Light)
 		{
 			PlayCombo(EAttackType::PS_Light);
@@ -72,11 +72,12 @@ void UMeleeAnimInstance::PlayCombo(EAttackType AttackType)
 			Montages = Melee->GetAirAttackMontages();
 		}
 
-		if (0 == Montages.Num()) { return; }
+		//Reset combo if we dont have no montage to play 
+		if (0 == Montages.Num()) { Reset(); return; }
 
 		
 		// ComboCounter == 0 - This bypass the base cass
-		UE_LOG(LogTemp, Warning, TEXT("ComboCounter : %d"), ComboCounter)
+		
 		if (bAcceptNextCombo || ComboCounter == 0)
 		{
 			
@@ -189,8 +190,7 @@ void UMeleeAnimInstance::Reset()
 		AMeleeWeapon* Melee = Cast<AMeleeWeapon>(CharacterPawn->CharacterEquipment.CurrentWeapon);
 		if (Melee)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Stop Attacking"))
-				Melee->StopAttack();
+			Melee->StopAttack();
 		}
 
 	}

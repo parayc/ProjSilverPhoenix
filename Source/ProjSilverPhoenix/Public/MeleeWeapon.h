@@ -49,13 +49,14 @@ public:
 	void SetDamage(int32 Value);
 
 	void DealDamage(const FHitResult& HitResult);
-
+	
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 	bool GetIsAttcking() const;
 
 
-	//UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
-		TSubclassOf<UDamageType> DamageType;
+	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
+	TSubclassOf<UDamageType> DamageType;
+
 	void SetLastSokcetFrame();
 
 	//Starts weapons line trace 
@@ -73,6 +74,11 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void SetDamageModifier(float newDamage);
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void GroundSlamDamage();
+
+	void GroundSlamAttack();
 
 	TArray<FWeaponAnimation> GetLightAttackMontages();
 
@@ -99,6 +105,7 @@ protected:
 private:
 
 
+
 	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
 		USoundBase* SwordImpactSounds;
 
@@ -114,6 +121,9 @@ private:
 	UPROPERTY(EditDefaultsOnly, Category = "Setup")
 		bool bDrawDebugLines = false;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Attack")
+		float GroundSlamAttackRadius = 0;
+
 	UPROPERTY()
 		bool bIsAttacking = false;
 
@@ -126,10 +136,10 @@ private:
 		TArray<FWeaponAnimation> LightAttackMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-		TArray<FWeaponAnimation> HeavyAttackMontage;
+	TArray<FWeaponAnimation> HeavyAttackMontage;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-		TArray<FWeaponAnimation> AirAttackMontage;
+	TArray<FWeaponAnimation> AirAttackMontage;
 
 	FVector prevBase;
 
@@ -146,9 +156,6 @@ private:
 	/* how many traces this weapon will do per swing*/
 	UPROPERTY(EditAnywhere, Category = Trace)
 	float AmountToTrace = 5;
-
-
-	
 
 	//UPROPERTY(EditDefaultsOnly, Category = "SetUp")
 	int32 Damage = 0;

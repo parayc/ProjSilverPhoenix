@@ -54,8 +54,6 @@ void AMeleeWeapon::StartAttack()
 		AnimInstance->Attack(EAttackType::PS_Light);
 	}
 	
-
-	 
 	SetLastSokcetFrame();
 
 }
@@ -118,15 +116,11 @@ void AMeleeWeapon::TraceSwing()
 					EnemiesHit.Add(HitActor);
 					SpawnHitEffext(HitResult);
 					PlaySound(SwordImpactSounds);
-					FVector EyeLocation;
-					FRotator EyeRotation;
-					MyPawn->GetActorEyesViewPoint(EyeLocation, EyeRotation);
-
-					FVector AttackDirection = EyeRotation.Vector();
+					
 					TArray<AActor*> AllActors;
 					UGameplayStatics::GetAllActorsOfClass(GetWorld(), AXBaseCharacter::StaticClass(), AllActors);
 					//I use radial damage on destructible actors to give it an explode effect
-					UGameplayStatics::ApplyRadialDamage(GetWorld(), 0.1f, HitResult.GetActor()->GetActorLocation(), 30.f, DamageType, AllActors, this, MyPawn->GetInstigatorController(), true, ECC_Weapon);
+					UGameplayStatics::ApplyRadialDamage(GetWorld(), 0.1f, HitResult.GetActor()->GetActorLocation(), 30.f, DamageType, AllActors, this, MyPawn->GetInstigatorController(),true, ECC_Weapon);
 
 				}
 				
@@ -147,6 +141,25 @@ void AMeleeWeapon::TraceSwing()
 
 }
 
+void AMeleeWeapon::GroundSlamDamage()
+{
+	
+	//FVector MidPoint = WeaponMesh->GetSocketLocation(SocketTip) + (WeaponMesh->GetSocketLocation(SocketBase) - WeaponMesh->GetSocketLocation(SocketTip)) / 2;
+	TSubclassOf<UDamageType> None;
+	DrawDebugSphere(GetWorld(), WeaponMesh->GetSocketLocation(SocketBase), 350.f, 12, FColor::Yellow, false, 3.f, 0, 1.f);
+	TArray<AActor*> IgnoredActor;
+	IgnoredActor.Add(MyPawn);
+	if (AirAttackMontage.Num() > 0)
+	{
+		float SlamDamage = 0;
+		SlamDamage = AirAttackMontage[0].DamagePerAnimation * DamageModifier;
+		UGameplayStatics::ApplyRadialDamage(GetWorld(), SlamDamage, WeaponMesh->GetSocketLocation(SocketBase), 350.f, DamageType, IgnoredActor, this, MyPawn->GetInstigatorController(), true, ECC_Weapon);
+
+	}
+	
+
+
+}
 
 
 void AMeleeWeapon::PlaySound(USoundBase * Sound)

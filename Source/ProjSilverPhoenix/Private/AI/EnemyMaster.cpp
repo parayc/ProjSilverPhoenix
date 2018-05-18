@@ -100,6 +100,7 @@ void AEnemyMaster::Tick(float DeltaTime)
 void AEnemyMaster::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
 {
 	//If We heal or do no damage just return
+	UE_LOG(LogTemp, Warning, TEXT("HealthComp"))
 	if (HealthDelta <= 0) { return; }
 
 	if (HealthWidget)
@@ -116,6 +117,7 @@ void AEnemyMaster::OnHealthChanged(UHealthComponent * OwningHealthComp, float He
 
 	}
 
+	UE_LOG(LogTemp, Warning, TEXT("Health damage"))
 	if (!ensure(CombatStates)) { return; }
 
 	if (CombatStates->GetBattleState() == EBattleState::PS_Normal)
