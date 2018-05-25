@@ -53,7 +53,7 @@ void AXBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-
+	/*
 	if (GetWalkDirection() >= 0.7f)//Check if walking forward
 	{
 		SetWalkSpeed(WalkSpeed);
@@ -67,6 +67,8 @@ void AXBaseCharacter::Tick(float DeltaTime)
 	{
 		SetWalkSpeed(BackwardsWalkSpeed);
 	}
+
+	*/
 
 }
 

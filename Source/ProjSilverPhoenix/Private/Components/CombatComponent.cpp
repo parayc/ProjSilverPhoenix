@@ -124,6 +124,18 @@ bool UCombatComponent::GetIsFlinching() const
 	return IsFlinching;
 }
 
+void UCombatComponent::KnockDown()
+{
+}
+
+void UCombatComponent::ResetKnockDown()
+{
+}
+
+void UCombatComponent::CalculateKnockDown()
+{
+}
+
 
 
 

@@ -48,14 +48,14 @@ public:
 
 	void SetDamage(int32 Value);
 
-	void DealDamage(const FHitResult& HitResult);
+	void DealDamage(const FHitResult& HitResult, TSubclassOf<UDamageType> DamageType);
+
+	void HandleDamage(const FHitResult& HitResult, TSubclassOf<UDamageType> DamageType);
+
+	bool CanDamage(const FHitResult& HitResult);
 	
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 	bool GetIsAttcking() const;
-
-
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "Weapon")
-	TSubclassOf<UDamageType> DamageType;
 
 	void SetLastSokcetFrame();
 
@@ -76,8 +76,6 @@ public:
 	void SetDamageModifier(float newDamage);
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	void GroundSlamDamage();
-
 	void GroundSlamAttack();
 
 	TArray<FWeaponAnimation> GetLightAttackMontages();
@@ -95,8 +93,7 @@ public:
 
 	void SpawnHitEffext(FHitResult& Hit);
 
-	UPROPERTY(EditDefaultsOnly, BlueprintReadOnly, Category = "FX")
-		UParticleSystem* HitFX;
+	
 
 protected:
 
@@ -105,24 +102,44 @@ protected:
 private:
 
 
+	bool IsTargetWithinSight(AActor* Target);
 
-	UPROPERTY(EditDefaultsOnly, Category = "Sounds")
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
 		USoundBase* SwordImpactSounds;
 
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	USoundBase* GroundSlamSounds;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Effects")
+	UParticleSystem* HitFX;
+
 	TArray<AActor*> EnemiesHit;
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
-		float DamageModifier = 1.0f;
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+
+	UPROPERTY(EditDefaultsOnly, Category = "Melee Weapon")
+		TSubclassOf<UDamageType> SwordDamageType;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Melee Weapon")
+		TSubclassOf<UDamageType> GroundSlamDamageType;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Melee Weapon")
+	float DamageModifier = 1.0f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Melee Weapon")
+	float GroundSlamAttackRadius = 350.f;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Melee Weapon")
 		FName SocketBase;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	UPROPERTY(EditDefaultsOnly, Category = "Melee Weapon")
 		FName SocketTip;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Setup")
+	/* whether to draws the ray cast lines of the sword trace and ground slam*/
+	UPROPERTY(EditDefaultsOnly, Category = "Debug")
 		bool bDrawDebugLines = false;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Attack")
-		float GroundSlamAttackRadius = 0;
+	/* how many traces to draw on the sword  per swing - More traces increase accuracy*/
+	UPROPERTY(EditAnywhere, Category = "Debug")
+		float AmountToTrace = 5;
 
 	UPROPERTY()
 		bool bIsAttacking = false;
@@ -153,9 +170,6 @@ private:
 	FVector StartSocket;
 	FVector EndSocket;
 
-	/* how many traces this weapon will do per swing*/
-	UPROPERTY(EditAnywhere, Category = Trace)
-	float AmountToTrace = 5;
 
 	//UPROPERTY(EditDefaultsOnly, Category = "SetUp")
 	int32 Damage = 0;

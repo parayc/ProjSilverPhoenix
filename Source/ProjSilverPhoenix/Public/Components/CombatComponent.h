@@ -45,6 +45,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "CombatComponent")
 	bool GetIsFlinching() const;
 
+	void KnockDown();
+
+	void ResetKnockDown();
+
+	void CalculateKnockDown();
+
 private: 
 	FTimerHandle FlinchHandleTimer;
 
@@ -63,6 +69,10 @@ private:
 
 	UPROPERTY(EditAnywhere, Category = "CombatComponent")
 	UAnimMontage* RightFlinchAnim;
+
+	float KnockdownThreshold;
+
+	float knockdownValue;
 
 protected:
 	// Called when the game starts

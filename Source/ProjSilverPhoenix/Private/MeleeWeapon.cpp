@@ -30,7 +30,6 @@ void AMeleeWeapon::Tick(float DeltaTime)
 		TraceSwing();
 	}
 
-
 }
 
 void AMeleeWeapon::BeginPlay()
@@ -97,41 +96,28 @@ void AMeleeWeapon::TraceSwing()
 			AActor* HitActor = HitResult.GetActor();
 			if (!HitActor) return;
 
-			UDestructibleComponent* DestructComp = HitActor->FindComponentByClass<UDestructibleComponent>();
+			//UDestructibleComponent* DestructComp = HitActor->FindComponentByClass<UDestructibleComponent>();
 			UHealthComponent* HealthComp = HitActor->FindComponentByClass<UHealthComponent>();
 			//We check if we hit the enemy already in the same swing and not hit ourself
 			if (!EnemiesHit.Contains(HitActor) && HitActor != MyPawn)
 			{
-				
-				
+	
 				if (HealthComp && HealthComp->GetHealth() > 0.0f)
 				{
 					EnemiesHit.Add(HitActor);
 					//Deal damage to enemy that was added
-					DealDamage(HitResult);
+					HandleDamage(HitResult, SwordDamageType);
 					SpawnHitEffext(HitResult);
+					//We only want to play sounds if the actor got hit or not invinble 
+					UCombatComponent* CombatComp = Cast<UCombatComponent>(HitResult.GetActor()->GetComponentByClass(UCombatComponent::StaticClass()));
+					if (CombatComp && CombatComp->GetBattleState() != EBattleState::PS_Invincible)
+					{
+						PlaySound(SwordImpactSounds);
+					}
 				}
-				else if (DestructComp)
-				{
-					EnemiesHit.Add(HitActor);
-					SpawnHitEffext(HitResult);
-					PlaySound(SwordImpactSounds);
-					
-					TArray<AActor*> AllActors;
-					UGameplayStatics::GetAllActorsOfClass(GetWorld(), AXBaseCharacter::StaticClass(), AllActors);
-					//I use radial damage on destructible actors to give it an explode effect
-					UGameplayStatics::ApplyRadialDamage(GetWorld(), 0.1f, HitResult.GetActor()->GetActorLocation(), 30.f, DamageType, AllActors, this, MyPawn->GetInstigatorController(),true, ECC_Weapon);
-
-				}
-				
-		
 			}
-			
-			
 		
 		}
-		//ELSE if ...
-
 
 	}
 
@@ -141,31 +127,83 @@ void AMeleeWeapon::TraceSwing()
 
 }
 
-void AMeleeWeapon::GroundSlamDamage()
+bool AMeleeWeapon::IsTargetWithinSight(AActor* Target)
 {
-	
-	//FVector MidPoint = WeaponMesh->GetSocketLocation(SocketTip) + (WeaponMesh->GetSocketLocation(SocketBase) - WeaponMesh->GetSocketLocation(SocketTip)) / 2;
-	TSubclassOf<UDamageType> None;
-	DrawDebugSphere(GetWorld(), WeaponMesh->GetSocketLocation(SocketBase), 350.f, 12, FColor::Yellow, false, 3.f, 0, 1.f);
-	TArray<AActor*> IgnoredActor;
-	IgnoredActor.Add(MyPawn);
-	if (AirAttackMontage.Num() > 0)
+	if (Target == nullptr) return false;
+
+	FHitResult Hit;
+	FCollisionQueryParams TraceParams;
+	TraceParams.AddIgnoredActor(this);
+	TraceParams.AddIgnoredActor(MyPawn);
+
+	FVector StartTrace = WeaponMesh->GetSocketLocation(SocketBase);
+	FVector EndTrace = Target->GetActorLocation();
+	//Check Whether the enemy is within sight 
+	if (GetWorld()->LineTraceSingleByChannel(Hit, StartTrace, EndTrace, ECC_Weapon, TraceParams))
 	{
-		float SlamDamage = 0;
-		SlamDamage = AirAttackMontage[0].DamagePerAnimation * DamageModifier;
-		UGameplayStatics::ApplyRadialDamage(GetWorld(), SlamDamage, WeaponMesh->GetSocketLocation(SocketBase), 350.f, DamageType, IgnoredActor, this, MyPawn->GetInstigatorController(), true, ECC_Weapon);
+		if (Target == Hit.GetActor())
+		{
+			return true;
+		}
 
 	}
-	
 
-
+	return false;
 }
 
 
+void AMeleeWeapon::GroundSlamAttack()
+{
+
+	TArray<FHitResult> HitResults;
+	FVector Start = WeaponMesh->GetSocketLocation(SocketBase);
+	FVector End = Start + FVector(0, 0, 50.f);//Line trace a sphere around the player
+
+											 //Setting the collision details
+	FCollisionShape CollionShape;
+	CollionShape.ShapeType = ECollisionShape::Sphere;
+	CollionShape.SetSphere(GroundSlamAttackRadius);
+
+	FCollisionQueryParams CollParam;
+	CollParam.AddIgnoredActor(this);//Ignore ourself
+	CollParam.AddIgnoredActor(MyPawn);
+
+									//We only look for pawn objects
+	//ECollisionChannel ECC = ECollisionChannel::ECC_Pawn;
+	if (bDrawDebugLines)
+	{
+		DrawDebugSphere(GetWorld(), End, GroundSlamAttackRadius, 12, FColor::Yellow, false, 3.f, 0, 1.f);
+	}
+
+	//PlaySound
+	
+	PlaySound(GroundSlamSounds);
+	if (GetWorld()->SweepMultiByChannel(HitResults, Start, End, FQuat::FQuat(), ECC_Weapon, CollionShape, CollParam))
+	{
+		
+		for (auto& Hit : HitResults)
+		{
+			if (Hit.GetActor())
+			{
+				UHealthComponent* HealthComp = Cast<UHealthComponent>(Hit.GetActor()->GetComponentByClass(UHealthComponent::StaticClass()));
+				if (HealthComp && IsTargetWithinSight(Hit.GetActor()) && !EnemiesHit.Contains(Hit.GetActor()))
+				{
+						UE_LOG(LogTemp, Warning, TEXT("Actor Name: %s"), *Hit.GetActor()->GetName())
+						EnemiesHit.Add(Hit.GetActor());
+						HandleDamage(Hit, GroundSlamDamageType);
+				}
+			}
+		
+		}
+	}
+}
+
 void AMeleeWeapon::PlaySound(USoundBase * Sound)
 {
-	UGameplayStatics::PlaySoundAtLocation(GetWorld(),Sound,GetActorLocation());
-	
+	if (Sound)
+	{
+		UGameplayStatics::PlaySoundAtLocation(GetWorld(), Sound, GetActorLocation());
+	}
 }
 
 void AMeleeWeapon::SpawnHitEffext(FHitResult& Hit)
@@ -184,40 +222,55 @@ void AMeleeWeapon::SetDamage(int32 Value)
 	Damage = Value;
 }
 
-void AMeleeWeapon::DealDamage(const FHitResult & HitResult)
+bool AMeleeWeapon::CanDamage(const FHitResult& HitResult)
 {
-	
+	//Move this code to the player and ai's take damage method - maybe
 	UHealthComponent* HealthComp = Cast<UHealthComponent>(HitResult.GetActor()->GetComponentByClass(UHealthComponent::StaticClass()));
 	UCombatComponent* CombatComp = Cast<UCombatComponent>(HitResult.GetActor()->GetComponentByClass(UCombatComponent::StaticClass()));
 
-	if (HealthComp == nullptr) return;
+	if (HealthComp == nullptr) return false;
 
 	//If we hit a immune enemy just end here
 	if (CombatComp && CombatComp->GetBattleState() == EBattleState::PS_Invincible)
 	{
-		return;
-	}
-	
-	if (UHealthComponent::IsFriendly(MyPawn, HitResult.GetActor()))
-	{
-			return;
+		return false;
 	}
 
+	if (UHealthComponent::IsFriendly(MyPawn, HitResult.GetActor()))
+	{
+		return false;
+	}
+
+	return true;
+}
+
+void AMeleeWeapon::HandleDamage(const FHitResult& HitResult, TSubclassOf<UDamageType> DamageType)
+{
+	if (CanDamage(HitResult))
+	{
+		DealDamage(HitResult, DamageType);
+	}
+}
+
+void AMeleeWeapon::DealDamage(const FHitResult& HitResult, TSubclassOf<UDamageType> DamageType)
+{
+	
 	FVector EyeLocation;
 	FRotator EyeRotation;
 	MyPawn->GetActorEyesViewPoint(EyeLocation, EyeRotation);
-	FVector ShotDirection = EyeRotation.Vector();
+	FVector HitDirection = EyeRotation.Vector();
+
 	float DealtDamage = Damage * DamageModifier;
-	FPointDamageEvent DamageEvent;
-	DamageEvent.Damage = DealtDamage;
-	DamageEvent.HitInfo = HitResult;
-	TSubclassOf<UDamageType> p;
-	PlaySound(SwordImpactSounds);
-	//UGameplayStatics::ApplyDamage(HitResult.GetActor(), DealtDamage, MyPawn->GetInstigatorController(), this, p);
-	UGameplayStatics::ApplyPointDamage(HitResult.GetActor(), DealtDamage, ShotDirection, HitResult, MyPawn->GetInstigatorController(), this, p);
-	CombatComp->Flinch(HitResult);
+	UGameplayStatics::ApplyPointDamage(HitResult.GetActor(), DealtDamage, HitDirection, HitResult, MyPawn->GetInstigatorController(), this, DamageType);
+	UCombatComponent* CombatComp = Cast<UCombatComponent>(HitResult.GetActor()->GetComponentByClass(UCombatComponent::StaticClass()));
+	if (CombatComp)
+	{
+		CombatComp->Flinch(HitResult);
+	}
 
 }
+
+
 
 bool AMeleeWeapon::GetIsAttcking() const
 {
@@ -233,7 +286,7 @@ void AMeleeWeapon::SetLastSokcetFrame()
 void AMeleeWeapon::StartTraceAttack()
 {
 	bIsAttackTrace = true;
-	//bIsAttacking = true;
+
 	if (SwordTrail)
 	{
 		SwordTrail->BeginTrails(SocketBase, SocketTip, ETrailWidthMode::ETrailWidthMode_FromCentre, 1.f);
@@ -243,7 +296,6 @@ void AMeleeWeapon::StartTraceAttack()
 void AMeleeWeapon::StopTraceAttack()
 {
 	bIsAttackTrace = false;
-	//bIsAttacking = false;
 
 	if (SwordTrail)
 	{

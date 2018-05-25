@@ -113,10 +113,7 @@ void UMeleeAnimInstance::PlayCombo(EAttackType AttackType)
 	
 
 		}
-		else
-		{
-			//UE_LOG(LogTemp, Warning, TEXT("next combo"))
-		}
+		
 	}
 
 

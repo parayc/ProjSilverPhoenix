@@ -187,9 +187,9 @@ void ASPlayer::StartJump()
 {
 
 	auto meleeweapon = Cast<AMeleeWeapon>(CharacterEquipment.CurrentWeapon);
-	//UE_LOG(LogTemp, Warning, TEXT("Start Jump"))
+	
 	if (meleeweapon->GetIsAttcking()) { return; }
-//	UE_LOG(LogTemp, Warning, TEXT("Jump"))
+
 	
 	if (!CombatStates->GetIsFlinching() && GetIsRolling() != true)
 	{
@@ -450,7 +450,7 @@ bool ASPlayer::IsTargetWithinSight(AActor * Target)
 	{
 		//DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
 		AEnemyMaster *target = Cast<AEnemyMaster>(Hit.GetActor());
-		if (target)//Check to see if enemy is in the list already and type checking target
+		if (target)
 		{
 			return true;
 		}
