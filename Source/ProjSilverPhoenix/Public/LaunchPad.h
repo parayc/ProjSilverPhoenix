@@ -6,6 +6,7 @@
 #include "GameFramework/Actor.h"
 #include "LaunchPad.generated.h"
 class UBoxComponent;
+class USphereComponent;
 class USoundCue;
 
 UCLASS()
@@ -23,14 +24,14 @@ protected:
 	UPROPERTY(VisibleAnywhere, Category = "Components")
 	UStaticMeshComponent* MeshComp;
 	UPROPERTY(VisibleAnywhere, Category = "Components")
-	UBoxComponent* BoxComp;
+	USphereComponent* SphereComp;
 	UPROPERTY(EditDefaultsOnly, Category = "FX")
 		UParticleSystem* LaunchPadEffect;
 
 	UPROPERTY(EditInstanceOnly, Category = "LaunchPad")
-		int32 LaunchStrength = 1000;
+		int32 LaunchStrength = 1500;
 	UPROPERTY(EditInstanceOnly, Category = "LaunchPad")
-		float LaunchPitAngle = 35.f;
+		float LaunchPitAngle = 90.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "TrackerBot")
 		USoundCue* LaunchPadSound;

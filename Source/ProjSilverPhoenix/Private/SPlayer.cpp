@@ -18,6 +18,7 @@
 #include "HealthComponent.h"
 
 
+
 ASPlayer::ASPlayer()
 {
 	// Set this character to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
@@ -38,6 +39,7 @@ ASPlayer::ASPlayer()
 
 	Camera = CreateDefaultSubobject<UCameraComponent>(TEXT("Camera"));
 	Camera->SetupAttachment(SpringArm, USpringArmComponent::SocketName);
+
 
 }
 
@@ -80,7 +82,7 @@ void ASPlayer::Tick(float DeltaTime)
 void ASPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
 {
 	Super::SetupPlayerInputComponent(PlayerInputComponent);
-
+	
 	PlayerInputComponent->BindAxis("Turn", this, &ASPlayer::TurnRate);
 	PlayerInputComponent->BindAxis("MoveForward", this, &ASPlayer::MoveForward);
 	PlayerInputComponent->BindAxis("MoveRight", this, &ASPlayer::MoveRight);
@@ -96,6 +98,7 @@ void ASPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
 
 	PlayerInputComponent->BindAction("NextTarget", IE_Pressed, this, &ASPlayer::NextTarget);
 	PlayerInputComponent->BindAction("PrevTarget", IE_Pressed, this, &ASPlayer::PrevTarget);
+
 
 }
 
@@ -505,6 +508,7 @@ void ASPlayer::LockOn()
 {
 	if (LockOnListTarget.Num() <= 0) return;
 
+	
 
 	FHitResult HitResults;
 	FVector Start = GetActorLocation();
@@ -553,6 +557,8 @@ void ASPlayer::LockOn()
 	//Make player face in the same direction as the camera
 	bUseControllerRotationYaw = true;
 	GetCharacterMovement()->bUseControllerDesiredRotation = false;
+	GetCharacterMovement()->bOrientRotationToMovement = false;
+	
 
 }
 
@@ -564,6 +570,7 @@ void ASPlayer::LockOff()
 		//Release the player from look direction
 		bUseControllerRotationYaw = false;
 		GetCharacterMovement()->bUseControllerDesiredRotation = true;
+		GetCharacterMovement()->bOrientRotationToMovement = true;
 		bIsLockedOn = false;
 
 

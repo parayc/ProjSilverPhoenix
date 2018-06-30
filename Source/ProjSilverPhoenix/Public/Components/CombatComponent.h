@@ -45,11 +45,18 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "CombatComponent")
 	bool GetIsFlinching() const;
 
-	void KnockDown();
+	void KnockDown(AActor* DamageInstigator);
 
+	UFUNCTION(BlueprintCallable, Category = "CombatComponent")
 	void ResetKnockDown();
 
+	UFUNCTION(BlueprintCallable, Category = "CombatComponent")
+	void KnockDownEnd();
+
 	void CalculateKnockDown();
+
+	UFUNCTION(BlueprintCallable, Category = "CombatComponent")
+	bool GetIsKnockedDown() const;
 
 private: 
 	FTimerHandle FlinchHandleTimer;
@@ -58,21 +65,33 @@ private:
 
 	bool IsFlinching = false;
 
-	UPROPERTY(EditAnywhere, Category = "CombatComponent")
+	UPROPERTY(EditAnywhere, Category = "CombatComponentAnimation | flinch")
 	UAnimMontage* FrontFlinchAnim;
 
-	UPROPERTY(EditAnywhere, Category = "CombatComponent")
+	UPROPERTY(EditAnywhere, Category = "CombatComponentAnimation | flinch")
 	UAnimMontage* BackFlinchAnim;
 
-	UPROPERTY(EditAnywhere, Category = "CombatComponent")
+	UPROPERTY(EditAnywhere, Category = "CombatComponentAnimation | flinch")
 	UAnimMontage* LeftFlinchAnim;
 
-	UPROPERTY(EditAnywhere, Category = "CombatComponent")
+	UPROPERTY(EditAnywhere, Category = "CombatComponentAnimation | flinch")
 	UAnimMontage* RightFlinchAnim;
+
+	UPROPERTY(EditAnywhere, Category = "CombatComponentAnimation | KnockDown")
+		UAnimMontage* KnockDownAnim;
+
+	UPROPERTY(EditAnywhere, Category = "CombatComponentAnimation | KnockDown")
+		UAnimMontage* KnockDownRecoveryAnim;
+
+	FTimerHandle KnockDownTimerHandle;
+
+	FTimerHandle KnockDownRecoverTimerHandle;
 
 	float KnockdownThreshold;
 
 	float knockdownValue;
+
+	bool bIsKnockedDown = false;
 
 protected:
 	// Called when the game starts

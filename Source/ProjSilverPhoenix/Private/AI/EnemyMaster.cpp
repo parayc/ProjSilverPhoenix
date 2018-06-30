@@ -117,7 +117,7 @@ void AEnemyMaster::OnHealthChanged(UHealthComponent * OwningHealthComp, float He
 	}
 
 	if (!ensure(CombatStates)) { return; }
-
+	
 	if (CombatStates->GetBattleState() == EBattleState::PS_Normal)
 	{
 		//Reset combo if we get hit
@@ -126,7 +126,7 @@ void AEnemyMaster::OnHealthChanged(UHealthComponent * OwningHealthComp, float He
 		{
 			PlayerAnimation->ResetComboAttack();
 		}
-
+		SetIsDamaged(true);
 		CombatStates->KnockBack(InstigatedBy->GetPawn(), this);
 	}
 }
@@ -183,6 +183,17 @@ void AEnemyMaster::OnDeath()
 void AEnemyMaster::SetTargetIconHidden(bool NewState)
 {
 	TargetIcon->SetHiddenInGame(NewState);
+}
+
+void AEnemyMaster::SetIsDamaged(bool newState)
+{
+	bIsDamaged = newState;
+	//Update in the Behaviour tree also
+	AEnemyAIController* AIController = Cast<AEnemyAIController>(GetController());
+	if (AIController)
+	{
+		AIController->SetIsDamagedState(bIsDamaged);
+	}
 }
 
 

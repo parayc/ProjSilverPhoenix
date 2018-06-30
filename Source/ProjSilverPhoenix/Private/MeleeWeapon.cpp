@@ -11,6 +11,7 @@
 #include "DestructibleComponent.h"
 #include "CombatComponent.h"
 #include "HealthComponent.h"
+#include "Components/CapsuleComponent.h"
 #include "GameFramework/NavMovementComponent.h"
 #include "GameFramework/PawnMovementComponent.h"
 
@@ -96,7 +97,6 @@ void AMeleeWeapon::TraceSwing()
 			AActor* HitActor = HitResult.GetActor();
 			if (!HitActor) return;
 
-			//UDestructibleComponent* DestructComp = HitActor->FindComponentByClass<UDestructibleComponent>();
 			UHealthComponent* HealthComp = HitActor->FindComponentByClass<UHealthComponent>();
 			//We check if we hit the enemy already in the same swing and not hit ourself
 			if (!EnemiesHit.Contains(HitActor) && HitActor != MyPawn)
@@ -110,7 +110,8 @@ void AMeleeWeapon::TraceSwing()
 					SpawnHitEffext(HitResult);
 					//We only want to play sounds if the actor got hit or not invinble 
 					UCombatComponent* CombatComp = Cast<UCombatComponent>(HitResult.GetActor()->GetComponentByClass(UCombatComponent::StaticClass()));
-					if (CombatComp && CombatComp->GetBattleState() != EBattleState::PS_Invincible)
+					
+					if (CombatComp && CombatComp->GetBattleState() != EBattleState::PS_Invincible && !UHealthComponent::IsFriendly(MyPawn, HitActor))
 					{
 						PlaySound(SwordImpactSounds);
 					}
@@ -185,16 +186,31 @@ void AMeleeWeapon::GroundSlamAttack()
 		{
 			if (Hit.GetActor())
 			{
+
 				UHealthComponent* HealthComp = Cast<UHealthComponent>(Hit.GetActor()->GetComponentByClass(UHealthComponent::StaticClass()));
 				if (HealthComp && IsTargetWithinSight(Hit.GetActor()) && !EnemiesHit.Contains(Hit.GetActor()))
 				{
-						UE_LOG(LogTemp, Warning, TEXT("Actor Name: %s"), *Hit.GetActor()->GetName())
 						EnemiesHit.Add(Hit.GetActor());
 						HandleDamage(Hit, GroundSlamDamageType);
+						UCombatComponent* CombatComp = Cast<UCombatComponent>(Hit.GetActor()->GetComponentByClass(UCombatComponent::StaticClass()));
+						if (CombatComp)
+						{
+							CombatComp->KnockDown(MyPawn);
+						}
+					
 				}
 			}
 		
 		}
+	}
+}
+
+void AMeleeWeapon::GroundSlamReset(AActor* HitActor)
+{
+	if (UCapsuleComponent* PrimitiveComponent = HitActor->FindComponentByClass<UCapsuleComponent>())
+	{
+		UE_LOG(LogTemp, Warning, TEXT("Primitive"))
+			PrimitiveComponent->SetCollisionResponseToChannel(ECC_Weapon, ECollisionResponse::ECR_Block);
 	}
 }
 
@@ -262,6 +278,7 @@ void AMeleeWeapon::DealDamage(const FHitResult& HitResult, TSubclassOf<UDamageTy
 
 	float DealtDamage = Damage * DamageModifier;
 	UGameplayStatics::ApplyPointDamage(HitResult.GetActor(), DealtDamage, HitDirection, HitResult, MyPawn->GetInstigatorController(), this, DamageType);
+	//TODO - move to health comp
 	UCombatComponent* CombatComp = Cast<UCombatComponent>(HitResult.GetActor()->GetComponentByClass(UCombatComponent::StaticClass()));
 	if (CombatComp)
 	{
@@ -275,6 +292,11 @@ void AMeleeWeapon::DealDamage(const FHitResult& HitResult, TSubclassOf<UDamageTy
 bool AMeleeWeapon::GetIsAttcking() const
 {
 	return bIsAttacking;
+}
+
+bool AMeleeWeapon::GetIsTracing() const
+{
+	return bIsAttackTrace;
 }
 
 void AMeleeWeapon::SetLastSokcetFrame()

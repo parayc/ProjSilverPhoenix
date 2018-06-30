@@ -153,7 +153,7 @@ void UMeleeAnimInstance::StopAttackingTrace()
 		if (Melee)
 		{
 			Melee->StopTraceAttack();
-
+			Melee->ClearEnemiesHitArray();
 		}
 	}
 }

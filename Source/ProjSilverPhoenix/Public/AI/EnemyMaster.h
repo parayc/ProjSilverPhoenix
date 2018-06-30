@@ -67,8 +67,10 @@ public:
 
 	void SetTargetIconHidden(bool NewState);
 
-	
+	UFUNCTION(BlueprintCallable, Category = "Damage")
+	void SetIsDamaged(bool newState);
 
+	
 private:
 
 	AXBaseCharacter* EnemyRef;
@@ -84,6 +86,8 @@ private:
 	bool bSensedTarget = false;
 
 	bool bIsTargeted = false;
+
+	bool bIsDamaged = false;
 
 	float LastSeenTime;
 

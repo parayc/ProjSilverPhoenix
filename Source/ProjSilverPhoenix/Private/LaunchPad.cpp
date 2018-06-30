@@ -1,22 +1,24 @@
 // Copyright Project Silver Phoneix
 
 #include "LaunchPad.h"
-#include "Components/BoxComponent.h"
+//#include "Components/BoxComponent.h"
 #include "Components/StaticMeshComponent.h"
 #include "Kismet/GameplayStatics.h"
 #include "XBaseCharacter.h"
 #include "Sound/SoundCue.h"
+#include "Components/SphereComponent.h"
 
 // Sets default values
 ALaunchPad::ALaunchPad()
 {
-	BoxComp = CreateDefaultSubobject<UBoxComponent>(TEXT("BoxComp"));
-	RootComponent = BoxComp;
-	BoxComp->SetBoxExtent(FVector(75.f, 75.f, 50));
-	BoxComp->OnComponentBeginOverlap.AddDynamic(this, &ALaunchPad::HanleOverlapped);
+	SphereComp = CreateDefaultSubobject<USphereComponent>(TEXT("SphereComp"));
+	RootComponent = SphereComp;
+	SphereComp->SetSphereRadius(30.f);
+
+	SphereComp->OnComponentBeginOverlap.AddDynamic(this, &ALaunchPad::HanleOverlapped);
 
 	MeshComp = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("MeshComp"));
-	MeshComp->SetupAttachment(BoxComp);
+	MeshComp->SetupAttachment(SphereComp);
 
 	LaunchStrength = 1500;
 	LaunchPitAngle = 35.f;
@@ -41,7 +43,7 @@ void ALaunchPad::HanleOverlapped(UPrimitiveComponent * OverlappedComponent, AAct
 	auto BaseCharacter = Cast<ACharacter>(OtherActor);
 	if (BaseCharacter)
 	{
-		UGameplayStatics::SpawnSoundAttached(LaunchPadSound, BoxComp);
+		UGameplayStatics::SpawnSoundAttached(LaunchPadSound, SphereComp);
 		BaseCharacter->LaunchCharacter(LaunchVelocity,true,true);
 		UGameplayStatics::SpawnEmitterAtLocation(this, LaunchPadEffect,GetActorLocation());
 	

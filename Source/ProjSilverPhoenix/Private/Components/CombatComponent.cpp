@@ -4,6 +4,9 @@
 #include "Animation/AnimMontage.h"
 #include "XBaseCharacter.h"
 #include "DrawDebugHelpers.h"
+#include "Kismet/KismetMathLibrary.h"
+#include "AIController.h"
+#include "EnemyAIController.h"
 #include "GameFramework/Character.h"
 
 // Sets default values for this component's properties
@@ -124,16 +127,55 @@ bool UCombatComponent::GetIsFlinching() const
 	return IsFlinching;
 }
 
-void UCombatComponent::KnockDown()
+void UCombatComponent::KnockDown(AActor* DamageInstigator)
 {
+	AXBaseCharacter* Owner = Cast<AXBaseCharacter>(GetOwner());
+	float Duration = 0.f;
+	if (Owner && !Owner->GetIsDead())
+	{
+		bIsKnockedDown = true;
+
+		auto Direction(DamageInstigator->GetActorLocation() - Owner->GetActorLocation());
+		auto LookDir = UKismetMathLibrary::MakeRotFromX(Direction);
+		FRotator NewTarget(0, LookDir.Yaw, 0);
+		Owner->SetActorRotation(NewTarget);
+		
+		if (KnockDownAnim)
+		{
+			Owner->PlayAnimMontage(KnockDownAnim);
+		}
+		
+	}
+	
 }
 
 void UCombatComponent::ResetKnockDown()
 {
+
+	AXBaseCharacter* Owner = Cast<AXBaseCharacter>(GetOwner());
+	float Duration = 0.f;
+	if (Owner && !Owner->GetIsDead())
+	{
+		if (KnockDownRecoveryAnim)
+		{
+			Owner->PlayAnimMontage(KnockDownRecoveryAnim);
+		}
+	
+	}
+}
+
+void UCombatComponent::KnockDownEnd()
+{
+	bIsKnockedDown = false;
 }
 
 void UCombatComponent::CalculateKnockDown()
 {
+}
+
+bool UCombatComponent::GetIsKnockedDown() const
+{
+	return bIsKnockedDown;
 }
 
 

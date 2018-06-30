@@ -53,7 +53,7 @@ void AXBaseCharacter::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
 
-	/*
+	
 	if (GetWalkDirection() >= 0.7f)//Check if walking forward
 	{
 		SetWalkSpeed(WalkSpeed);
@@ -68,7 +68,7 @@ void AXBaseCharacter::Tick(float DeltaTime)
 		SetWalkSpeed(BackwardsWalkSpeed);
 	}
 
-	*/
+	
 
 }
 
@@ -213,7 +213,6 @@ void AXBaseCharacter::SwitchStats(EPlayerStates NewState)
 		if (EPlayerStates::PS_Passive == CurrentPlayerState && CanUnequip())
 		{
 			CharacterEquipment.CurrentWeapon->UnEquip();
-			//UE_LOG(LogTemp, Warning, TEXT("Animation"));
 		}
 		else if (EPlayerStates::PS_Passive == CurrentPlayerState)//If is not appropriate to play animation just attach to back
 		{

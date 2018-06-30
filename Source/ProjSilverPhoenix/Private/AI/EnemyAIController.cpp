@@ -20,6 +20,7 @@ AEnemyAIController::AEnemyAIController()
 	EnemyInRange = "EnemyInRange";
 	NoiseLocation = "TargetDestination";
 	AIState = "AIState";
+	IsBeingDamaged = "IsDamaged";
 }
 
 void AEnemyAIController::Possess(APawn * pawn)
@@ -78,6 +79,14 @@ void AEnemyAIController::SetAIState(EAIStates newState)
 	if (BlackboardComp)
 	{
 		BlackboardComp->SetValue<UBlackboardKeyType_Enum>(AIState, static_cast<UBlackboardKeyType_Enum::FDataType>(newState));
+	}
+}
+
+void AEnemyAIController::SetIsDamagedState(bool newState)
+{
+	if (BlackboardComp)
+	{
+		BlackboardComp->SetValueAsBool(IsBeingDamaged, newState);
 	}
 }
 

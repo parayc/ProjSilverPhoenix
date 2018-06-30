@@ -18,7 +18,6 @@ class AEnemyMaster;
 class UCombatComponent;
 class UHealthComponent;
 
-
 UCLASS()
 class PROJSILVERPHOENIX_API ASPlayer : public AXBaseCharacter
 {
@@ -36,6 +35,7 @@ protected:
 
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
 	UHealthComponent* HealthComponent;
+
 
 public:
 

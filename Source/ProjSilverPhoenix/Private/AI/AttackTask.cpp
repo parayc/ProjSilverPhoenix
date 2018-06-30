@@ -22,7 +22,7 @@ EBTNodeResult::Type UAttackTask::ExecuteTask(UBehaviorTreeComponent & OwnerComp,
 		auto length = Weapon->GetLightAttackMontages().Num();
 
 		auto RanValue = FMath::RandRange(0, length - 1);
-		if (Weapon->GetLightAttackMontages()[RanValue].MeleeAttackMontages == nullptr)
+		if (length == 0 || Weapon->GetLightAttackMontages()[RanValue].MeleeAttackMontages == nullptr)
 		{
 			UE_LOG(LogTemp, Warning, TEXT("Failed"))
 			return EBTNodeResult::Failed; 

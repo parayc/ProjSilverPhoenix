@@ -57,6 +57,9 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 	bool GetIsAttcking() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Setup")
+	bool GetIsTracing() const;
+
 	void SetLastSokcetFrame();
 
 	//Starts weapons line trace 
@@ -77,6 +80,8 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	void GroundSlamAttack();
+
+	void GroundSlamReset(AActor* HitActor);
 
 	TArray<FWeaponAnimation> GetLightAttackMontages();
 

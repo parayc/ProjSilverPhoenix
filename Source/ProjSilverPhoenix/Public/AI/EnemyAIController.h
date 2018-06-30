@@ -50,6 +50,8 @@ public:
 
 	void SetAIState(EAIStates newState);
 
+	void SetIsDamagedState(bool newState);
+
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName Enemy;
 
@@ -61,6 +63,9 @@ public:
 
 	UPROPERTY(EditDefaultsOnly, Category = AI)
 	FName AIState;
+
+	UPROPERTY(EditDefaultsOnly, Category = AI)
+	FName IsBeingDamaged;
 
 	UFUNCTION(BlueprintCallable)
 	AActor* GetEnemyRef() const;
