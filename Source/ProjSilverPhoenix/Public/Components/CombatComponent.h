@@ -53,7 +53,7 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "CombatComponent")
 	void KnockDownEnd();
 
-	void CalculateKnockDown();
+	void CalculateKnockDown(AActor* DamageInstigator, float KnockDownAmount);
 
 	UFUNCTION(BlueprintCallable, Category = "CombatComponent")
 	bool GetIsKnockedDown() const;

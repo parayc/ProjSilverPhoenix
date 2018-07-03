@@ -127,6 +127,18 @@ bool UCombatComponent::GetIsFlinching() const
 	return IsFlinching;
 }
 
+
+void UCombatComponent::CalculateKnockDown(AActor* DamageInstigator, float KnockDownAmount)
+{
+	knockdownValue += KnockDownAmount; 
+
+	if (knockdownValue >= KnockdownThreshold)
+	{
+		knockdownValue = 0;
+		KnockDown(DamageInstigator);
+	}
+}
+
 void UCombatComponent::KnockDown(AActor* DamageInstigator)
 {
 	AXBaseCharacter* Owner = Cast<AXBaseCharacter>(GetOwner());
@@ -169,9 +181,6 @@ void UCombatComponent::KnockDownEnd()
 	bIsKnockedDown = false;
 }
 
-void UCombatComponent::CalculateKnockDown()
-{
-}
 
 bool UCombatComponent::GetIsKnockedDown() const
 {

@@ -85,15 +85,15 @@ void UMeleeAnimInstance::PlayCombo(EAttackType AttackType)
 			{
 				
 				
-				if (Montages[ComboCounter].LaunchCharacter)
-				{
-					//Launch Character
-					CharacterPawn->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-				}
-				else
-				{
-					CharacterPawn->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-				}
+				//if (Montages[ComboCounter].LaunchCharacter)
+				//{
+				//	//Launch Character
+				//	CharacterPawn->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
+				//}
+				//else
+				//{
+				//	CharacterPawn->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
+				//}
 
 			
 				//change direction after each attack montage

@@ -26,8 +26,8 @@ struct FWeaponAnimation
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SetUp")
 		int32 DamagePerAnimation = 0;
 	//Some Montages 
-	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SetUp")
-		bool LaunchCharacter;
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SetUp", meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
+		float KnockDownAmount;
 
 };
 UCLASS()
