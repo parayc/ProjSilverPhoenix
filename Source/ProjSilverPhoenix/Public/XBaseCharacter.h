@@ -87,6 +87,7 @@ public:
 	virtual void OnDeath();
 
 	bool CanUnequip() const;
+
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	TArray<UAnimMontage*>  DeathMontages; 
 

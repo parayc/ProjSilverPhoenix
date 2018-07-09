@@ -39,6 +39,7 @@ protected:
 
 public:
 
+
 	ASPlayer();
 
 		/**Movement*/
