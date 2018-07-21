@@ -474,11 +474,10 @@ void ASPlayer::LockOnCamera(float DeltaSec)
 			auto Target = LockOnListTarget[TargetIndex]->GetActorLocation();
 
 			//Same thing as UKismetMathLibrary::FindLookAtRotation(PlayerLocation,Target);
-			auto Direction(Target - PlayerLocation);
+			auto Direction = (Target - PlayerLocation);
 			auto LookDir = UKismetMathLibrary::MakeRotFromX(Direction);
-			FRotator NewTarget(-20, LookDir.Yaw, 0);
-
-
+			float Offset = -20.f;
+			FRotator NewTarget(Offset + LookDir.Pitch, LookDir.Yaw, 0);
 			GetController()->SetControlRotation(UKismetMathLibrary::RInterpTo(GetControlRotation(), NewTarget, DeltaSec, 20));
 		}
 
