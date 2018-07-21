@@ -24,12 +24,12 @@ AEnemyMaster::AEnemyMaster()
 
 
 	TargetIcon = CreateDefaultSubobject<UWidgetComponent>(TEXT("Target Icon"));
-	TargetIcon->SetupAttachment(GetMesh());
+	TargetIcon->SetupAttachment(RootComponent);
 	TargetIcon->SetDrawSize(FVector2D(20, 15));
 	TargetIcon->bVisible = true;
 	
 	HealthWidget = CreateDefaultSubobject<UWidgetComponent>(TEXT("Health Widget"));
-	HealthWidget->SetupAttachment(GetMesh());
+	HealthWidget->SetupAttachment(RootComponent);
 	HealthWidget->SetDrawSize(FVector2D(60, 15));
 	HealthWidget->SetVisibility(false);
 
