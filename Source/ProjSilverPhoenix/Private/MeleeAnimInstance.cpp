@@ -84,16 +84,7 @@ void UMeleeAnimInstance::PlayCombo(EAttackType AttackType)
 			if (ComboCounter < Montages.Num())
 			{
 				
-				
-				//if (Montages[ComboCounter].LaunchCharacter)
-				//{
-				//	//Launch Character
-				//	CharacterPawn->GetCharacterMovement()->SetMovementMode(MOVE_Flying);
-				//}
-				//else
-				//{
-				//	CharacterPawn->GetCharacterMovement()->SetMovementMode(MOVE_Walking);
-				//}
+				//Check whether the montage has super armor
 
 			
 				//change direction after each attack montage

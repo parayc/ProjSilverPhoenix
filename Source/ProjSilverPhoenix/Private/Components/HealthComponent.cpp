@@ -25,21 +25,33 @@ void UHealthComponent::BeginPlay()
 	AActor* MyOwner = GetOwner();
 	if (MyOwner)
 	{
-		MyOwner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::OnTakeDamage);
+		//MyOwner->OnTakeAnyDamage.AddDynamic(this, &UHealthComponent::OnTakeDamage);
+		MyOwner->OnTakePointDamage.AddDynamic(this, &UHealthComponent::OnTakePDamage);
 	}
 }
 
-void UHealthComponent::OnTakeDamage(AActor * DamagedActor, float Damage, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
+//void UHealthComponent::OnTakeDamage(AActor * DamagedActor, float Damage, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
+//{
+//	
+//	if (CurrentHealth <= 0)
+//	{
+//		return;
+//	}
+//
+//	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.0f, MaxHealth);
+//	OnHealthChange.Broadcast(this, CurrentHealth, Damage, HitLocation, DamageType, InstigatedBy, DamageCauser);
+//	UE_LOG(LogTemp, Warning, TEXT("Primitive"))
+//}
+
+void UHealthComponent::OnTakePDamage(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser)
 {
-	
 	if (CurrentHealth <= 0)
 	{
 		return;
 	}
 
 	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.0f, MaxHealth);
-	OnHealthChange.Broadcast(this, CurrentHealth, Damage, DamageType, InstigatedBy, DamageCauser);
-	
+	OnHealthChange.Broadcast(this, CurrentHealth, Damage, HitLocation, DamageType, InstigatedBy, DamageCauser);
 }
 
 bool UHealthComponent::IsFriendly(AActor * ActorA, AActor * ActorB)
@@ -74,7 +86,7 @@ void UHealthComponent::Heal(float HealAmount)
 	}
 	
 	CurrentHealth = FMath::Clamp(CurrentHealth + HealAmount, 0.0f, MaxHealth);
-	OnHealthChange.Broadcast(this, CurrentHealth, -HealAmount, nullptr, nullptr, nullptr);
+	OnHealthChange.Broadcast(this, CurrentHealth, -HealAmount, FVector(0,0,0),nullptr, nullptr, nullptr);
 }
 
 float UHealthComponent::GetHealth() const

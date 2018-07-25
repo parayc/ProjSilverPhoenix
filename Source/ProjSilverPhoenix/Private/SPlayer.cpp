@@ -102,7 +102,7 @@ void ASPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
 
 }
 
-void ASPlayer::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
+void ASPlayer::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, FVector HitDirection,  const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
 {
 	//If We heal or do no damage just return
 	if (HealthDelta <= 0) { return; }

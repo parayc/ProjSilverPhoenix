@@ -274,16 +274,16 @@ void AMeleeWeapon::DealDamage(const FHitResult& HitResult, TSubclassOf<UDamageTy
 	FVector EyeLocation;
 	FRotator EyeRotation;
 	MyPawn->GetActorEyesViewPoint(EyeLocation, EyeRotation);
-	FVector HitDirection = EyeRotation.Vector();
+
+	FVector HitPoint = HitResult.ImpactPoint;
+
+	FVector ForwardDir = MyPawn->GetActorForwardVector();
+	FVector HitDirection = MyPawn->GetActorLocation() - HitResult.ImpactPoint;
 
 	float DealtDamage = Damage * DamageModifier;
-	UGameplayStatics::ApplyPointDamage(HitResult.GetActor(), DealtDamage, HitDirection, HitResult, MyPawn->GetInstigatorController(), this, DamageType);
-	//TODO - move to health comp
-	UCombatComponent* CombatComp = Cast<UCombatComponent>(HitResult.GetActor()->GetComponentByClass(UCombatComponent::StaticClass()));
-	if (CombatComp)
-	{
-		CombatComp->Flinch(HitResult);
-	}
+	//We pass the impact point instead of the hit direction
+	UGameplayStatics::ApplyPointDamage(HitResult.GetActor(), DealtDamage, HitResult.ImpactPoint, HitResult, MyPawn->GetInstigatorController(), this, DamageType);
+	
 
 }
 

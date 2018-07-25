@@ -91,6 +91,8 @@ public:
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "Animations")
 	TArray<UAnimMontage*>  DeathMontages; 
 
+	UCombatComponent* GetCombatState() const;
+
 protected:
 
 	//UFUNCTION()

@@ -38,7 +38,7 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "CombatComponent")
 		float KnockBackAmount = 5;
 
-	void Flinch(const FHitResult& HitResult);
+	void Flinch(const FVector HitDirection);
 
 	void StopFlinch();
 
@@ -57,6 +57,13 @@ public:
 
 	UFUNCTION(BlueprintCallable, Category = "CombatComponent")
 	bool GetIsKnockedDown() const;
+
+	/*Returns true if the super armor was broken during activation */
+	bool CalculateSuperArmor(float Damage);
+
+	void ActiveSuperArmor(float SuperArmorValue);
+
+	void DeactiveSuperArmor();
 
 private: 
 	FTimerHandle FlinchHandleTimer;
@@ -90,6 +97,10 @@ private:
 	float KnockdownThreshold;
 
 	float knockdownValue;
+
+	float SuperArmorThreshold;
+
+	float CurrentSuperArmorValue = 0;
 
 	bool bIsKnockedDown = false;
 

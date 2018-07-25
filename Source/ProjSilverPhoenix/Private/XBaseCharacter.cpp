@@ -242,3 +242,8 @@ bool AXBaseCharacter::CanUnequip() const
 	return  Player->GetIsRolling() != true && Player->GetIsJumping() != true && CombatStates->GetIsFlinching() != true && Player->GetIsDead() != true;
 }
 
+UCombatComponent * AXBaseCharacter::GetCombatState() const
+{
+	return CombatStates;
+}
+

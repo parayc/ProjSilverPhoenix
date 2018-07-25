@@ -97,7 +97,7 @@ void AEnemyMaster::Tick(float DeltaTime)
 
 }
 
-void AEnemyMaster::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
+void AEnemyMaster::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, FVector HitDirection, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
 {
 	//If We heal or do no damage just return
 	if (HealthDelta <= 0) { return; }
@@ -116,8 +116,36 @@ void AEnemyMaster::OnHealthChanged(UHealthComponent * OwningHealthComp, float He
 
 	}
 
-	if (!ensure(CombatStates)) { return; }
+	/*Material Pulses when Ai takes damage  */
+
+	//We make sure all material components pulses not just the base 
+	if (MatInstList.Num() == 0)
+	{
+		for (int i = 0; i < GetMesh()->GetNumMaterials(); i++)
+		{
+			MatInstList.Add(GetMesh()->CreateAndSetMaterialInstanceDynamicFromMaterial(i, GetMesh()->GetMaterial(i)));
+		}
+	}
+
+
+	if (MatInstList.Num() > 0)
+	{
+
+		for (int i = 0; i < MatInstList.Num(); i++)
+		{
+			MatInstList[i]->SetScalarParameterValue("LastTimeDamageTaken", GetWorld()->TimeSeconds);
+		
+		}
+
+	}
 	
+	/*This sets a varible in the AI behaviour tree */
+	SetIsDamaged(true);
+
+
+	if (!ensure(CombatStates)) { return; } 
+	
+
 	if (CombatStates->GetBattleState() == EBattleState::PS_Normal)
 	{
 		//Reset combo if we get hit
@@ -126,8 +154,15 @@ void AEnemyMaster::OnHealthChanged(UHealthComponent * OwningHealthComp, float He
 		{
 			PlayerAnimation->ResetComboAttack();
 		}
-		SetIsDamaged(true);
+	
 		CombatStates->KnockBack(InstigatedBy->GetPawn(), this);
+		CombatStates->Flinch(HitDirection);
+
+	}
+	else if(CombatStates->GetBattleState() == EBattleState::PS_SuperArmor && CombatStates->CalculateSuperArmor(HealthDelta))
+	{
+		CombatStates->KnockBack(InstigatedBy->GetPawn(), this);
+		CombatStates->Flinch(HitDirection);
 	}
 }
 

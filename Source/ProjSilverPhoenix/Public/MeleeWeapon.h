@@ -28,6 +28,9 @@ struct FWeaponAnimation
 	//Some Montages 
 	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SetUp", meta = (ClampMin = "0.0", ClampMax = "1.0", UIMin = "0.0", UIMax = "1.0"))
 		float KnockDownAmount;
+	/*If value is zero the montage has no Super Armor - The value is the amount of damage it takes to break the super armor */
+	UPROPERTY(EditAnywhere, BlueprintReadWrite, Category = "SetUp")
+	float SuperArmorThreshold = 0.f;
 
 };
 UCLASS()

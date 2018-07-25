@@ -53,21 +53,21 @@ void UCombatComponent::KnockBack(AActor * DamageCauser, AActor * DamageReceiver)
 	
 }
 
-void UCombatComponent::Flinch(const FHitResult& HitResult)
+void UCombatComponent::Flinch(const FVector HitDirection)
 {
-	
+	/*HitDirection is Hitimpact point  */
 	if (GetBattleState() != EBattleState::PS_Normal) return;
 	AXBaseCharacter* Owner = Cast<AXBaseCharacter>(GetOwner());
 	if (Owner && !Owner->GetIsDead())
 	{
 	
-		FVector HitPoint = HitResult.ImpactPoint;
+		
 		//DrawDebugSphere(GetWorld(), HitPoint, 10.f, 14, FColor::Yellow, false, 1.f, 0, 1.f);
 
 		FVector ForwardDir = Owner->GetActorForwardVector();
-		FVector Dir = Owner->GetActorLocation() - HitPoint;
-		float DotNum = FVector::DotProduct(Dir.GetSafeNormal(), ForwardDir.GetSafeNormal());
-		float CrossNum = FVector::CrossProduct(Dir.GetSafeNormal(), ForwardDir.GetSafeNormal()).Z;
+		FVector Direction = Owner->GetActorLocation() - HitDirection;
+		float DotNum = FVector::DotProduct(Direction.GetSafeNormal(), ForwardDir.GetSafeNormal());
+		float CrossNum = FVector::CrossProduct(Direction.GetSafeNormal(), ForwardDir.GetSafeNormal()).Z;
 		IsFlinching = true;
 		float Duration = 0.f;
 
@@ -185,6 +185,44 @@ void UCombatComponent::KnockDownEnd()
 bool UCombatComponent::GetIsKnockedDown() const
 {
 	return bIsKnockedDown;
+}
+
+bool UCombatComponent::CalculateSuperArmor(float Damage)
+{
+	if (CurrentBattleState != EBattleState::PS_SuperArmor) return false;
+
+
+	UE_LOG(LogTemp, Warning, TEXT("Super Armor Cal"))
+	CurrentSuperArmorValue += Damage;
+	 
+	if (CurrentSuperArmorValue >= SuperArmorThreshold)
+	{
+		CurrentSuperArmorValue = 0;
+		//Break super amror 
+		CurrentBattleState = EBattleState::PS_Normal;
+		 //flinch or knockdown
+		UE_LOG(LogTemp, Warning, TEXT("Broke"))
+			return true;
+
+	}
+
+	return false;
+}
+
+void UCombatComponent::ActiveSuperArmor(float SuperArmorValue)
+{
+	if (SuperArmorValue > 0.0f)
+	{
+		CurrentBattleState = EBattleState::PS_SuperArmor;
+		SuperArmorThreshold = SuperArmorValue;
+		CurrentSuperArmorValue = 0;
+	}
+}
+
+void UCombatComponent::DeactiveSuperArmor()
+{
+	CurrentBattleState = EBattleState::PS_Normal;
+
 }
 
 
