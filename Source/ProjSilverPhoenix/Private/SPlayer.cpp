@@ -118,19 +118,29 @@ void ASPlayer::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health
 	}
 
 	if (!ensure(CombatStates)) { return; }
-
-	//TODO - Move to melee sword
+	UMeleeAnimInstance* PlayerAnimation = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
 	if (CombatStates->GetBattleState() == EBattleState::PS_Normal)
 	{
 		//Reset combo if we get hit
-		UMeleeAnimInstance* PlayerAnimation = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
 		if (PlayerAnimation)
 		{
 			PlayerAnimation->ResetComboAttack();
 		}
 
-		CombatStates->KnockBack(DamageCauser, this);
+		CombatStates->KnockBack(InstigatedBy->GetPawn(), this);
+		CombatStates->Flinch(HitDirection);
 
+	}
+	else if (CombatStates->GetBattleState() == EBattleState::PS_SuperArmor && CombatStates->CalculateSuperArmor(HealthDelta))
+	{
+
+		//Reset combo if we get hit
+		if (PlayerAnimation)
+		{
+			PlayerAnimation->ResetComboAttack();
+		}
+		CombatStates->KnockBack(InstigatedBy->GetPawn(), this);
+		CombatStates->Flinch(HitDirection);
 	}
 }
 

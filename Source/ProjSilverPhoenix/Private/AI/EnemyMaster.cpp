@@ -65,7 +65,7 @@ void AEnemyMaster::BeginPlay()
 		TargetIcon->SetHiddenInGame(true);
 	}
 
-	SetGuradState(AIStates);
+	SetGuardState(AIStates);
 	
 }
 
@@ -79,7 +79,7 @@ void AEnemyMaster::Tick(float DeltaTime)
 	/* Check if the last time we sensed a player is beyond the time out value to prevent from endlessly following a player. */
 	if (LastTimeSensePlayer())
 	{
-		SetGuradState(EAIStates::Passive);
+		SetGuardState(EAIStates::Passive);
 
 		AEnemyAIController* AIController = Cast<AEnemyAIController>(GetController());
 		if (AIController)
@@ -145,11 +145,10 @@ void AEnemyMaster::OnHealthChanged(UHealthComponent * OwningHealthComp, float He
 
 	if (!ensure(CombatStates)) { return; } 
 	
-
+	UMeleeAnimInstance* PlayerAnimation = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
 	if (CombatStates->GetBattleState() == EBattleState::PS_Normal)
 	{
 		//Reset combo if we get hit
-		UMeleeAnimInstance* PlayerAnimation = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
 		if (PlayerAnimation)
 		{
 			PlayerAnimation->ResetComboAttack();
@@ -161,12 +160,17 @@ void AEnemyMaster::OnHealthChanged(UHealthComponent * OwningHealthComp, float He
 	}
 	else if(CombatStates->GetBattleState() == EBattleState::PS_SuperArmor && CombatStates->CalculateSuperArmor(HealthDelta))
 	{
+
+		if (PlayerAnimation)
+		{
+			PlayerAnimation->ResetComboAttack();
+		}
 		CombatStates->KnockBack(InstigatedBy->GetPawn(), this);
 		CombatStates->Flinch(HitDirection);
 	}
 }
 
-void AEnemyMaster::SetGuradState(EAIStates NewState)
+void AEnemyMaster::SetGuardState(EAIStates NewState)
 {
 	if (NewState == AIStates) return;
 
@@ -246,7 +250,7 @@ void AEnemyMaster::OnseePlayer(APawn * pawn)
 		{
 			EnemyRef = player;
 			AIController->SetSeenTarget(EnemyRef);
-			SetGuradState(EAIStates::Alerted);
+			SetGuardState(EAIStates::Alerted);
 		}
 		else
 		{
@@ -269,7 +273,7 @@ void AEnemyMaster::OnHearNoise(APawn * PawnInstigator, const FVector & Location,
 		AIController->SetHeardLocation(Location);
 	}
 
-	SetGuradState(EAIStates::Suspicious);
+	SetGuardState(EAIStates::Suspicious);
 }
 
 bool AEnemyMaster::LastTimeSensePlayer()

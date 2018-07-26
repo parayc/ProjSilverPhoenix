@@ -43,7 +43,7 @@ protected:
 
 	EAIStates AIStates; 
 
-	void SetGuradState(EAIStates NewState);
+	void SetGuardState(EAIStates NewState);
 
 
 public:	
