@@ -30,18 +30,6 @@ void UHealthComponent::BeginPlay()
 	}
 }
 
-//void UHealthComponent::OnTakeDamage(AActor * DamagedActor, float Damage, const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
-//{
-//	
-//	if (CurrentHealth <= 0)
-//	{
-//		return;
-//	}
-//
-//	CurrentHealth = FMath::Clamp(CurrentHealth - Damage, 0.0f, MaxHealth);
-//	OnHealthChange.Broadcast(this, CurrentHealth, Damage, HitLocation, DamageType, InstigatedBy, DamageCauser);
-//	UE_LOG(LogTemp, Warning, TEXT("Primitive"))
-//}
 
 void UHealthComponent::OnTakePDamage(AActor* DamagedActor, float Damage, class AController* InstigatedBy, FVector HitLocation, class UPrimitiveComponent* FHitComponent, FName BoneName, FVector ShotFromDirection, const class UDamageType* DamageType, AActor* DamageCauser)
 {

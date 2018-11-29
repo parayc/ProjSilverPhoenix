@@ -18,3 +18,7 @@ void ASPlayerCameraManager::UpdateCamera(float DeltaTime)
 void ASPlayerCameraManager::test()
 {
 }
+
+void ASPlayerCameraManager:: LockOn()
+{
+}

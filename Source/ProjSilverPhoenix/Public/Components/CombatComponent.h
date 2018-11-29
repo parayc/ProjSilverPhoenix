@@ -34,7 +34,7 @@ public:
 	void SetBattleState(EBattleState BattleState);
 
 	void KnockBack(AActor * DamageCauser, AActor * DamageReceiver);
-
+	/*How far the actor is hit back*/
 	UPROPERTY(EditDefaultsOnly, Category = "CombatComponent")
 		float KnockBackAmount = 5;
 
@@ -53,8 +53,6 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "CombatComponent")
 	void KnockDownEnd();
 
-	void CalculateKnockDown(AActor* DamageInstigator, float KnockDownAmount);
-
 	UFUNCTION(BlueprintCallable, Category = "CombatComponent")
 	bool GetIsKnockedDown() const;
 
@@ -64,6 +62,10 @@ public:
 	void ActiveSuperArmor(float SuperArmorValue);
 
 	void DeactiveSuperArmor();
+
+	void ResetKnockDownValue();
+
+	void HandleDamage(float HealthChange, FVector HitDirection, AActor* PawnInstigator, AActor* ActorHit);
 
 private: 
 	FTimerHandle FlinchHandleTimer;
@@ -90,19 +92,30 @@ private:
 	UPROPERTY(EditAnywhere, Category = "CombatComponentAnimation | KnockDown")
 		UAnimMontage* KnockDownRecoveryAnim;
 
-	FTimerHandle KnockDownTimerHandle;
+	FTimerHandle KnockDownLastHitTimerHandle;
 
 	FTimerHandle KnockDownRecoverTimerHandle;
+	
 
-	float KnockdownThreshold;
+	UPROPERTY(EditAnywhere, Category = "CombatComponent")
+	bool bCanBeKnockdown = true;
+	/*The amount of damage needed before the actor is knocked down*/
+	UPROPERTY(EditAnywhere, Category = "CombatComponent", meta = (EditCondition = "bCanBeKnockdown"))
+	float KnockdownThreshold = 25;
+	/*This is how long it would take to reset the knock down value */
+	UPROPERTY(EditAnywhere, Category = "CombatComponent", meta = (EditCondition = "bCanBeKnockdown"))
+	float LastTimeHit = 2;
 
-	float knockdownValue;
+	float CurrentknockdownValue;
 
+	/*The amount of damage needed before the actor super amror is broken - Set in Attack Task*/
 	float SuperArmorThreshold;
 
 	float CurrentSuperArmorValue = 0;
 
 	bool bIsKnockedDown = false;
+
+	
 
 protected:
 	// Called when the game starts

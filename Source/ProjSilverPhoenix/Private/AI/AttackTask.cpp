@@ -36,7 +36,7 @@ EBTNodeResult::Type UAttackTask::ExecuteTask(UBehaviorTreeComponent & OwnerComp,
 		auto CombatComp = AIPawn->GetCombatState();
 		if (CombatComp && Weapon->GetLightAttackMontages()[RanValue].SuperArmorThreshold > 0.0f)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Super Armor Active"))
+			//UE_LOG(LogTemp, Warning, TEXT("Super Armor Active"))
 			CombatComp->ActiveSuperArmor(Weapon->GetLightAttackMontages()[RanValue].SuperArmorThreshold);
 		}
 	}
@@ -61,7 +61,7 @@ void UAttackTask::TickTask(UBehaviorTreeComponent& OwnerComp, uint8* NodeMemory,
 		auto CombatComp = AIPawn->GetCombatState();
 		if (CombatComp)
 		{
-			UE_LOG(LogTemp, Warning, TEXT("Super Armor eNDED"))
+			
 			CombatComp->DeactiveSuperArmor();
 		}
 		

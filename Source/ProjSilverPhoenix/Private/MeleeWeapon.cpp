@@ -114,6 +114,7 @@ void AMeleeWeapon::TraceSwing()
 					if (CombatComp && CombatComp->GetBattleState() != EBattleState::PS_Invincible && !UHealthComponent::IsFriendly(MyPawn, HitActor))
 					{
 						PlaySound(SwordImpactSounds);
+						UE_LOG(LogTemp, Warning, TEXT("Play Sound"))
 					}
 				}
 			}

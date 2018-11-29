@@ -146,27 +146,18 @@ void AEnemyMaster::OnHealthChanged(UHealthComponent * OwningHealthComp, float He
 	if (!ensure(CombatStates)) { return; } 
 	
 	UMeleeAnimInstance* PlayerAnimation = Cast<UMeleeAnimInstance>(GetMesh()->GetAnimInstance());
+	if (PlayerAnimation)
+	{
+		PlayerAnimation->ResetComboAttack();
+	}
+
 	if (CombatStates->GetBattleState() == EBattleState::PS_Normal)
 	{
-		//Reset combo if we get hit
-		if (PlayerAnimation)
-		{
-			PlayerAnimation->ResetComboAttack();
-		}
-	
-		CombatStates->KnockBack(InstigatedBy->GetPawn(), this);
-		CombatStates->Flinch(HitDirection);
-
+		CombatStates->HandleDamage(HealthDelta,HitDirection, InstigatedBy->GetPawn(),this);
 	}
 	else if(CombatStates->GetBattleState() == EBattleState::PS_SuperArmor && CombatStates->CalculateSuperArmor(HealthDelta))
 	{
-
-		if (PlayerAnimation)
-		{
-			PlayerAnimation->ResetComboAttack();
-		}
-		CombatStates->KnockBack(InstigatedBy->GetPawn(), this);
-		CombatStates->Flinch(HitDirection);
+		CombatStates->HandleDamage(HealthDelta, HitDirection, InstigatedBy->GetPawn(), this);
 	}
 }
 

@@ -16,6 +16,9 @@ UCombatComponent::UCombatComponent()
 	// ...
 }
 
+
+
+
 // Called when the game starts
 void UCombatComponent::BeginPlay()
 {
@@ -34,6 +37,35 @@ EBattleState UCombatComponent::GetBattleState() const
 void UCombatComponent::SetBattleState(EBattleState BattleState)
 {
 	CurrentBattleState = BattleState;
+}
+
+void UCombatComponent::HandleDamage(float HealthChange, FVector HitDirection, AActor * PawnInstigator, AActor * ActorHit)
+{
+
+	if (bIsKnockedDown) return;
+
+	CurrentknockdownValue += HealthChange;
+
+	if (CurrentknockdownValue >= KnockdownThreshold)
+	{
+		CurrentknockdownValue = 0;
+		//Play Knockdown
+		KnockDown(PawnInstigator);
+		return;
+	}
+	
+	Flinch(HitDirection);
+	KnockBack(PawnInstigator, ActorHit);
+
+	//Reset knockdown counter if not hit after a period of time
+	GetWorld()->GetTimerManager().SetTimer(KnockDownLastHitTimerHandle, this, &UCombatComponent::ResetKnockDownValue, LastTimeHit, false);
+
+}
+
+void UCombatComponent::ResetKnockDownValue()
+{
+	CurrentknockdownValue = 0;
+	GetWorld()->GetTimerManager().ClearTimer(KnockDownLastHitTimerHandle);
 }
 
 void UCombatComponent::KnockBack(AActor * DamageCauser, AActor * DamageReceiver)
@@ -128,17 +160,6 @@ bool UCombatComponent::GetIsFlinching() const
 }
 
 
-void UCombatComponent::CalculateKnockDown(AActor* DamageInstigator, float KnockDownAmount)
-{
-	knockdownValue += KnockDownAmount; 
-
-	if (knockdownValue >= KnockdownThreshold)
-	{
-		knockdownValue = 0;
-		KnockDown(DamageInstigator);
-	}
-}
-
 void UCombatComponent::KnockDown(AActor* DamageInstigator)
 {
 	AXBaseCharacter* Owner = Cast<AXBaseCharacter>(GetOwner());
@@ -181,7 +202,6 @@ void UCombatComponent::KnockDownEnd()
 	bIsKnockedDown = false;
 }
 
-
 bool UCombatComponent::GetIsKnockedDown() const
 {
 	return bIsKnockedDown;
@@ -192,7 +212,7 @@ bool UCombatComponent::CalculateSuperArmor(float Damage)
 	if (CurrentBattleState != EBattleState::PS_SuperArmor) return false;
 
 
-	UE_LOG(LogTemp, Warning, TEXT("Super Armor Cal"))
+	//UE_LOG(LogTemp, Warning, TEXT("Super Armor Cal"))
 	CurrentSuperArmorValue += Damage;
 	 
 	if (CurrentSuperArmorValue >= SuperArmorThreshold)
@@ -201,7 +221,7 @@ bool UCombatComponent::CalculateSuperArmor(float Damage)
 		//Break super amror 
 		CurrentBattleState = EBattleState::PS_Normal;
 		 //flinch or knockdown
-		UE_LOG(LogTemp, Warning, TEXT("Broke"))
+		//UE_LOG(LogTemp, Warning, TEXT("Broke"))
 			return true;
 
 	}

@@ -22,5 +22,7 @@ class PROJSILVERPHOENIX_API ASPlayerCameraManager : public APlayerCameraManager
 public:
 
 	void test();
+
+	void LockOn();
 	
 };
