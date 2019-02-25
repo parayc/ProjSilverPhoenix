@@ -41,7 +41,7 @@ void AMeleeWeapon::BeginPlay()
 
 void AMeleeWeapon::StartAttack()
 {
-
+	
 	UMeleeAnimInstance* AnimInstance = Cast<UMeleeAnimInstance>(MyPawn->GetMesh()->GetAnimInstance());
 	bIsAttacking = true;
 	bool IsInAir = MyPawn->GetMovementComponent()->IsFalling();

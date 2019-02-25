@@ -17,13 +17,14 @@ class PROJSILVERPHOENIX_API ARangeWeapon : public ABaseWeapon
 
 public:
 
-	virtual void StartAttack() override;
 
-	virtual void StopAttack() override;
+	ARangeWeapon();
 
-	void StartFire();
+	//virtual void StartAttack() override;
 
-	void StopFire();
+	//virtual void StopAttack() override;
+
+	//virtual void ReleaseAttack() override;
 
 	int32 GetCurrentAmmoInClip() const;
 
@@ -36,21 +37,17 @@ public:
 	void UseAmmo();
 
 	FVector GetAdjustedAim();
-
-private:
-
+protected:
 	/*Firerate timer handle*/
 	FTimerHandle FireRateHandle;
 
-	bool bIsFiring = false;
+	bool bIsFiring;
 
-	bool bCanFire = true;
+	bool bCanFire;
 
-	bool bIsReloading = false;
+	bool bIsReloading;
 
 	float FireRate;
-
-	 
 
 	int32 CurrentAmmo;
 
@@ -59,11 +56,9 @@ private:
 	int32 MaxAmmoInGun;
 
 	int32 CurrentAmmoInClip;
-	
-protected:
 
 	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-		FName MuzzleName;
+	FName MuzzleName;
 	
 	
 };

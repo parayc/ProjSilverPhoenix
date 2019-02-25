@@ -125,7 +125,9 @@ public:
 
 	/*Equipent & Attacking*/
 
-	void Attack();
+	void PressAttack();
+
+	void ReleaseAttack();
 
 	void HeavyAttack();
 

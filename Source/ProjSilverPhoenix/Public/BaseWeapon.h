@@ -31,9 +31,14 @@ public:
 	UFUNCTION(BlueprintCallable,Category = "Animation")
 	float PlayWeaponAnimation(UAnimMontage* Animation, float InPlayRate = 1.f, FName StartSectionName = NAME_None);
 
-	virtual void StartAttack();
+	virtual void StartAttack() {};
 
-	virtual void StopAttack();
+	virtual void StopAttack() {};
+
+	virtual void ReleaseAttack() {};
+
+	UFUNCTION(BlueprintCallable, Category = "Setup")
+	virtual bool GetIsAttcking() const { return bIsAttacking; };
 
 	virtual void UseItem(AActor* OwnerController) override;
 
@@ -50,10 +55,14 @@ protected:
 	UPROPERTY()
 	class AXBaseCharacter* MyPawn;
 
+	UPROPERTY()
+		bool bIsAttacking = false;
+
 private:
 
 	FTimerHandle EquipFinishedTimerHandle;
 
+	
 
 
 public:	

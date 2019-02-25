@@ -90,7 +90,8 @@ void ASPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASPlayer::StartJump);
 	PlayerInputComponent->BindAction("Roll", IE_Pressed, this, &ASPlayer::StartRoll);
-	PlayerInputComponent->BindAction("LightAttack", IE_Pressed, this, &ASPlayer::Attack);
+	PlayerInputComponent->BindAction("PressAttack", IE_Pressed, this, &ASPlayer::PressAttack);
+	PlayerInputComponent->BindAction("ReleaseAttack", IE_Released, this, &ASPlayer::ReleaseAttack);
 	PlayerInputComponent->BindAction("HeavyAttack", IE_Pressed, this, &ASPlayer::HeavyAttack);
 
 	PlayerInputComponent->BindAction("LockOn", IE_Pressed, this, &ASPlayer::LockOn);
@@ -199,11 +200,11 @@ void ASPlayer::LookUp(float Rate)
 void ASPlayer::StartJump()
 {
 
-	auto meleeweapon = Cast<AMeleeWeapon>(CharacterEquipment.CurrentWeapon);
-	
-	if (meleeweapon->GetIsAttcking()) { return; }
+	if (CharacterEquipment.CurrentWeapon && CharacterEquipment.CurrentWeapon->GetIsAttcking())
+	{
+		 return; 
+	}
 
-	
 	if (!CombatStates->GetIsFlinching() && GetIsRolling() != true)
 	{
 		SetIsJumping(true);
@@ -680,7 +681,7 @@ bool ASPlayer::GetIsLockedOn() const
 	return bIsLockedOn;
 }
 
-void ASPlayer::Attack()
+void ASPlayer::PressAttack()
 {
 	//Stop the player from attacking if rolling
 	if (GetIsRolling() == true || CombatStates->GetIsFlinching() == true) { return; }
@@ -695,9 +696,26 @@ void ASPlayer::Attack()
 			//When we attack, attach sword to hand
 			AttachWeaponToSocket();
 
+		}
+	}
+}
+
+void ASPlayer::ReleaseAttack()
+{
+	if (CharacterEquipment.CurrentWeapon)
+	{
+
+		CharacterEquipment.CurrentWeapon->ReleaseAttack();
+		if (EPlayerStates::PS_Passive == CurrentPlayerState)
+		{
+			//When we attack we go into combat state
+			SwitchStats(EPlayerStates::PS_Combat);
+			//When we attack, attach sword to hand
+			AttachWeaponToSocket();
 
 		}
 	}
+
 }
 
 

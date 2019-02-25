@@ -4,7 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
+
 #include "Projectile.generated.h"
+
+
+class UStaticMeshComponent;
+class UCapsuleComponet;
+class UProjectileMovementComponent;
 
 UCLASS()
 class PROJSILVERPHOENIX_API AProjectile : public AActor
@@ -15,13 +21,22 @@ public:
 	// Sets default values for this actor's properties
 	AProjectile();
 
+	void LaunchProjectile(float speed);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
 
-public:	
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
+
+protected:	
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	class UCapsuleComponent* CollisionCap;
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	class UStaticMeshComponent* ProjectileMesh;
+	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	class UProjectileMovementComponent* ProjectileMovement;
 
 	
 	

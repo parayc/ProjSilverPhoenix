@@ -5,41 +5,47 @@
 #include "EnemyAIController.h"
 
 
-void ARangeWeapon::StartAttack()
-{
-	
-	if (MyPawn && MyPawn->GetIsDead())
-	{
-		if (CurrentAmmoInClip > 0 && bCanFire)
-		{
-			bIsFiring = true;
-			StartFire();
-
-			float TimeDelay = FireRate > 0 ? 1 / (FireRate*0.01667) : FApp::GetDeltaTime();
-
-			if (!FireRateHandle.IsValid())
-			{
-
-				GetWorld()->GetTimerManager().SetTimer(FireRateHandle, this, &ARangeWeapon::StartAttack, TimeDelay, true);//This will loop the startfire because we set it to true
-
-			}
-		}
-	}
-}
-void ARangeWeapon::StopAttack()
+ARangeWeapon::ARangeWeapon()
+: 
+bIsFiring(false),
+bCanFire(true),
+bIsReloading(false),
+FireRate(0),
+CurrentAmmo(0),
+MaxAmmoInClip(0),
+CurrentAmmoInClip(0),
+MuzzleName("")
 {
 }
-
-void ARangeWeapon::StartFire()
-{
-	//Use ammo
-	UseAmmo();
-}
-
-void ARangeWeapon::StopFire()
-{
-
-}
+//void ARangeWeapon::StartAttack()
+//{
+//	
+//	/*if (MyPawn && MyPawn->GetIsDead())
+//	{
+//		if (CurrentAmmoInClip > 0 && bCanFire)
+//		{
+//			bIsFiring = true;
+//			StartFire();
+//
+//			float TimeDelay = FireRate > 0 ? 1 / (FireRate*0.01667) : FApp::GetDeltaTime();
+//
+//			if (!FireRateHandle.IsValid())
+//			{
+//
+//				GetWorld()->GetTimerManager().SetTimer(FireRateHandle, this, &ARangeWeapon::StartAttack, TimeDelay, true);//This will loop the startfire because we set it to true
+//
+//			}
+//		}
+//	}*/
+//}
+//void ARangeWeapon::StopAttack()
+//{
+//}
+//
+//void  ARangeWeapon::ReleaseAttack()
+//{
+//
+//}
 
 FVector ARangeWeapon::GetAdjustedAim()
 {

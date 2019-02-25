@@ -58,7 +58,7 @@ public:
 	bool CanDamage(const FHitResult& HitResult);
 	
 	UFUNCTION(BlueprintCallable, Category = "Setup")
-	bool GetIsAttcking() const;
+	bool GetIsAttcking() const override;
 
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 	bool GetIsTracing() const;
@@ -148,9 +148,6 @@ private:
 	/* how many traces to draw on the sword  per swing - More traces increase accuracy*/
 	UPROPERTY(EditAnywhere, Category = "Debug")
 		float AmountToTrace = 5;
-
-	UPROPERTY()
-		bool bIsAttacking = false;
 
 	UPROPERTY()
 		bool bCanAttack = true;

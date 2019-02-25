@@ -4,6 +4,8 @@
 #include "XBaseCharacter.h"
 #include "SPlayerController.h"
 #include "TimerManager.h"
+#include "Components/SkeletalMeshComponent.h"
+
 
 
 // Sets default values
@@ -15,6 +17,7 @@ ABaseWeapon::ABaseWeapon()
 
 	WeaponMesh = CreateDefaultSubobject<USkeletalMeshComponent>(TEXT("WeaponMesh"));
 	RootComponent = WeaponMesh;
+	
 
 }
 
@@ -30,18 +33,9 @@ void ABaseWeapon::BeginPlay()
 void ABaseWeapon::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
+	
 }
 
-void ABaseWeapon::StartAttack()
-{
-
-}
-
-void ABaseWeapon::StopAttack()
-{
-
-}
 
 void ABaseWeapon::UseItem(AActor* OwnerController)
 {
