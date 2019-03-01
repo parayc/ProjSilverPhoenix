@@ -31,34 +31,34 @@ void ABaseItem::UseItem(AActor* OwnerController)
 	//OnUseItemRequest.Broadcast();
 
 	//Call blueprint 
-	//OnActivited(OwnerController, InventoryRef);
+	OnActivited(OwnerController, InventoryRef);
 
-	//if (TickInterval <= 0.0f)
-	//{
-	//	OnTickPowerup();
-	//}
-	//else
-	//{
-	//	GetWorldTimerManager().SetTimer(TimerHandle_ItemTick, this, &ABaseItem::OnTickPowerup, TickInterval, true);
-	//}
+	if (TickInterval <= 0.0f)
+	{
+		OnTickPowerup();
+	}
+	else
+	{
+		GetWorldTimerManager().SetTimer(TimerHandle_ItemTick, this, &ABaseItem::OnTickPowerup, TickInterval, true);
+	}
 }
 
 
 
-//void ABaseItem::OnTickPowerup()
-//{
-//	//TicksCounter++;
-//
-//	////Implmenetation is done in blueprints
-//	///*Allows the designer to make the items do some function every tick*/
-//	//OnItemTick();
-//
-//	//if (TicksCounter >= TotalNumberOfTicks)
-//	//{
-//	//	OnExpired();
-//	//	GetWorldTimerManager().ClearTimer(TimerHandle_ItemTick);
-//	//}
-//}
+void ABaseItem::OnTickPowerup()
+{
+	TicksCounter++;
+
+	//Implmenetation is done in blueprints
+	/*Allows the designer to make the items do some function every tick*/
+	OnItemTick();
+
+	if (TicksCounter >= TotalNumberOfTicks)
+	{
+		OnExpired();
+		GetWorldTimerManager().ClearTimer(TimerHandle_ItemTick);
+	}
+}
 
 // Called every frame
 void ABaseItem::Tick(float DeltaTime)
