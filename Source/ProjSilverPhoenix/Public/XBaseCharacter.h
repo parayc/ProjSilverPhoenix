@@ -66,7 +66,7 @@ public:
 	void AddWeaponToCharacterEquipment(class ABaseWeapon* NewWeapon);
 
 	UFUNCTION(BlueprintCallable, Category = "Animations")
-	void AttachWeaponToSocket();
+	void AttachWeaponToSocket(ABaseWeapon* weapon);
 
 	void SetCanAttack(bool NewState);
 
@@ -99,13 +99,7 @@ protected:
 	//void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayerState")
-		EPlayerStates CurrentPlayerState;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Setup | Weapon")
-	FName WeaponSocketName;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Setup | Weapon")
-	FName BackSocketName;
+	EPlayerStates CurrentPlayerState;
 
 	bool bCanAttack = true;
 

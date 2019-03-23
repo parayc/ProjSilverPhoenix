@@ -19,7 +19,8 @@ AMeleeWeapon::AMeleeWeapon()
 {
 	SwordTrail = CreateDefaultSubobject<UParticleSystemComponent>(TEXT("SpawnTrail"));
 	SwordTrail->AttachToComponent(RootComponent, FAttachmentTransformRules::KeepRelativeTransform);
-
+	WeaponSocketName = FName("MeleeSocket");
+	BackSocketName = FName("MeleeBackSocket");
 }
 
 void AMeleeWeapon::Tick(float DeltaTime)

@@ -4,14 +4,13 @@
 
 #include "CoreMinimal.h"
 #include "GameFramework/Actor.h"
-
 #include "Projectile.generated.h"
 
 
 class UStaticMeshComponent;
 class UCapsuleComponet;
 class UProjectileMovementComponent;
-
+class USceneComponent;
 UCLASS()
 class PROJSILVERPHOENIX_API AProjectile : public AActor
 {
@@ -30,7 +29,8 @@ protected:
 	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-protected:	
+protected:
+	class USceneComponent * SceneComp;
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
 	class UCapsuleComponent* CollisionCap;
 	UPROPERTY(EditDefaultsOnly, Category = "Projectile")

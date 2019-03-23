@@ -29,13 +29,23 @@ public:
 	 //todo -c ahneg back
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AProjectile> ProjectileToShoot;
+
+	
+
 private:
 	UPROPERTY(EditAnywhere, Category = "Bow")
-		AProjectile* currentProjectile = nullptr;
+	AProjectile* currentProjectile = nullptr;
+
 	UPROPERTY(EditAnywhere, Category = "Bow")
 	float LaunchSpeed = 5000.f;
 	UPROPERTY(EditAnywhere, Category = "Bow")
 	FName ArrowSocket;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	class UAnimMontage* DrawBowAnim;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Animation")
+	class UAnimMontage* FireBowAnim;
 
 	
 };

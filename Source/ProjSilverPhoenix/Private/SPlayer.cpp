@@ -694,7 +694,7 @@ void ASPlayer::PressAttack()
 			//When we attack we go into combat state
 			SwitchStats(EPlayerStates::PS_Combat);
 			//When we attack, attach sword to hand
-			AttachWeaponToSocket();
+			AttachWeaponToSocket(CharacterEquipment.CurrentWeapon);
 
 		}
 	}
@@ -711,7 +711,7 @@ void ASPlayer::ReleaseAttack()
 			//When we attack we go into combat state
 			SwitchStats(EPlayerStates::PS_Combat);
 			//When we attack, attach sword to hand
-			AttachWeaponToSocket();
+			AttachWeaponToSocket(CharacterEquipment.CurrentWeapon);
 
 		}
 	}

@@ -31,10 +31,11 @@ void AXBaseCharacter::BeginPlay()
 
 		//Spawn the weapon
 		ABaseWeapon* Weapon = GetWorld()->SpawnActor<ABaseWeapon>(StartingWeaponBlueprint,
-			GetMesh()->GetSocketLocation(WeaponSocketName),
-			GetMesh()->GetSocketRotation(WeaponSocketName));
+			FVector(0.f),
+			FRotator(0.f));
 
 		AddWeaponToCharacterEquipment(Weapon);
+		
 	}
 
 	
@@ -150,11 +151,11 @@ void AXBaseCharacter::AddWeaponToCharacterEquipment(ABaseWeapon * NewWeapon)
 	{
 		if (CurrentPlayerState == EPlayerStates::PS_Combat)
 		{
-			NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);//Attching the new weapon 
+			NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, NewWeapon->WeaponSocketName);//Attching the new weapon 
 		}
 		else if (CurrentPlayerState == EPlayerStates::PS_Passive)
 		{
-			NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, BackSocketName);
+			NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, NewWeapon->BackSocketName);
 		}
 
 		NewWeapon->SetOwningPawn(this);
@@ -170,16 +171,18 @@ void AXBaseCharacter::AddWeaponToCharacterEquipment(ABaseWeapon * NewWeapon)
 	}
 }
 
-void AXBaseCharacter::AttachWeaponToSocket()
+void AXBaseCharacter::AttachWeaponToSocket(ABaseWeapon* weapon)
 {
+	if (!weapon) return;
+
 	if (EPlayerStates::PS_Combat == CurrentPlayerState)
 	{
-		CharacterEquipment.CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, WeaponSocketName);
+		CharacterEquipment.CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, weapon->WeaponSocketName);
 		
 	}
 	else
 	{
-		CharacterEquipment.CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, BackSocketName);
+		CharacterEquipment.CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, weapon->BackSocketName);
 		
 	}
 }
@@ -216,11 +219,11 @@ void AXBaseCharacter::SwitchStats(EPlayerStates NewState)
 		}
 		else if (EPlayerStates::PS_Passive == CurrentPlayerState)//If is not appropriate to play animation just attach to back
 		{
-			AttachWeaponToSocket();
+			AttachWeaponToSocket(CharacterEquipment.CurrentWeapon);
 		}
 		else if (EPlayerStates::PS_Combat == CurrentPlayerState)
 		{
-			AttachWeaponToSocket();
+			AttachWeaponToSocket(CharacterEquipment.CurrentWeapon);
 		}
 
 	}

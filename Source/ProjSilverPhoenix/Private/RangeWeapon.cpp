@@ -3,7 +3,8 @@
 #include "RangeWeapon.h"
 #include "XBaseCharacter.h"
 #include "EnemyAIController.h"
-
+#include "Engine/World.h"
+#include "DrawDebugHelpers.h"
 
 ARangeWeapon::ARangeWeapon()
 : 
@@ -17,35 +18,6 @@ CurrentAmmoInClip(0),
 MuzzleName("")
 {
 }
-//void ARangeWeapon::StartAttack()
-//{
-//	
-//	/*if (MyPawn && MyPawn->GetIsDead())
-//	{
-//		if (CurrentAmmoInClip > 0 && bCanFire)
-//		{
-//			bIsFiring = true;
-//			StartFire();
-//
-//			float TimeDelay = FireRate > 0 ? 1 / (FireRate*0.01667) : FApp::GetDeltaTime();
-//
-//			if (!FireRateHandle.IsValid())
-//			{
-//
-//				GetWorld()->GetTimerManager().SetTimer(FireRateHandle, this, &ARangeWeapon::StartAttack, TimeDelay, true);//This will loop the startfire because we set it to true
-//
-//			}
-//		}
-//	}*/
-//}
-//void ARangeWeapon::StopAttack()
-//{
-//}
-//
-//void  ARangeWeapon::ReleaseAttack()
-//{
-//
-//}
 
 FVector ARangeWeapon::GetAdjustedAim()
 {
@@ -62,6 +34,31 @@ FVector ARangeWeapon::GetAdjustedAim()
 	}
 
 	return AimDir;
+}
+
+void ARangeWeapon::AimTowardsCrossHair()
+{
+	FHitResult HitLocation;
+	auto PawnOwner = Cast<AXBaseCharacter>(GetOwner());
+	if (PawnOwner)
+	{
+		FVector EyeLocation;
+		FRotator EyeRotation;
+		PawnOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
+
+		FVector StartLocation;
+		FVector TraceEnd = EyeLocation + EyeRotation.Vector() * 1000;
+		FCollisionQueryParams QueryParams;
+		QueryParams.AddIgnoredActor(PawnOwner);
+		QueryParams.AddIgnoredActor(this);
+
+		if (GetWorld()->LineTraceSingleByChannel(HitLocation, EyeLocation , TraceEnd,ECC_Weapon, QueryParams))
+		{
+			DrawDebugLine(GetWorld(), EyeLocation, TraceEnd, FColor(255, 0, 0), true, 10.f);
+		}
+	}
+	
+
 }
 
 int32 ARangeWeapon::GetCurrentAmmoInClip() const
@@ -82,6 +79,16 @@ int32 ARangeWeapon::GetCurrentAmmo() const
 int32 ARangeWeapon::GetMaxAmmoClip() const
 {
 	return int32();
+}
+
+bool ARangeWeapon::GetIsFiring() const
+{
+	return bIsFiring;
+}
+
+bool ARangeWeapon::SetIsFiring() const
+{
+	return bIsFiring;
 }
 
 void ARangeWeapon::UseAmmo()

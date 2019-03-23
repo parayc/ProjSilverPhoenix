@@ -17,14 +17,7 @@ class PROJSILVERPHOENIX_API ARangeWeapon : public ABaseWeapon
 
 public:
 
-
 	ARangeWeapon();
-
-	//virtual void StartAttack() override;
-
-	//virtual void StopAttack() override;
-
-	//virtual void ReleaseAttack() override;
 
 	int32 GetCurrentAmmoInClip() const;
 
@@ -34,14 +27,22 @@ public:
 
 	int32 GetMaxAmmoClip() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	bool GetIsFiring() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	bool SetIsFiring() const;
+
 	void UseAmmo();
 
 	FVector GetAdjustedAim();
+
+	void AimTowardsCrossHair();
 protected:
 	/*Firerate timer handle*/
 	FTimerHandle FireRateHandle;
 
-	bool bIsFiring;
+	bool bIsFiring = false;
 
 	bool bCanFire;
 

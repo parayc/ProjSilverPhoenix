@@ -48,6 +48,14 @@ public:
 
 	void DestroyWeapon();
 
+	/*The Socket will connect to the owner body*/
+	UPROPERTY(EditDefaultsOnly, Category = "WeaponSetup")
+	FName WeaponSocketName;
+
+	UPROPERTY(EditDefaultsOnly, Category = "WeaponSetup")
+	FName BackSocketName;
+
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -57,6 +65,7 @@ protected:
 
 	UPROPERTY()
 		bool bIsAttacking = false;
+
 
 private:
 
