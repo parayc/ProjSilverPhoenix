@@ -21,31 +21,37 @@ public:
 	
 	 void StartAttack() override;
 
-	 void StopAttack() override;
-
 	 void ReleaseAttack() override;
 
+	 void PressFocus() override;
+
+	 void ReleaseFocus() override;
+	
+	 void AimBow();
+
 	 void SpawnArrow();
+
+	 UFUNCTION(BlueprintCallable, Category = "Weapon")
+	bool GetIsDrawingBow() const;
+
 	 //todo -c ahneg back
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AProjectile> ProjectileToShoot;
 
-	
-
 private:
-	UPROPERTY(EditAnywhere, Category = "Bow")
+	
 	AProjectile* currentProjectile = nullptr;
 
 	UPROPERTY(EditAnywhere, Category = "Bow")
 	float LaunchSpeed = 5000.f;
+
 	UPROPERTY(EditAnywhere, Category = "Bow")
-	FName ArrowSocket;
+	FName ArrowSpawnSocket;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	class UAnimMontage* DrawBowAnim;
+	class UAnimMontage* FireBowMontage;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Animation")
-	class UAnimMontage* FireBowAnim;
+	bool bIsDrawingBow = false;
 
 	
 };

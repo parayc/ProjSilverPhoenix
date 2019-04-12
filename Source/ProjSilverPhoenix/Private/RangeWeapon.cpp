@@ -14,8 +14,7 @@ bIsReloading(false),
 FireRate(0),
 CurrentAmmo(0),
 MaxAmmoInClip(0),
-CurrentAmmoInClip(0),
-MuzzleName("")
+CurrentAmmoInClip(0)
 {
 }
 
@@ -89,6 +88,16 @@ bool ARangeWeapon::GetIsFiring() const
 bool ARangeWeapon::SetIsFiring() const
 {
 	return bIsFiring;
+}
+
+bool ARangeWeapon::GetIsAiming() const
+{
+	return bIsAiming;
+}
+
+void  ARangeWeapon::SetIsAiming(bool isAiming) 
+{
+	bIsAiming = isAiming;
 }
 
 void ARangeWeapon::UseAmmo()

@@ -5,6 +5,7 @@
 #include "EnemyMaster.h"
 #include "ProjSilverPhoenix.h"
 #include "XBaseCharacter.h"
+#include "SPlayer.h"
 #include "DrawDebugHelpers.h"
 #include "MeleeAnimInstance.h"
 #include "Kismet/GameplayStatics.h"
@@ -42,7 +43,15 @@ void AMeleeWeapon::BeginPlay()
 
 void AMeleeWeapon::StartAttack()
 {
-	
+	//Change player state;
+
+	auto PlayerOwner = Cast<ASPlayer>(MyPawn);
+	if (PlayerOwner)
+	{
+		PlayerOwner->SwitchStats(EPlayerStates::PS_Combat);
+		PlayerOwner->AttachWeaponToSocket(this);
+	}
+
 	UMeleeAnimInstance* AnimInstance = Cast<UMeleeAnimInstance>(MyPawn->GetMesh()->GetAnimInstance());
 	bIsAttacking = true;
 	bool IsInAir = MyPawn->GetMovementComponent()->IsFalling();
@@ -62,6 +71,30 @@ void AMeleeWeapon::StartAttack()
 void AMeleeWeapon::StopAttack()
 {
 	bIsAttacking = false;
+}
+
+void AMeleeWeapon::PressFocus()
+{
+	if (MyPawn)
+	{
+		auto PlayerPawn = Cast<ASPlayer>(MyPawn);
+		if (PlayerPawn)
+		{
+			PlayerPawn->LockOn();
+		}
+	}
+}
+
+void AMeleeWeapon::ReleaseFocus()
+{
+	if (MyPawn)
+	{
+		auto PlayerPawn = Cast<ASPlayer>(MyPawn);
+		if (PlayerPawn)
+		{
+			PlayerPawn->LockOff();
+		}
+	}
 }
 
 void AMeleeWeapon::TraceSwing()

@@ -85,8 +85,6 @@ public:
 	UPROPERTY(EditDefaultsOnly, Category = "Setup | Movement")
 		float JumpHeight = 600.f;
 
-	
-	
 	/*Rolling*/
 
 	void RollCoolDown();
@@ -123,11 +121,17 @@ public:
 
 	void RemoveEnemyFromTargeting(AEnemyMaster* Target);
 
+	void LockPlayerToCameraView(bool bLockPLayerView);
+
 	/*Equipent & Attacking*/
 
 	void PressAttack();
 
 	void ReleaseAttack();
+
+	void PressFocus();
+
+	void ReleaseFocus();
 
 	void HeavyAttack();
 

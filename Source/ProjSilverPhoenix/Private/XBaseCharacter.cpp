@@ -171,20 +171,20 @@ void AXBaseCharacter::AddWeaponToCharacterEquipment(ABaseWeapon * NewWeapon)
 	}
 }
 
+//TODO - refactor
 void AXBaseCharacter::AttachWeaponToSocket(ABaseWeapon* weapon)
 {
 	if (!weapon) return;
 
+	
 	if (EPlayerStates::PS_Combat == CurrentPlayerState)
 	{
 		CharacterEquipment.CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, weapon->WeaponSocketName);
-		
+		return;
 	}
-	else
-	{
-		CharacterEquipment.CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, weapon->BackSocketName);
-		
-	}
+	
+	CharacterEquipment.CurrentWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, weapon->BackSocketName);
+	
 }
 
 

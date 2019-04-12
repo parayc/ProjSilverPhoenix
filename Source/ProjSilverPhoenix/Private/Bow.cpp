@@ -4,6 +4,7 @@
 #include "Projectile.h"
 #include "Engine/World.h"
 #include "DrawDebugHelpers.h"
+#include "SPlayer.h"
 
 ABow::ABow()
 {
@@ -13,37 +14,63 @@ ABow::ABow()
 
 void ABow::StartAttack()
 {
-	//Play the animation
-	//Spawn the arrow
-	if (DrawBowAnim)
-	{
-		PlayWeaponAnimation(DrawBowAnim, 1.3f);
-	}
+	if (!GetIsAiming()) return;
 
-	//TODO - Needs to be called in animation
-	SpawnArrow();
-	
-}
-
-void ABow::StopAttack()
-{
-}
-
-void ABow::ReleaseAttack()
-{
+	bIsDrawingBow = true;
 	//release the arrow 
-
 	if (!currentProjectile) { return; }
-	if (FireBowAnim)
+	if (FireBowMontage)
 	{
-		bIsFiring = true;
-		PlayWeaponAnimation(FireBowAnim,1.3f);
+		PlayWeaponAnimation(FireBowMontage, 1.3f);
 		currentProjectile->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 		currentProjectile->LaunchProjectile(LaunchSpeed);
 		currentProjectile = nullptr;
 	}
-	
 
+	ASPlayer* Owner = Cast<ASPlayer>(MyPawn);
+	if (Owner)
+		Owner->LockPlayerToCameraView(false);
+}
+
+void ABow::ReleaseAttack()
+{
+	bIsDrawingBow = false;
+}
+
+void ABow::PressFocus()
+{
+
+	auto PlayerOwner = Cast<ASPlayer>(MyPawn);
+	if (PlayerOwner)
+	{
+		bIsAiming = true;
+		PlayerOwner->SwitchStats(EPlayerStates::PS_Combat);
+		PlayerOwner->AttachWeaponToSocket(this);
+		PlayerOwner->LockPlayerToCameraView(true);
+	}
+	
+	//AimBow();
+}
+
+void ABow::ReleaseFocus()
+{
+	bIsAiming = false;
+	ASPlayer* Owner = Cast<ASPlayer>(MyPawn);
+	if (Owner)
+	{
+		Owner->LockPlayerToCameraView(false);
+	}
+	//we need to return back to idle
+}
+
+void ABow::AimBow()
+{
+	//Getowner and lock the forward diretiont to camera
+	ASPlayer* Owner = Cast<ASPlayer>(MyPawn);
+	if (Owner)
+	{
+		Owner->LockPlayerToCameraView(true);
+	}
 }
 
 void ABow::SpawnArrow()
@@ -51,13 +78,13 @@ void ABow::SpawnArrow()
 
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	FVector NewLocation = this->WeaponMesh->GetSocketLocation(ArrowSocket);
-	FRotator NewRotaor = this->WeaponMesh->GetSocketRotation(ArrowSocket);
+	FVector NewLocation = this->WeaponMesh->GetSocketLocation(ArrowSpawnSocket);
+	FRotator NewRotaor = this->WeaponMesh->GetSocketRotation(ArrowSpawnSocket);
 
 	if (ProjectileToShoot)
 	{
-		currentProjectile = GetWorld()->SpawnActor<AProjectile>(ProjectileToShoot, WeaponMesh->GetSocketLocation(ArrowSocket), WeaponMesh->GetSocketRotation(ArrowSocket), SpawnParams);
-		currentProjectile->AttachToComponent(WeaponMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, ArrowSocket);
+		currentProjectile = GetWorld()->SpawnActor<AProjectile>(ProjectileToShoot, WeaponMesh->GetSocketLocation(ArrowSpawnSocket), WeaponMesh->GetSocketRotation(ArrowSpawnSocket), SpawnParams);
+		currentProjectile->AttachToComponent(WeaponMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, ArrowSpawnSocket);
 		currentProjectile->SetOwner(this);
 	}
 	
@@ -76,4 +103,9 @@ void ABow::SpawnArrow()
 	}
 */
 
+}
+
+bool ABow::GetIsDrawingBow() const
+{
+	return bIsDrawingBow;
 }

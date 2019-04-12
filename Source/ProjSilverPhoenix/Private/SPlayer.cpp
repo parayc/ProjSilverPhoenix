@@ -90,12 +90,12 @@ void ASPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
 
 	PlayerInputComponent->BindAction("Jump", IE_Pressed, this, &ASPlayer::StartJump);
 	PlayerInputComponent->BindAction("Roll", IE_Pressed, this, &ASPlayer::StartRoll);
-	PlayerInputComponent->BindAction("PressAttack", IE_Pressed, this, &ASPlayer::PressAttack);
-	PlayerInputComponent->BindAction("ReleaseAttack", IE_Released, this, &ASPlayer::ReleaseAttack);
-	PlayerInputComponent->BindAction("HeavyAttack", IE_Pressed, this, &ASPlayer::HeavyAttack);
+	PlayerInputComponent->BindAction("Attack", IE_Pressed, this, &ASPlayer::PressAttack);
+	PlayerInputComponent->BindAction("Attack", IE_Released, this, &ASPlayer::ReleaseAttack);
 
-	PlayerInputComponent->BindAction("LockOn", IE_Pressed, this, &ASPlayer::LockOn);
-	PlayerInputComponent->BindAction("LockOn", IE_Released, this, &ASPlayer::LockOff);
+	PlayerInputComponent->BindAction("Focus", IE_Pressed, this, &ASPlayer::PressFocus);
+	PlayerInputComponent->BindAction("Focus", IE_Released, this, &ASPlayer::ReleaseFocus);
+	PlayerInputComponent->BindAction("HeavyAttack", IE_Pressed, this, &ASPlayer::HeavyAttack);
 
 	PlayerInputComponent->BindAction("NextTarget", IE_Pressed, this, &ASPlayer::NextTarget);
 	PlayerInputComponent->BindAction("PrevTarget", IE_Pressed, this, &ASPlayer::PrevTarget);
@@ -195,7 +195,6 @@ void ASPlayer::LookUp(float Rate)
 	if (bIsLockedOn) return;
 	AddControllerPitchInput(Rate * BasePitchRate * GetWorld()->GetDeltaSeconds());
 }
-
 
 void ASPlayer::StartJump()
 {
@@ -327,13 +326,13 @@ void ASPlayer::RollDircetion()
 	{
 		CombatStates->SetBattleState(EBattleState::PS_Invincible);
 	}
-	
+
 	float Duration = 0.f;
 	if (!GetIsLockedOn())
 	{
 		//Play montage 
 		Duration = AnimInst->PlayAnimation(ForwardRoll);
-		
+
 	}
 	else
 	{
@@ -344,7 +343,6 @@ void ASPlayer::RollDircetion()
 		//DotProduct
 		//auto DotDirection = FVector::DotProduct(PlayersVelocity, PlayersForwardDirection);
 		//auto CrossDirection = FVector::CrossProduct(PlayersForwardDirection, PlayersVelocity).Z;
-
 
 		if (GetMoveRight() >= 0.5)
 		{
@@ -366,17 +364,14 @@ void ASPlayer::RollDircetion()
 			//Play backward montage
 			Duration = AnimInst->PlayAnimation(BackwardRoll);
 		}
-		
-	}
 
+	}
 
 	/*This calls the method once the animation is played*/
 	GetWorld()->GetTimerManager().SetTimer(RollResetHandle, this, &ASPlayer::EndRoll, Duration - 0.3f, false);
 
 	//Stops the player from tracing if they roll
 	AnimInst->ResetComboAttack();
-	
-
 }
 
 bool ASPlayer::GetCanRoll() const
@@ -429,17 +424,7 @@ void ASPlayer::IsEnemyInRange()
 			AEnemyMaster* Enemy = Cast<AEnemyMaster>(Hits.GetActor());
 			
 			if (Enemy && !LockOnListTarget.Contains(Enemy) && IsTargetWithinSight(Enemy) && !Enemy->GetIsDead())
-			{
-				//UE_LOG(LogTemp, Warning, TEXT("Add enemy"))
 				LockOnListTarget.Add(Enemy);
-
-				//Also make sure the collision is ignored once in the target list
-				//				if (UCapsuleComponent* PrimitiveComponent = target->FindComponentByClass<UCapsuleComponent>())
-				//				{
-				//					UE_LOG(LogTemp, Warning, TEXT("Primitive"))
-				//					PrimitiveComponent->SetCollisionResponseToChannel(ECC_TargetSystem, ECollisionResponse::ECR_Ignore);
-				//				}
-			}
 			
 		}
 	}
@@ -465,10 +450,8 @@ bool ASPlayer::IsTargetWithinSight(AActor * Target)
 		//DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
 		AEnemyMaster *target = Cast<AEnemyMaster>(Hit.GetActor());
 		if (target)
-		{
 			return true;
-		}
-
+		
 	}
 	
 	return false;
@@ -518,8 +501,6 @@ void ASPlayer::LockOn()
 {
 	if (LockOnListTarget.Num() <= 0) return;
 
-	
-
 	FHitResult HitResults;
 	FVector Start = GetActorLocation();
 	FVector End = Start + (GetActorForwardVector() * 500);
@@ -535,8 +516,6 @@ void ASPlayer::LockOn()
 
 	FCollisionQueryParams CollParam;
 	CollParam.AddIgnoredActor(this);
-
-	
 
 	//I choose ECC_Weapon as it would always be blocking the enemy  
 	if (GetWorld()->SweepSingleByChannel(HitResults,Start,End, FQuat::FQuat(),ECC_Weapon, CollionShape,CollParam))
@@ -565,9 +544,7 @@ void ASPlayer::LockOn()
 	bIsLockedOn = true;
 
 	//Make player face in the same direction as the camera
-	bUseControllerRotationYaw = true;
-	GetCharacterMovement()->bUseControllerDesiredRotation = false;
-	GetCharacterMovement()->bOrientRotationToMovement = false;
+	LockPlayerToCameraView(bIsLockedOn);
 	
 
 }
@@ -576,13 +553,9 @@ void ASPlayer::LockOff()
 {
 	if (bIsLockedOn)
 	{
-		
-		//Release the player from look direction
-		bUseControllerRotationYaw = false;
-		GetCharacterMovement()->bUseControllerDesiredRotation = true;
-		GetCharacterMovement()->bOrientRotationToMovement = true;
 		bIsLockedOn = false;
-
+		//Release the player from look direction
+		LockPlayerToCameraView(bIsLockedOn);
 
 		//Check to see if the enemy is not dead
 		if (LockOnListTarget[TargetIndex] != nullptr)
@@ -594,8 +567,14 @@ void ASPlayer::LockOff()
 		//Empty the array
 		LockOnListTarget.Empty();
 		TargetIndex = 0;
-	
 	}
+}
+
+void ASPlayer::LockPlayerToCameraView(bool bLockPLayerView)
+{
+	bUseControllerRotationYaw = bLockPLayerView;
+	GetCharacterMovement()->bUseControllerDesiredRotation = !bLockPLayerView;
+	GetCharacterMovement()->bOrientRotationToMovement = !bLockPLayerView;
 }
 
 void ASPlayer::RemoveEnemyFromTargeting(AEnemyMaster * Target)
@@ -687,37 +666,37 @@ void ASPlayer::PressAttack()
 	if (GetIsRolling() == true || CombatStates->GetIsFlinching() == true) { return; }
 	if (CharacterEquipment.CurrentWeapon)
 	{
-
 		CharacterEquipment.CurrentWeapon->StartAttack();
-		if (EPlayerStates::PS_Passive == CurrentPlayerState)
-		{
-			//When we attack we go into combat state
-			SwitchStats(EPlayerStates::PS_Combat);
-			//When we attack, attach sword to hand
-			AttachWeaponToSocket(CharacterEquipment.CurrentWeapon);
-
-		}
 	}
 }
 
 void ASPlayer::ReleaseAttack()
 {
 	if (CharacterEquipment.CurrentWeapon)
-	{
-
 		CharacterEquipment.CurrentWeapon->ReleaseAttack();
-		if (EPlayerStates::PS_Passive == CurrentPlayerState)
-		{
-			//When we attack we go into combat state
-			SwitchStats(EPlayerStates::PS_Combat);
-			//When we attack, attach sword to hand
-			AttachWeaponToSocket(CharacterEquipment.CurrentWeapon);
-
-		}
-	}
-
 }
 
+void ASPlayer::PressFocus()
+{
+	if (!CharacterEquipment.CurrentWeapon)
+		LockOn();
+	
+	if (CharacterEquipment.CurrentWeapon)
+	{
+		CharacterEquipment.CurrentWeapon->PressFocus();
+		AttachWeaponToSocket(CharacterEquipment.CurrentWeapon);
+	}
+}
+
+void ASPlayer::ReleaseFocus()
+{
+	if (!CharacterEquipment.CurrentWeapon)
+		LockOff();
+
+	if (CharacterEquipment.CurrentWeapon)
+		CharacterEquipment.CurrentWeapon->ReleaseFocus();
+	
+}
 
 void ASPlayer::OnDeath()
 {

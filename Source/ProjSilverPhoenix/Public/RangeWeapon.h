@@ -33,6 +33,12 @@ public:
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	bool SetIsFiring() const;
 
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	bool GetIsAiming() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	void SetIsAiming(bool isAiming);
+
 	void UseAmmo();
 
 	FVector GetAdjustedAim();
@@ -58,8 +64,6 @@ protected:
 
 	int32 CurrentAmmoInClip;
 
-	UPROPERTY(EditDefaultsOnly, Category = "Effects")
-	FName MuzzleName;
-	
+	bool bIsAiming = false;
 	
 };

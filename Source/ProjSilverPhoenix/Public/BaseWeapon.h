@@ -37,6 +37,12 @@ public:
 
 	virtual void ReleaseAttack() {};
 
+	virtual void PressAttack() {};
+
+	virtual void PressFocus() {};
+
+	virtual void ReleaseFocus() {};
+
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 	virtual bool GetIsAttcking() const { return bIsAttacking; };
 

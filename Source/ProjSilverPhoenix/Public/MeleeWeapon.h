@@ -49,6 +49,11 @@ public:
 
 	virtual void StopAttack() override;
 
+	virtual void PressFocus() override;
+
+	virtual void ReleaseFocus() override;
+
+
 	void SetDamage(int32 Value);
 
 	void DealDamage(const FHitResult& HitResult, TSubclassOf<UDamageType> DamageType);
