@@ -19,8 +19,8 @@ void ABow::BeginPlay()
 
 void ABow::StartAttack()
 {
-	//Check weather the player can fire . e.g. ammo, current arrow is not shooting
-	if (!GetIsAiming()) return;
+	//Check weather the player can fire . e.g. ammo, current arrow is not shooting, are they aiming
+	if (!CanFire()) return;
 
 	bIsDrawingBow = true;
 }
@@ -28,8 +28,9 @@ void ABow::StartAttack()
 void ABow::ReleaseAttack()
 {
 	bIsDrawingBow = false;
-	//Play fire animation
-	
+
+	if (!CanFire()) return;
+
 	if (FireBowMontage)
 	{
 		PlayWeaponAnimation(FireBowMontage, 1.3f);
@@ -40,11 +41,12 @@ void ABow::ReleaseAttack()
 
 void ABow::PressFocus()
 {
-	playerOwner = Cast<ASPlayer>(MyPawn);
+	ASPlayer* playerOwner = Cast<ASPlayer>(MyPawn);
 	
 	if (playerOwner)
 	{
 		bIsAiming = true;
+		Zoom(bIsAiming);
 		playerOwner->SwitchStats(EPlayerStates::PS_Combat);
 		playerOwner->AttachWeaponToSocket(this);
 		playerOwner->LockPlayerToCameraView(true);
@@ -54,15 +56,16 @@ void ABow::PressFocus()
 void ABow::ReleaseFocus()
 {
 	bIsAiming = false;
-	
+	Zoom(bIsAiming);
+	ASPlayer* playerOwner = Cast<ASPlayer>(MyPawn);
 	if (playerOwner)
 	{
 		playerOwner->LockPlayerToCameraView(false);
 	}
-	//we need to return back to idle
-	//check whether we are still drawing the bow
-	//if so release it
-	//add method to call to set drawing to false
+
+	//stop the player from drawing the bow when they are not aiming
+	bIsDrawingBow = false;
+	
 }
 
 
@@ -96,6 +99,7 @@ void ABow::SpawnArrow(FVector endPoint)
 
 FVector ABow::AimDirection()
 {
+	ASPlayer* playerOwner = Cast<ASPlayer>(MyPawn);
 	if (!playerOwner) return FVector(0);
 
 	FHitResult Hit;
@@ -119,7 +123,21 @@ FVector ABow::AimDirection()
 	return EndTrace;
 }
 
+bool ABow::CanFire()
+{
+	return GetIsAiming();
+}
 
+void ABow::Zoom(bool bZooming)
+{
+	ASPlayer* playerOwner = Cast<ASPlayer>(MyPawn);
+	if (playerOwner)
+	{
+		playerOwner->ZoomCamera(bZooming, ZoomFOV);
+	}
+
+	
+}
 
 bool ABow::GetIsDrawingBow() const
 {

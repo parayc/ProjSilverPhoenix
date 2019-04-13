@@ -47,6 +47,8 @@ void ASPlayer::BeginPlay()
 {
 	Super::BeginPlay();
 
+	DefaultFOV = Camera->FieldOfView;
+	TargetFOV = DefaultFOV;
 	//This restricts the players Camera movmevent from going to high or low 
 	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMax = 70;
 	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMin = -70;
@@ -76,6 +78,11 @@ void ASPlayer::Tick(float DeltaTime)
 		EndJump();
 	}
 
+	
+	float NewFOV = FMath::FInterpTo(Camera->FieldOfView, TargetFOV, DeltaTime, 10.f);
+	Camera->SetFieldOfView(NewFOV);
+
+
 }
 
 void ASPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
@@ -99,7 +106,6 @@ void ASPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
 	PlayerInputComponent->BindAction("NextTarget", IE_Pressed, this, &ASPlayer::NextTarget);
 	PlayerInputComponent->BindAction("PrevTarget", IE_Pressed, this, &ASPlayer::PrevTarget);
 
-
 }
 
 void ASPlayer::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health, float HealthDelta, FVector HitDirection,  const UDamageType * DamageType, AController * InstigatedBy, AActor * DamageCauser)
@@ -114,7 +120,6 @@ void ASPlayer::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health
 		OnDeath();
 
 		return;
-
 	}
 
 	if (!ensure(CombatStates)) { return; }
@@ -129,11 +134,9 @@ void ASPlayer::OnHealthChanged(UHealthComponent * OwningHealthComp, float Health
 
 		CombatStates->KnockBack(InstigatedBy->GetPawn(), this);
 		CombatStates->Flinch(HitDirection);
-
 	}
 	else if (CombatStates->GetBattleState() == EBattleState::PS_SuperArmor && CombatStates->CalculateSuperArmor(HealthDelta))
 	{
-
 		//Reset combo if we get hit
 		if (PlayerAnimation)
 		{
@@ -582,6 +585,20 @@ void ASPlayer::RemoveEnemyFromTargeting(AEnemyMaster * Target)
 		LockOnListTarget.Remove(Target);
 	}
 
+}
+
+
+void ASPlayer::ZoomCamera(bool Zoom, float FieldOfViw)
+{
+	if (Zoom)
+	{
+		TargetFOV = FieldOfViw;
+	}
+	else
+	{
+		TargetFOV = DefaultFOV;
+	}
+	UE_LOG(LogTemp, Warning, TEXT("TargetFOV: %f"), FieldOfViw);
 }
 
 void ASPlayer::NextTarget()

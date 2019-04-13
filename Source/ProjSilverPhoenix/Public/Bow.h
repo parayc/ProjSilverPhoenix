@@ -28,15 +28,11 @@ public:
 
 	 void ReleaseFocus() override;
 	
-
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	bool GetIsDrawingBow() const;
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AProjectile> ProjectileToShoot;
-
-	//TODO - move this to base weapon
-	ASPlayer* playerOwner;
 
 protected:
 	// Called when the game starts or when spawned
@@ -50,7 +46,13 @@ private:
 
 	FVector AimDirection();
 	
+	bool CanFire();
+
+	void Zoom(bool bZooming);
+
 	AProjectile* currentProjectile = nullptr;
+	UPROPERTY(EditAnywhere, Category = "Bow")
+	float ZoomFOV = 70.f;
 
 	UPROPERTY(EditAnywhere, Category = "Bow")
 	FName ArrowSpawnSocket;

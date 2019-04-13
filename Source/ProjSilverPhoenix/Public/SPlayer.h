@@ -107,6 +107,14 @@ public:
 
 	float GetMoveRight() const;
 
+	float DefaultFOV;
+
+	float TargetFOV;
+
+	bool bWantsToZoom = false;
+
+	void ZoomCamera(bool Zoom,float FieldOfViw = 0);
+
 	/*Target System*/
 
 	void NextTarget();

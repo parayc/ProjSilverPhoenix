@@ -72,7 +72,6 @@ protected:
 	UPROPERTY()
 		bool bIsAttacking = false;
 
-
 private:
 
 	FTimerHandle EquipFinishedTimerHandle;
