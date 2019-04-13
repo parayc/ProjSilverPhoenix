@@ -65,9 +65,7 @@ void ABow::ReleaseFocus()
 
 	//stop the player from drawing the bow when they are not aiming
 	bIsDrawingBow = false;
-	
 }
-
 
 void ABow::FireArrow(AProjectile* arrow, FVector arrowVelocity)
 {
@@ -77,7 +75,6 @@ void ABow::FireArrow(AProjectile* arrow, FVector arrowVelocity)
 
 void ABow::SpawnArrow(FVector endPoint)
 {
-
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 	FVector muzzleLoc = this->WeaponMesh->GetSocketLocation(ArrowSpawnSocket);
@@ -119,7 +116,7 @@ FVector ABow::AimDirection()
 		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
 		return Hit.ImpactPoint;
 	}
-	
+	DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
 	return EndTrace;
 }
 
@@ -135,8 +132,6 @@ void ABow::Zoom(bool bZooming)
 	{
 		playerOwner->ZoomCamera(bZooming, ZoomFOV);
 	}
-
-	
 }
 
 bool ABow::GetIsDrawingBow() const

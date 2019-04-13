@@ -115,6 +115,9 @@ public:
 
 	void ZoomCamera(bool Zoom,float FieldOfViw = 0);
 
+	//We override it to return the camera location as the eye location
+	virtual FVector GetPawnViewLocation() const;
+
 	/*Target System*/
 
 	void NextTarget();

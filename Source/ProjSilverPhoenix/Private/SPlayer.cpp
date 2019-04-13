@@ -584,21 +584,27 @@ void ASPlayer::RemoveEnemyFromTargeting(AEnemyMaster * Target)
 	{
 		LockOnListTarget.Remove(Target);
 	}
-
 }
-
 
 void ASPlayer::ZoomCamera(bool Zoom, float FieldOfViw)
 {
 	if (Zoom)
 	{
 		TargetFOV = FieldOfViw;
+		return;
 	}
-	else
-	{
-		TargetFOV = DefaultFOV;
-	}
+	
+	TargetFOV = DefaultFOV;
 	UE_LOG(LogTemp, Warning, TEXT("TargetFOV: %f"), FieldOfViw);
+}
+
+FVector ASPlayer::GetPawnViewLocation() const
+{
+	if (Camera)
+	{
+		return Camera->GetComponentLocation();
+	}
+	return Super::GetPawnViewLocation();
 }
 
 void ASPlayer::NextTarget()
