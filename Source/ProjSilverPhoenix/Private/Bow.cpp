@@ -14,9 +14,7 @@ ABow::ABow()
 
 void ABow::BeginPlay()
 {
-	
 	Super::BeginPlay();
-
 }
 
 void ABow::StartAttack()
@@ -25,7 +23,6 @@ void ABow::StartAttack()
 	if (!GetIsAiming()) return;
 
 	bIsDrawingBow = true;
-	
 }
 
 void ABow::ReleaseAttack()
@@ -52,7 +49,6 @@ void ABow::PressFocus()
 		playerOwner->AttachWeaponToSocket(this);
 		playerOwner->LockPlayerToCameraView(true);
 	}
-	
 }
 
 void ABow::ReleaseFocus()
@@ -122,6 +118,8 @@ FVector ABow::AimDirection()
 	
 	return EndTrace;
 }
+
+
 
 bool ABow::GetIsDrawingBow() const
 {

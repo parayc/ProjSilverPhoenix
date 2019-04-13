@@ -28,11 +28,6 @@ public:
 
 	 void ReleaseFocus() override;
 	
-	 void FireArrow(AProjectile* arrow, FVector arrowVelocity);
-
-	 void SpawnArrow(FVector endPoint);
-
-	 FVector AimDirection();
 
 	UFUNCTION(BlueprintCallable, Category = "Weapon")
 	bool GetIsDrawingBow() const;
@@ -48,6 +43,12 @@ protected:
 	virtual void BeginPlay() override;
 
 private:
+
+	void FireArrow(AProjectile* arrow, FVector arrowVelocity);
+
+	void SpawnArrow(FVector endPoint);
+
+	FVector AimDirection();
 	
 	AProjectile* currentProjectile = nullptr;
 
@@ -58,7 +59,7 @@ private:
 	float projectileSpeed = 5000.f;
 
 	UPROPERTY(EditAnywhere, Category = "Bow")
-	float MaxprojectileSpeed = 5000.f;
+	float maxprojectileSpeed = 5000.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	class UAnimMontage* FireBowMontage;
