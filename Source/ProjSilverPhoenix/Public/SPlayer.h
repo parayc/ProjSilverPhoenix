@@ -24,11 +24,6 @@ class PROJSILVERPHOENIX_API ASPlayer : public AXBaseCharacter
 	GENERATED_BODY()
 
 protected: 
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-		class USpringArmComponent* SpringArm;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-		class UCameraComponent* Camera;
 
 	UFUNCTION()
 	void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, FVector HitDirection ,const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
@@ -41,6 +36,12 @@ public:
 
 
 	ASPlayer();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+		class USpringArmComponent* SpringArm;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+		class UCameraComponent* Camera;
 
 	/**Movement*/
 
@@ -133,11 +134,7 @@ public:
 
 	void ReleaseFocus();
 
-	void HeavyAttack();
-
 	void SetCanAttack(bool NewState);
-
-	UCameraComponent* GetCamera();
 
 	virtual void OnDeath() override;
 

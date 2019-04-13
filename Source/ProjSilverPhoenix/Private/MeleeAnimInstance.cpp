@@ -214,7 +214,7 @@ void UMeleeAnimInstance::ChangeDirection()
 		MoveRight = CharacterPawn->GetMoveRight();
 		MoveRight *= -1;
 
-		auto CameraLocation = CharacterPawn->GetCamera()->GetComponentLocation();
+		auto CameraLocation = CharacterPawn->Camera->GetComponentLocation();
 
 		//This makes sure wheh for example presses up its relative to the camera 
 		auto LookRotator = UKismetMathLibrary::FindLookAtRotation(CameraLocation, CharacterPawn->GetActorLocation());

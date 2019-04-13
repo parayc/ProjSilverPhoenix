@@ -159,7 +159,7 @@ void AXBaseCharacter::AddWeaponToCharacterEquipment(ABaseWeapon * NewWeapon)
 		}
 
 		NewWeapon->SetOwningPawn(this);
-
+		
 		//Add the existing weapon back to to the inventory
 		if (CharacterEquipment.CurrentWeapon != nullptr)
 		{

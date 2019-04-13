@@ -8,7 +8,7 @@
 
 
 class UStaticMeshComponent;
-class UCapsuleComponet;
+class USphereComponent;
 class UProjectileMovementComponent;
 class USceneComponent;
 UCLASS()
@@ -20,7 +20,7 @@ public:
 	// Sets default values for this actor's properties
 	AProjectile();
 
-	void LaunchProjectile(float speed);
+	void LaunchProjectile(FVector arrowVelocity);
 
 protected:
 	// Called when the game starts or when spawned
@@ -30,13 +30,15 @@ protected:
 	virtual void Tick(float DeltaTime) override;
 
 protected:
-	class USceneComponent * SceneComp;
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	class UCapsuleComponent* CollisionCap;
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
-	class UStaticMeshComponent* ProjectileMesh;
-	UPROPERTY(EditDefaultsOnly, Category = "Projectile")
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile")
 	class UProjectileMovementComponent* ProjectileMovement;
+
+	class USceneComponent * SceneComp;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,Category = "Projectile")
+	class USphereComponent* CollisionSphere;
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,Category = "Projectile")
+	class UStaticMeshComponent* ProjectileMesh;
+	
 
 	
 	

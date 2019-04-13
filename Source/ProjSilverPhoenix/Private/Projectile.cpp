@@ -2,7 +2,7 @@
 
 
 #include "Projectile.h"
-#include "Components/CapsuleComponent.h"	
+#include "Components/SphereComponent.h"	
 #include "Components/StaticMeshComponent.h"
 #include "GameFramework/ProjectileMovementComponent.h"
 #include "Components/SceneComponent.h"
@@ -15,20 +15,22 @@ AProjectile::AProjectile()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Component"));
-	RootComponent = SceneComp;
+	//SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Component"));
+	//RootComponent = SceneComp;
 
-	CollisionCap = CreateDefaultSubobject<UCapsuleComponent>(TEXT("Collision Comp"));
-	CollisionCap->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	CollisionCap->SetupAttachment(SceneComp);
-
+	CollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Collision Comp"));
+	CollisionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	//CollisionSphere->SetupAttachment(SceneComp);
+	RootComponent = CollisionSphere;
 	/*ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Mesh"));
 	ProjectileMesh->SetupAttachment(CollisionCap);
 	ProjectileMesh->bAutoActivate = false;*/
 	
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
-	ProjectileMovement->UpdatedComponent = CollisionCap;
+	ProjectileMovement->UpdatedComponent = CollisionSphere;
 	ProjectileMovement->bAutoActivate = false;
+	//ProjectileMovement->InitialSpeed = 5000;
+	//ProjectileMovement->MaxSpeed = 6000;
 
 }
 
@@ -47,23 +49,13 @@ void AProjectile::Tick(float DeltaTime)
 }
 
 
-void AProjectile::LaunchProjectile(float speed)
+void AProjectile::LaunchProjectile(FVector arrowVelocity)
 {
 
 	//CollisionCap->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	// GetActorForwardVector()
-	FHitResult HitLocation;
+	
 	ProjectileMovement->Activate();
-	FVector StartLocation = GetActorLocation();
-	FVector TraceEnd = StartLocation + GetActorForwardVector() * speed;
-	FCollisionQueryParams QueryParams;
-	//QueryParams.AddIgnoredActor(PawnOwner);
-	QueryParams.AddIgnoredActor(this);
-
-	if (GetWorld()->LineTraceSingleByChannel(HitLocation, StartLocation, TraceEnd, ECC_Camera, QueryParams))
-	{
-		DrawDebugLine(GetWorld(), StartLocation, TraceEnd, FColor(255, 0, 0), true, 10.f);
-	}
-	ProjectileMovement->SetVelocityInLocalSpace(TraceEnd);
+	ProjectileMovement->Velocity = arrowVelocity;
+	//ProjectileMovement->SetVelocityInLocalSpace(arrowVelocity);
 
 }

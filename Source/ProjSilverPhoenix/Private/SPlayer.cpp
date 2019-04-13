@@ -43,7 +43,6 @@ ASPlayer::ASPlayer()
 
 }
 
-
 void ASPlayer::BeginPlay()
 {
 	Super::BeginPlay();
@@ -95,7 +94,7 @@ void ASPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
 
 	PlayerInputComponent->BindAction("Focus", IE_Pressed, this, &ASPlayer::PressFocus);
 	PlayerInputComponent->BindAction("Focus", IE_Released, this, &ASPlayer::ReleaseFocus);
-	PlayerInputComponent->BindAction("HeavyAttack", IE_Pressed, this, &ASPlayer::HeavyAttack);
+
 
 	PlayerInputComponent->BindAction("NextTarget", IE_Pressed, this, &ASPlayer::NextTarget);
 	PlayerInputComponent->BindAction("PrevTarget", IE_Pressed, this, &ASPlayer::PrevTarget);
@@ -300,7 +299,6 @@ void ASPlayer::StartRoll()
 		SetCanRoll(false);
 		RollCounter++;
 		RollDircetion();
-
 	}
 }
 
@@ -708,17 +706,7 @@ void ASPlayer::OnDeath()
 	
 }
 
-void ASPlayer::HeavyAttack()
-{
-}
-
 void ASPlayer::SetCanAttack(bool NewState)
 {
 }
-
-UCameraComponent * ASPlayer::GetCamera()
-{
-	return Camera;
-}
-
 
