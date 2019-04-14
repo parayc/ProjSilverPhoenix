@@ -12,6 +12,9 @@
 class AProjectile;
 class ASPlayer;
 
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnBowCharhingSignature);
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnDrawBowEndSignature);
+
 UCLASS()
 class PROJSILVERPHOENIX_API ABow : public ARangeWeapon
 {
@@ -33,6 +36,10 @@ public:
 
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AProjectile> ProjectileToShoot;
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FOnBowCharhingSignature OnBowCharged;
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+		FOnDrawBowEndSignature OnDrawBowEnd;
 
 protected:
 	// Called when the game starts or when spawned
@@ -43,6 +50,15 @@ private:
 	void FireArrow(AProjectile* arrow, FVector arrowVelocity);
 
 	void SpawnArrow(FVector endPoint);
+	
+	//This is called when the bow begins to charge
+	UFUNCTION(BlueprintCallable, Category = "Bow")
+	void BowCharging();
+	//this is called when the bow charging animation is complete
+	UFUNCTION(BlueprintCallable, Category = "Bow")
+	void BowFullyCharged();
+
+	void CalculateProjectileSpeed();
 
 	FVector AimDirection();
 	
@@ -55,18 +71,23 @@ private:
 	float ZoomFOV = 70.f;
 
 	UPROPERTY(EditAnywhere, Category = "Bow")
-	FName ArrowSpawnSocket;
+	FName ArrowSpawnSocket = "Arrow";
 
 	UPROPERTY(EditAnywhere, Category = "Bow")
-	float projectileSpeed = 5000.f;
+	float minProjectileSpeed = 1900.f;
 
 	UPROPERTY(EditAnywhere, Category = "Bow")
-	float maxprojectileSpeed = 5000.f;
+	float maxProjectileSpeed = 5500.f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Animation")
 	class UAnimMontage* FireBowMontage;
 
 	bool bIsDrawingBow = false;
 
+	FTimerHandle BowDrawingTimeHandle;
 	
+	UPROPERTY(EditAnywhere, Category = "Bow")
+	float BowDrawingChargeRate = 0.11;
+
+	float LaunchSpeed = 0;
 };

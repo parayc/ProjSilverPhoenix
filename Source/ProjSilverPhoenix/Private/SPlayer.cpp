@@ -595,7 +595,6 @@ void ASPlayer::ZoomCamera(bool Zoom, float FieldOfViw)
 	}
 	
 	TargetFOV = DefaultFOV;
-	UE_LOG(LogTemp, Warning, TEXT("TargetFOV: %f"), FieldOfViw);
 }
 
 FVector ASPlayer::GetPawnViewLocation() const
