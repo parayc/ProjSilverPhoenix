@@ -12,16 +12,14 @@ ABow::ABow()
 {
 	WeaponSocketName = FName("BowSocket");
 	BackSocketName = FName("MeleeBackSocket"); //TODO - Create back socket for bow
-}
 
-void ABow::BeginPlay()
-{
-	Super::BeginPlay();
+	LaunchSpeed = 0;
+	CameraOffset = FVector(0, 40, 0);
 }
 
 void ABow::BowCharging()
 {
-	LaunchSpeed = 40;
+	LaunchSpeed = InitialLaunchSpeed;
 	GetWorldTimerManager().SetTimer(BowDrawingTimeHandle,this, &ABow::CalculateProjectileSpeed, BowDrawingChargeRate,true,0.0f);
 }
 
@@ -32,7 +30,7 @@ void ABow::BowFullyCharged()
 
 void ABow::CalculateProjectileSpeed()
 {
-	LaunchSpeed += LaunchSpeed * 0.12;
+	LaunchSpeed += LaunchSpeed * PercentageIncrease;
 	UE_LOG(LogTemp, Warning, TEXT("Launch: %f"), LaunchSpeed);
 }
 
@@ -47,7 +45,7 @@ void ABow::StartAttack()
 
 void ABow::ReleaseAttack()
 {
-	
+	UE_LOG(LogTemp, Warning, TEXT("RA Launch: %f"), LaunchSpeed);
 	bIsDrawingBow = false;
 	GetWorldTimerManager().ClearTimer(BowDrawingTimeHandle);
 
@@ -98,6 +96,8 @@ void ABow::FireArrow(AProjectile* arrow, FVector arrowVelocity)
 {
 	currentProjectile->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	currentProjectile->LaunchProjectile(arrowVelocity);
+	currentProjectile->DestroyProjectile(5.f);
+	currentProjectile = nullptr;
 }
 
 void ABow::SpawnArrow(FVector endPoint)
@@ -110,7 +110,9 @@ void ABow::SpawnArrow(FVector endPoint)
 	FVector arrowVelocity = endPoint - muzzleLoc;
 	arrowVelocity.Normalize();
 	
+	UE_LOG(LogTemp, Warning, TEXT("SA LunchSpeed: %f"), LaunchSpeed);
 	float projectileSpeed = LaunchSpeed * LaunchSpeed;
+	
 	projectileSpeed = FMath::Clamp(projectileSpeed, minProjectileSpeed, maxProjectileSpeed);
 	arrowVelocity *= projectileSpeed;
 
@@ -165,7 +167,8 @@ void ABow::Zoom(bool bZooming)
 	ASPlayer* playerOwner = Cast<ASPlayer>(MyPawn);
 	if (playerOwner)
 	{
-		playerOwner->ZoomCamera(bZooming, ZoomFOV);
+		//This adds a offset and doesnt ovewrite it
+		playerOwner->ZoomCamera(bZooming, CameraOffset, ZoomFOV);
 	}
 }
 

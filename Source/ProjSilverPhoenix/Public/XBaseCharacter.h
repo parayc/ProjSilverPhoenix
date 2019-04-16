@@ -98,6 +98,7 @@ protected:
 	//UFUNCTION()
 	//void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
 
+	/*Check if the players is fighting(weapon equipped) or is passive(weapon unequipped)*/
 	UPROPERTY(EditAnywhere, BlueprintReadOnly, Category = "PlayerState")
 	EPlayerStates CurrentPlayerState;
 

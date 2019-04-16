@@ -41,10 +41,6 @@ public:
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 		FOnDrawBowEndSignature OnDrawBowEnd;
 
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
 private:
 
 	void FireArrow(AProjectile* arrow, FVector arrowVelocity);
@@ -67,8 +63,6 @@ private:
 	void Zoom(bool bZooming);
 
 	AProjectile* currentProjectile = nullptr;
-	UPROPERTY(EditAnywhere, Category = "Bow")
-	float ZoomFOV = 70.f;
 
 	UPROPERTY(EditAnywhere, Category = "Bow")
 	FName ArrowSpawnSocket = "Arrow";
@@ -89,5 +83,18 @@ private:
 	UPROPERTY(EditAnywhere, Category = "Bow")
 	float BowDrawingChargeRate = 0.11;
 
-	float LaunchSpeed = 0;
+	/*The starting launchSpeed value before bow ischarging*/
+	UPROPERTY(EditAnywhere, Category = "Bow")
+	float InitialLaunchSpeed = 37.f;
+	/*Gets the percentage of the current launch speed and adds to it */
+	UPROPERTY(EditAnywhere, Category = "Bow", meta =  (ClampMin = "0", ClampMax = "1"))
+	float PercentageIncrease = 0.12f;
+
+	float LaunchSpeed;
+	/*This offset the camera to the left or the right of the owning pawn*/
+	UPROPERTY(EditAnywhere, Category = "Bow")
+	FVector CameraOffset;
+
+	UPROPERTY(EditAnywhere, Category = "Bow")
+	float ZoomFOV = 70.f;
 };

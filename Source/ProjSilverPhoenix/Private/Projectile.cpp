@@ -15,22 +15,16 @@ AProjectile::AProjectile()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
-	//SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Component"));
-	//RootComponent = SceneComp;
-
 	CollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Collision Comp"));
 	CollisionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	//CollisionSphere->SetupAttachment(SceneComp);
+	
 	RootComponent = CollisionSphere;
-	/*ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Mesh"));
-	ProjectileMesh->SetupAttachment(CollisionCap);
-	ProjectileMesh->bAutoActivate = false;*/
+
 	
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
 	ProjectileMovement->UpdatedComponent = CollisionSphere;
 	ProjectileMovement->bAutoActivate = false;
-	//ProjectileMovement->InitialSpeed = 5000;
-	//ProjectileMovement->MaxSpeed = 6000;
+
 
 }
 
@@ -58,4 +52,18 @@ void AProjectile::LaunchProjectile(FVector arrowVelocity)
 	ProjectileMovement->Velocity = arrowVelocity;
 	//ProjectileMovement->SetVelocityInLocalSpace(arrowVelocity);
 
+}
+
+void AProjectile::DestroyProjectile(float TimeTakenBeforeDestroyed)
+{
+	if (!bCanDestroy) return;
+
+	bCanDestroy = false;
+	GetWorldTimerManager().SetTimer(DestroyHandle, this, &AProjectile::DestroyProjectile, TimeTakenBeforeDestroyed,false);
+}
+
+void AProjectile::DestroyProjectile()
+{
+	GetWorldTimerManager().ClearTimer(DestroyHandle);
+	Destroy();
 }

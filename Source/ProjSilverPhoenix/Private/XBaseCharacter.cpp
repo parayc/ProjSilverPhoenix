@@ -151,10 +151,12 @@ void AXBaseCharacter::AddWeaponToCharacterEquipment(ABaseWeapon * NewWeapon)
 	{
 		if (CurrentPlayerState == EPlayerStates::PS_Combat)
 		{
+			
 			NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, NewWeapon->WeaponSocketName);//Attching the new weapon 
 		}
 		else if (CurrentPlayerState == EPlayerStates::PS_Passive)
 		{
+		
 			NewWeapon->AttachToComponent(GetMesh(), FAttachmentTransformRules::SnapToTargetNotIncludingScale, NewWeapon->BackSocketName);
 		}
 

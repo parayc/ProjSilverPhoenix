@@ -22,6 +22,8 @@ public:
 
 	void LaunchProjectile(FVector arrowVelocity);
 
+	void DestroyProjectile(float TimeTakenBeforeDestroyed);
+
 protected:
 	// Called when the game starts or when spawned
 	virtual void BeginPlay() override;
@@ -39,7 +41,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,Category = "Projectile")
 	class UStaticMeshComponent* ProjectileMesh;
 	
+private:
+	bool bCanDestroy = true;
 
+	void DestroyProjectile();
+
+	FTimerHandle DestroyHandle;
 	
 	
 };

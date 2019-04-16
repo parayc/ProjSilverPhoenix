@@ -49,6 +49,9 @@ void ASPlayer::BeginPlay()
 
 	DefaultFOV = Camera->FieldOfView;
 	TargetFOV = DefaultFOV;
+
+	DefaultSpringArmOffset = SpringArm->SocketOffset;
+
 	//This restricts the players Camera movmevent from going to high or low 
 	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMax = 70;
 	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMin = -70;
@@ -79,7 +82,7 @@ void ASPlayer::Tick(float DeltaTime)
 	}
 
 	
-	float NewFOV = FMath::FInterpTo(Camera->FieldOfView, TargetFOV, DeltaTime, 10.f);
+	float NewFOV = FMath::FInterpTo(Camera->FieldOfView, TargetFOV, DeltaTime, 20.f);
 	Camera->SetFieldOfView(NewFOV);
 
 
@@ -578,6 +581,18 @@ void ASPlayer::LockPlayerToCameraView(bool bLockPLayerView)
 	GetCharacterMovement()->bOrientRotationToMovement = !bLockPLayerView;
 }
 
+void ASPlayer::ZoomCamera(bool Zoom, FVector CameraOffset, float FieldOfViw)
+{
+	if (Zoom)
+	{
+		TargetFOV = FieldOfViw;
+		SpringArm->SocketOffset += CameraOffset;
+		return;
+	}
+
+	ResetCameraPosistion();
+}
+
 void ASPlayer::RemoveEnemyFromTargeting(AEnemyMaster * Target)
 {
 	if(Target)
@@ -586,15 +601,10 @@ void ASPlayer::RemoveEnemyFromTargeting(AEnemyMaster * Target)
 	}
 }
 
-void ASPlayer::ZoomCamera(bool Zoom, float FieldOfViw)
+void ASPlayer::ResetCameraPosistion()
 {
-	if (Zoom)
-	{
-		TargetFOV = FieldOfViw;
-		return;
-	}
-	
 	TargetFOV = DefaultFOV;
+	SpringArm->SocketOffset = DefaultSpringArmOffset;
 }
 
 FVector ASPlayer::GetPawnViewLocation() const

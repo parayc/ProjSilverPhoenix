@@ -113,8 +113,9 @@ public:
 
 	bool bWantsToZoom = false;
 
-	
+	FVector DefaultSpringArmOffset;
 
+	void ResetCameraPosistion();
 	//We override it to return the camera location as the eye location
 	virtual FVector GetPawnViewLocation() const;
 
@@ -135,7 +136,7 @@ public:
 
 	void LockPlayerToCameraView(bool bLockPLayerView);
 
-	void ZoomCamera(bool Zoom, float FieldOfViw = 0);
+	void ZoomCamera(bool Zoom, FVector CameraOffset, float FieldOfViw = 0.f);
 
 	/*Equipent & Attacking*/
 
