@@ -51,6 +51,7 @@ void ASPlayer::BeginPlay()
 	TargetFOV = DefaultFOV;
 
 	DefaultSpringArmOffset = SpringArm->SocketOffset;
+	TargetOffset = DefaultSpringArmOffset;
 
 	//This restricts the players Camera movmevent from going to high or low 
 	GetWorld()->GetFirstPlayerController()->PlayerCameraManager->ViewPitchMax = 70;
@@ -82,10 +83,7 @@ void ASPlayer::Tick(float DeltaTime)
 	}
 
 	
-	float NewFOV = FMath::FInterpTo(Camera->FieldOfView, TargetFOV, DeltaTime, 20.f);
-	Camera->SetFieldOfView(NewFOV);
-
-
+	ZoomToNewCameraPosition(DeltaTime);
 }
 
 void ASPlayer::SetupPlayerInputComponent(UInputComponent * PlayerInputComponent)
@@ -275,11 +273,6 @@ void ASPlayer::EndDoubleJump()
 	GetWorldTimerManager().ClearTimer(DJumpResetHandle);
 }
 
-void ASPlayer::CreateNoise(float Loudness)
-{
-	MakeNoise(Loudness, this, GetActorLocation());
-}
-
 bool ASPlayer::GetIsJumping() const
 {
 	return bIsJumping;
@@ -403,7 +396,6 @@ float ASPlayer::GetMoveRight() const
 	return MoveRightAxisValue;
 }
 
-
 void ASPlayer::IsEnemyInRange()
 {
 	TArray<FHitResult> HitResults;
@@ -429,7 +421,6 @@ void ASPlayer::IsEnemyInRange()
 			
 			if (Enemy && !LockOnListTarget.Contains(Enemy) && IsTargetWithinSight(Enemy) && !Enemy->GetIsDead())
 				LockOnListTarget.Add(Enemy);
-			
 		}
 	}
 }
@@ -586,11 +577,28 @@ void ASPlayer::ZoomCamera(bool Zoom, FVector CameraOffset, float FieldOfViw)
 	if (Zoom)
 	{
 		TargetFOV = FieldOfViw;
-		SpringArm->SocketOffset += CameraOffset;
+		TargetOffset = CameraOffset;
 		return;
 	}
 
 	ResetCameraPosistion();
+}
+
+void ASPlayer::ZoomToNewCameraPosition(float DeltaTime)
+{
+	float NewFOV = FMath::FInterpTo(Camera->FieldOfView, TargetFOV, DeltaTime, 5.f);
+	Camera->SetFieldOfView(NewFOV);
+
+	float NewXOffset = FMath::FInterpTo(SpringArm->SocketOffset.X, TargetOffset.X, DeltaTime, 5.f);
+	float NewYOffset = FMath::FInterpTo(SpringArm->SocketOffset.Y, TargetOffset.Y, DeltaTime, 5.f);
+	float NewZOffset = FMath::FInterpTo(SpringArm->SocketOffset.Z, TargetOffset.Z, DeltaTime, 5.f);
+
+	SpringArm->SocketOffset = FVector(NewXOffset, NewYOffset, NewZOffset);
+}
+
+FVector ASPlayer::GetDefaultSpringArmSocket()
+{
+	return DefaultSpringArmOffset;
 }
 
 void ASPlayer::RemoveEnemyFromTargeting(AEnemyMaster * Target)
@@ -604,7 +612,7 @@ void ASPlayer::RemoveEnemyFromTargeting(AEnemyMaster * Target)
 void ASPlayer::ResetCameraPosistion()
 {
 	TargetFOV = DefaultFOV;
-	SpringArm->SocketOffset = DefaultSpringArmOffset;
+	TargetOffset = DefaultSpringArmOffset;
 }
 
 FVector ASPlayer::GetPawnViewLocation() const
@@ -622,10 +630,10 @@ void ASPlayer::NextTarget()
 	if (LockOnListTarget.Num() == 0 || LockOnListTarget.Num() == 1) return;
 
 	//Check how much time has elasped since the last time the player tried to change  target
-	float timeSincseLastPressed = GetWorld()->GetTimeSeconds() - LastTimePressed;
+	float timeSincseLastPressed = GetWorld()->GetTimeSeconds() - LastTimeTargetChanged;
 	if (0.5f < timeSincseLastPressed)
 	{
-		LastTimePressed = GetWorld()->GetTimeSeconds();
+		LastTimeTargetChanged = GetWorld()->GetTimeSeconds();
 		if (bIsLockedOn)
 		{
 
@@ -659,11 +667,11 @@ void ASPlayer::PrevTarget()
 	if (LockOnListTarget.Num() == 0 || LockOnListTarget.Num() == 1) return;
 
 	//Check how much time has elasped since the last time the player tried to change  target
-	float timeSincseLastPressed = GetWorld()->GetTimeSeconds() - LastTimePressed;
+	float timeSincseLastPressed = GetWorld()->GetTimeSeconds() - LastTimeTargetChanged;
 	
 	if (0.5f < timeSincseLastPressed)
 	{
-		LastTimePressed = GetWorld()->GetTimeSeconds();
+		LastTimeTargetChanged = GetWorld()->GetTimeSeconds();
 		if (bIsLockedOn)
 		{
 
@@ -736,9 +744,5 @@ void ASPlayer::OnDeath()
 	auto playerController = Cast<APlayerController>(this->GetController());
 	DisableInput(playerController);
 	
-}
-
-void ASPlayer::SetCanAttack(bool NewState)
-{
 }
 

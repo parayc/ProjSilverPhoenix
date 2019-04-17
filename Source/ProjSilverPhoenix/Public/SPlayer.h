@@ -23,36 +23,7 @@ class PROJSILVERPHOENIX_API ASPlayer : public AXBaseCharacter
 {
 	GENERATED_BODY()
 
-protected: 
-
-	UFUNCTION()
-	void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, FVector HitDirection ,const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
-	UHealthComponent* HealthComponent;
-
-
-public:
-
-
-	ASPlayer();
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-		class USpringArmComponent* SpringArm;
-
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-		class UCameraComponent* Camera;
-
-	/**Movement*/
-
-	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-	float BaseTurnRate;
-
-	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
-	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
-		float BasePitchRate;
-
+private:
 	void MoveForward(float Value);
 
 	void MoveRight(float Value);
@@ -68,23 +39,7 @@ public:
 
 	void DoubleJump();
 
-	void SetIsJumping(bool NewState);
-
-	void SetCanJump(bool NewState);
-
 	void EndDoubleJump();
-
-	UFUNCTION(BlueprintCallable, Category = "Setup")
-		void CreateNoise(float Loudness);
-
-	UFUNCTION(BlueprintCallable, Category = "Setup")
-		bool GetIsJumping() const;
-
-	UFUNCTION(BlueprintCallable, Category = "Setup")
-		bool GetIsDoubleJumping() const;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Setup | Movement")
-		float JumpHeight = 600.f;
 
 	/*Rolling*/
 
@@ -96,10 +51,71 @@ public:
 
 	void RollDircetion();
 
+	/*Camera & Target System*/
+
+	void NextTarget();
+
+	void PrevTarget();
+
+	void ResetCameraPosistion();
+
+	void ZoomToNewCameraPosition(float DeltaTime);
+
+	/*Equipent & Attacking*/
+
+	void PressAttack();
+
+	void ReleaseAttack();
+
+	void PressFocus();
+
+	void ReleaseFocus();
+
+	void IsEnemyInRange();
+
+	bool IsTargetWithinSight(AActor* Target);
+
+	void LockOnCamera(float DeltaSec);
+
+	void IsEnemyOutOfRange();
+
+
+
+protected: 
+
+	UFUNCTION()
+	void OnHealthChanged(UHealthComponent* OwningHealthComp, float Health, float HealthDelta, FVector HitDirection ,const class UDamageType* DamageType, class AController* InstigatedBy, AActor* DamageCauser);
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Components")
+	UHealthComponent* HealthComponent;
+
+
+public:
+
+	ASPlayer();
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+	class USpringArmComponent* SpringArm;
+
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera")
+	class UCameraComponent* Camera;
+
+	virtual void BeginPlay() override;
+
+	void SetIsJumping(bool NewState);
+
+	void SetCanJump(bool NewState);
+
+	UFUNCTION(BlueprintCallable, Category = "Setup")
+	bool GetIsJumping() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Setup")
+	bool GetIsDoubleJumping() const;
+
 	bool GetCanRoll() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Animations")
-		bool GetIsRolling() const;
+	bool GetIsRolling() const;
 
 	void SetCanRoll(bool NewState);
 
@@ -107,23 +123,8 @@ public:
 
 	float GetMoveRight() const;
 
-	float DefaultFOV;
-
-	float TargetFOV;
-
-	bool bWantsToZoom = false;
-
-	FVector DefaultSpringArmOffset;
-
-	void ResetCameraPosistion();
 	//We override it to return the camera location as the eye location
 	virtual FVector GetPawnViewLocation() const;
-
-	/*Camera & Target System*/
-
-	void NextTarget();
-
-	void PrevTarget();
 
 	UFUNCTION(BlueprintCallable, Category = "SetUp")
 	bool GetIsLockedOn() const;
@@ -138,38 +139,38 @@ public:
 
 	void ZoomCamera(bool Zoom, FVector CameraOffset, float FieldOfViw = 0.f);
 
-	/*Equipent & Attacking*/
-
-	void PressAttack();
-
-	void ReleaseAttack();
-
-	void PressFocus();
-
-	void ReleaseFocus();
-
-	void SetCanAttack(bool NewState);
+	FVector GetDefaultSpringArmSocket();
 
 	virtual void OnDeath() override;
 
-	UPROPERTY(BlueprintAssignable)
-	FOnDeathRequest OnDeathRequest;
-
-	float LastTimePressed = 0.0f;
-
-	
-protected:
-	// Called when the game starts or when spawned
-	virtual void BeginPlay() override;
-
-public:
-	// Called every frame
 	virtual void Tick(float DeltaTime) override;
 
-	// Called to bind functionality to input
 	virtual void SetupPlayerInputComponent(class UInputComponent* PlayerInputComponent) override;
 
 private:
+	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+		float BaseTurnRate;
+
+	/** Base turn rate, in deg/sec. Other scaling may affect final turn rate. */
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Camera", meta = (AllowPrivateAccess = "true"))
+	float BasePitchRate;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Setup | Movement", meta = (AllowPrivateAccess = "true"))
+	float JumpHeight = 600.f;
+
+	float DefaultFOV;
+
+	float TargetFOV;
+
+	FVector TargetOffset;
+
+	float LastTimeTargetChanged = 0.0f;
+
+	FVector DefaultSpringArmOffset;
+
+	UPROPERTY(BlueprintAssignable, meta = (AllowPrivateAccess = "true"))
+	FOnDeathRequest OnDeathRequest;
 
 	bool bCanJump = true;
 
@@ -194,7 +195,7 @@ private:
 
 	/*This is the cooldown length once the player has reached the max time they can roll*/
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | Movement")
-		float RollCooldownTimer = 5.f;
+	float RollCooldownTimer = 5.f;
 
 	int JumpCounter = 0;
 
@@ -205,7 +206,6 @@ private:
 	float MoveForwardAxisValue = 0.f;
 
 	float MoveRightAxisValue = 0.f;
-
 
 	/*Roll Animations*/
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | Movement")
@@ -225,15 +225,8 @@ private:
 
 	TArray<AEnemyMaster*> LockOnListTarget;
 
-	void IsEnemyInRange();
-
-	bool IsTargetWithinSight(AActor* Target);
-
-	void LockOnCamera(float DeltaSec);
-
 	UPROPERTY(EditDefaultsOnly, meta = (AllowPrivateAccess = true), Category = "Setup | LockOnSystem")
 	float LockOnSphereRadius = 1000.f;
 
-	void IsEnemyOutOfRange();
 
 };

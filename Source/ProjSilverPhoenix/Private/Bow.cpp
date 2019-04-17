@@ -31,21 +31,21 @@ void ABow::BowFullyCharged()
 void ABow::CalculateProjectileSpeed()
 {
 	LaunchSpeed += LaunchSpeed * PercentageIncrease;
-	UE_LOG(LogTemp, Warning, TEXT("Launch: %f"), LaunchSpeed);
 }
 
 void ABow::StartAttack()
 {
 	//Check weather the player can fire . e.g. ammo, current arrow is not shooting, are they aiming
-	if (!CanFire()) return;
-
+	//if (!CanFire()) return;
+	if (!GetIsAiming()) return;
+	UE_LOG(LogTemp, Warning, TEXT("Start Attack: "));
 	OnBowCharged.Broadcast();
 	bIsDrawingBow = true;
 }
 
 void ABow::ReleaseAttack()
 {
-	UE_LOG(LogTemp, Warning, TEXT("RA Launch: %f"), LaunchSpeed);
+	UE_LOG(LogTemp, Warning, TEXT("Release Attack "));
 	bIsDrawingBow = false;
 	GetWorldTimerManager().ClearTimer(BowDrawingTimeHandle);
 
@@ -55,7 +55,13 @@ void ABow::ReleaseAttack()
 
 	if (FireBowMontage)
 	{
-		PlayWeaponAnimation(FireBowMontage, 1.0f);
+		bIsFiring = true;
+		float duration = PlayWeaponAnimation(FireBowMontage, 1.f);
+		GetWorldTimerManager().SetTimer(OnFireEndTimeHandle, this, &ABow::OnFireEnd, duration, true);
+	}
+	else
+	{
+		UE_LOG(LogTemp, Error, TEXT("Error - Bow Firing animation selected for %s"), *this->GetName());
 	}
 
 	//TODO - Dont allow player to fire until animation is complete
@@ -98,6 +104,12 @@ void ABow::FireArrow(AProjectile* arrow, FVector arrowVelocity)
 	currentProjectile->LaunchProjectile(arrowVelocity);
 	currentProjectile->DestroyProjectile(5.f);
 	currentProjectile = nullptr;
+}
+
+void ABow::OnFireEnd()
+{
+	bIsFiring = false;
+	GetWorldTimerManager().ClearTimer(OnFireEndTimeHandle);
 }
 
 void ABow::SpawnArrow(FVector endPoint)
@@ -159,7 +171,7 @@ FVector ABow::AimDirection()
 
 bool ABow::CanFire()
 {
-	return GetIsAiming();
+	return GetIsAiming() && !bIsFiring;
 }
 
 void ABow::Zoom(bool bZooming)
@@ -168,7 +180,9 @@ void ABow::Zoom(bool bZooming)
 	if (playerOwner)
 	{
 		//This adds a offset and doesnt ovewrite it
-		playerOwner->ZoomCamera(bZooming, CameraOffset, ZoomFOV);
+		//
+		FVector TargetOffset = playerOwner->GetDefaultSpringArmSocket() + CameraOffset;
+		playerOwner->ZoomCamera(bZooming, TargetOffset, ZoomFOV);
 	}
 }
 

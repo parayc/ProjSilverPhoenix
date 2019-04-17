@@ -45,6 +45,8 @@ private:
 
 	void FireArrow(AProjectile* arrow, FVector arrowVelocity);
 
+	void OnFireEnd();
+
 	void SpawnArrow(FVector endPoint);
 	
 	//This is called when the bow begins to charge
@@ -80,6 +82,7 @@ private:
 
 	FTimerHandle BowDrawingTimeHandle;
 	
+	FTimerHandle OnFireEndTimeHandle;
 	UPROPERTY(EditAnywhere, Category = "Bow")
 	float BowDrawingChargeRate = 0.11;
 
