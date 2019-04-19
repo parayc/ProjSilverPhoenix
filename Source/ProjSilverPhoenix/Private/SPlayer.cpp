@@ -202,11 +202,6 @@ void ASPlayer::LookUp(float Rate)
 void ASPlayer::StartJump()
 {
 
-	if (CharacterEquipment.CurrentWeapon && CharacterEquipment.CurrentWeapon->GetIsAttcking())
-	{
-		 return; 
-	}
-
 	if (!CombatStates->GetIsFlinching() && GetIsRolling() != true)
 	{
 		SetIsJumping(true);

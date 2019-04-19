@@ -321,8 +321,6 @@ void AMeleeWeapon::DealDamage(const FHitResult& HitResult, TSubclassOf<UDamageTy
 
 }
 
-
-
 bool AMeleeWeapon::GetIsAttcking() const
 {
 	return bIsAttacking;

@@ -53,7 +53,6 @@ public:
 
 	virtual void ReleaseFocus() override;
 
-
 	void SetDamage(int32 Value);
 
 	void DealDamage(const FHitResult& HitResult, TSubclassOf<UDamageType> DamageType);
@@ -63,7 +62,7 @@ public:
 	bool CanDamage(const FHitResult& HitResult);
 	
 	UFUNCTION(BlueprintCallable, Category = "Setup")
-	bool GetIsAttcking() const override;
+	bool GetIsAttcking() const;
 
 	UFUNCTION(BlueprintCallable, Category = "Setup")
 	bool GetIsTracing() const;
@@ -180,7 +179,10 @@ private:
 	FVector StartSocket;
 	FVector EndSocket;
 
-
 	//UPROPERTY(EditDefaultsOnly, Category = "SetUp")
 	int32 Damage = 0;
+
+	UPROPERTY()
+	bool bIsAttacking = false;
+
 };

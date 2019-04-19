@@ -43,9 +43,6 @@ public:
 
 	virtual void ReleaseFocus() {};
 
-	UFUNCTION(BlueprintCallable, Category = "Setup")
-	virtual bool GetIsAttcking() const { return bIsAttacking; };
-
 	virtual void UseItem(AActor* OwnerController) override;
 
 	void UnEquip();
@@ -69,15 +66,9 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly)
 	class AXBaseCharacter* MyPawn;
 
-	UPROPERTY()
-		bool bIsAttacking = false;
-
 private:
 
 	FTimerHandle EquipFinishedTimerHandle;
-
-	
-
 
 public:	
 	// Called every frame

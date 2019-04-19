@@ -20,27 +20,6 @@ class PROJSILVERPHOENIX_API ABow : public ARangeWeapon
 {
 	GENERATED_BODY()
 
-public:
-	ABow();
-	
-	 void StartAttack() override;
-
-	 void ReleaseAttack() override;
-
-	 void PressFocus() override;
-
-	 void ReleaseFocus() override;
-	
-	UFUNCTION(BlueprintCallable, Category = "Weapon")
-	bool GetIsDrawingBow() const;
-
-	UPROPERTY(EditAnywhere)
-	TSubclassOf<class AProjectile> ProjectileToShoot;
-	UPROPERTY(BlueprintAssignable, Category = "Events")
-		FOnBowCharhingSignature OnBowCharged;
-	UPROPERTY(BlueprintAssignable, Category = "Events")
-		FOnDrawBowEndSignature OnDrawBowEnd;
-
 private:
 
 	void FireArrow(AProjectile* arrow, FVector arrowVelocity);
@@ -48,10 +27,10 @@ private:
 	void OnFireEnd();
 
 	void SpawnArrow(FVector endPoint);
-	
+
 	//This is called when the bow begins to charge
 	UFUNCTION(BlueprintCallable, Category = "Bow")
-	void BowCharging();
+		void BowCharging();
 	//this is called when the bow charging animation is complete
 	UFUNCTION(BlueprintCallable, Category = "Bow")
 	void BowFullyCharged();
@@ -59,10 +38,38 @@ private:
 	void CalculateProjectileSpeed();
 
 	FVector AimDirection();
-	
+
 	bool CanFire();
 
 	void Zoom(bool bZooming);
+
+public:
+	ABow();
+	
+	void StartAttack() override;
+
+	void ReleaseAttack() override;
+
+	void PressFocus() override;
+
+	void ReleaseFocus() override;
+	
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	bool GetIsDrawingBow() const;
+
+	UFUNCTION(BlueprintCallable, Category = "Weapon")
+	bool CanAttachToBowString() const;
+
+	UPROPERTY(EditAnywhere)
+	TSubclassOf<class AProjectile> ProjectileToShoot;
+
+private:
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnBowCharhingSignature OnBowCharged;
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnDrawBowEndSignature OnDrawBowEnd;
 
 	AProjectile* currentProjectile = nullptr;
 
@@ -83,12 +90,14 @@ private:
 	FTimerHandle BowDrawingTimeHandle;
 	
 	FTimerHandle OnFireEndTimeHandle;
+
 	UPROPERTY(EditAnywhere, Category = "Bow")
 	float BowDrawingChargeRate = 0.11;
 
 	/*The starting launchSpeed value before bow ischarging*/
 	UPROPERTY(EditAnywhere, Category = "Bow")
 	float InitialLaunchSpeed = 37.f;
+
 	/*Gets the percentage of the current launch speed and adds to it */
 	UPROPERTY(EditAnywhere, Category = "Bow", meta =  (ClampMin = "0", ClampMax = "1"))
 	float PercentageIncrease = 0.12f;

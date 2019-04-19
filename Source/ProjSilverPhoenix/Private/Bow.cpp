@@ -7,6 +7,7 @@
 #include "SPlayer.h"
 #include "Kismet/KismetMathLibrary.h"
 #include "TimerManager.h"
+#include "GameFramework/MovementComponent.h"
 
 ABow::ABow()
 {
@@ -61,7 +62,7 @@ void ABow::ReleaseAttack()
 	}
 	else
 	{
-		UE_LOG(LogTemp, Error, TEXT("Error - Bow Firing animation selected for %s"), *this->GetName());
+		UE_LOG(LogTemp, Error, TEXT("Error - No Bow Firing animation selected for %s"), *this->GetName());
 	}
 
 	//TODO - Dont allow player to fire until animation is complete
@@ -189,6 +190,20 @@ void ABow::Zoom(bool bZooming)
 bool ABow::GetIsDrawingBow() const
 {
 	return bIsDrawingBow;
+}
+
+bool ABow::CanAttachToBowString() const
+{
+	if (!MyPawn) return false;
+
+	//auto MovementComp = MyPawn->FindComponentByClass<UMovementComponent>();
+	ASPlayer* playerOwner = Cast<ASPlayer>(MyPawn);
+	if (playerOwner)
+	{
+		return !GetIsFiring() && !playerOwner->GetIsJumping() && (GetIsDrawingBow() || GetIsAiming() || MyPawn->GetCurrentState() == EPlayerStates::PS_Combat);
+	}
+	
+	return false;
 }
 
 
