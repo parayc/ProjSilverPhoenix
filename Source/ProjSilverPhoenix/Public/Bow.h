@@ -22,11 +22,14 @@ class PROJSILVERPHOENIX_API ABow : public ARangeWeapon
 
 private:
 
-	void FireArrow(AProjectile* arrow, FVector arrowVelocity);
+	void FireArrow(FVector arrowVelocity);
 
 	void OnFireEnd();
 
-	void SpawnArrow(FVector endPoint);
+	UFUNCTION(BlueprintCallable, Category = "Bow")
+	void SpawnArrow();
+
+	FVector CalculateArrowVelocity(FVector endPoint);
 
 	//This is called when the bow begins to charge
 	UFUNCTION(BlueprintCallable, Category = "Bow")
@@ -63,6 +66,8 @@ public:
 	UPROPERTY(EditAnywhere)
 	TSubclassOf<class AProjectile> ProjectileToShoot;
 
+	virtual void Tick(float DeltaTime) override;
+
 private:
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
@@ -72,9 +77,9 @@ private:
 	FOnDrawBowEndSignature OnDrawBowEnd;
 
 	AProjectile* currentProjectile = nullptr;
-
+	/*The socket on the bow the arrow attach to when its ready to fire*/
 	UPROPERTY(EditAnywhere, Category = "Bow")
-	FName ArrowSpawnSocket = "Arrow";
+	FName ArrowRestSocket = "ArrowRestSocket";
 
 	UPROPERTY(EditAnywhere, Category = "Bow")
 	float minProjectileSpeed = 1900.f;

@@ -9,6 +9,7 @@
 #include "TimerManager.h"
 #include "GameFramework/MovementComponent.h"
 
+
 ABow::ABow()
 {
 	WeaponSocketName = FName("BowSocket");
@@ -16,6 +17,12 @@ ABow::ABow()
 
 	LaunchSpeed = 0;
 	CameraOffset = FVector(0, 40, 0);
+}
+
+void ABow::Tick(float DeltaTime)
+{
+	Super::Tick(DeltaTime);
+
 }
 
 void ABow::BowCharging()
@@ -39,14 +46,13 @@ void ABow::StartAttack()
 	//Check weather the player can fire . e.g. ammo, current arrow is not shooting, are they aiming
 	//if (!CanFire()) return;
 	if (!GetIsAiming()) return;
-	UE_LOG(LogTemp, Warning, TEXT("Start Attack: "));
 	OnBowCharged.Broadcast();
 	bIsDrawingBow = true;
+	SpawnArrow();
 }
 
 void ABow::ReleaseAttack()
 {
-	UE_LOG(LogTemp, Warning, TEXT("Release Attack "));
 	bIsDrawingBow = false;
 	GetWorldTimerManager().ClearTimer(BowDrawingTimeHandle);
 
@@ -65,8 +71,8 @@ void ABow::ReleaseAttack()
 		UE_LOG(LogTemp, Error, TEXT("Error - No Bow Firing animation selected for %s"), *this->GetName());
 	}
 
-	//TODO - Dont allow player to fire until animation is complete
-	SpawnArrow(AimDirection());
+	auto arrorVelcity = CalculateArrowVelocity(AimDirection());
+	FireArrow(arrorVelcity);
 }
 
 void ABow::PressFocus()
@@ -75,6 +81,7 @@ void ABow::PressFocus()
 	
 	if (playerOwner)
 	{
+		
 		bIsAiming = true;
 		Zoom(bIsAiming);
 		playerOwner->SwitchStats(EPlayerStates::PS_Combat);
@@ -99,7 +106,7 @@ void ABow::ReleaseFocus()
 	bIsDrawingBow = false;
 }
 
-void ABow::FireArrow(AProjectile* arrow, FVector arrowVelocity)
+void ABow::FireArrow(FVector arrowVelocity)
 {
 	currentProjectile->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	currentProjectile->LaunchProjectile(arrowVelocity);
@@ -113,36 +120,48 @@ void ABow::OnFireEnd()
 	GetWorldTimerManager().ClearTimer(OnFireEndTimeHandle);
 }
 
-void ABow::SpawnArrow(FVector endPoint)
+void ABow::SpawnArrow()
 {
+
+	if (!ProjectileToShoot)
+	{
+		UE_LOG(LogTemp, Error, TEXT("Error - No projectile selected in %s"), *this->GetName());
+		return;
+	}
+
+	//Don't spawn arrow if we already have arrow 
+	if (currentProjectile) return;
+		
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
-	FVector muzzleLoc = this->WeaponMesh->GetSocketLocation(ArrowSpawnSocket);
-	FRotator MuzzleRot = this->WeaponMesh->GetSocketRotation(ArrowSpawnSocket);
 
+	FVector arrowSocketLoc = WeaponMesh->GetSocketLocation(ArrowRestSocket);
+	FRotator arrowSocketRot = WeaponMesh->GetSocketRotation(ArrowRestSocket);
+	
+	currentProjectile = GetWorld()->SpawnActor<AProjectile>(ProjectileToShoot, arrowSocketLoc, arrowSocketRot, SpawnParams);
+	currentProjectile->AttachToComponent(WeaponMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, ArrowRestSocket);
+	currentProjectile->SetOwner(this);
+
+}
+
+FVector ABow::CalculateArrowVelocity(FVector endPoint)
+{
+
+	FVector muzzleLoc = WeaponMesh->GetSocketLocation(ArrowRestSocket);
 	FVector arrowVelocity = endPoint - muzzleLoc;
 	arrowVelocity.Normalize();
-	
+
 	UE_LOG(LogTemp, Warning, TEXT("SA LunchSpeed: %f"), LaunchSpeed);
 	float projectileSpeed = LaunchSpeed * LaunchSpeed;
-	
+
 	projectileSpeed = FMath::Clamp(projectileSpeed, minProjectileSpeed, maxProjectileSpeed);
 	arrowVelocity *= projectileSpeed;
 
 	UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), projectileSpeed);
 
-	if (ProjectileToShoot)
-	{
-		currentProjectile = GetWorld()->SpawnActor<AProjectile>(ProjectileToShoot, WeaponMesh->GetSocketLocation(ArrowSpawnSocket), WeaponMesh->GetSocketRotation(ArrowSpawnSocket), SpawnParams);
-		currentProjectile->AttachToComponent(WeaponMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, ArrowSpawnSocket);
-		currentProjectile->SetOwner(this);
-		FireArrow(currentProjectile, arrowVelocity);
-		return;
-	}
-
-	UE_LOG(LogTemp, Error, TEXT("Error - No projectile selected in %s"),*this->GetName());
-
+	return arrowVelocity;
 }
+
 
 FVector ABow::AimDirection()
 {
@@ -163,7 +182,7 @@ FVector ABow::AimDirection()
 
 	if (GetWorld()->LineTraceSingleByChannel(Hit, StartTrace, EndTrace, ECC_Camera, TraceParams))
 	{
-		//DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
+		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
 		return Hit.ImpactPoint;
 	}
 	//DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
@@ -180,8 +199,6 @@ void ABow::Zoom(bool bZooming)
 	ASPlayer* playerOwner = Cast<ASPlayer>(MyPawn);
 	if (playerOwner)
 	{
-		//This adds a offset and doesnt ovewrite it
-		//
 		FVector TargetOffset = playerOwner->GetDefaultSpringArmSocket() + CameraOffset;
 		playerOwner->ZoomCamera(bZooming, TargetOffset, ZoomFOV);
 	}
@@ -196,7 +213,6 @@ bool ABow::CanAttachToBowString() const
 {
 	if (!MyPawn) return false;
 
-	//auto MovementComp = MyPawn->FindComponentByClass<UMovementComponent>();
 	ASPlayer* playerOwner = Cast<ASPlayer>(MyPawn);
 	if (playerOwner)
 	{

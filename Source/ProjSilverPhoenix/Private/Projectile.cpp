@@ -15,16 +15,20 @@ AProjectile::AProjectile()
  	// Set this actor to call Tick() every frame.  You can turn this off to improve performance if you don't need it.
 	PrimaryActorTick.bCanEverTick = true;
 
+	SceneComp = CreateDefaultSubobject<USceneComponent>(TEXT("Scene Comp"));
+	RootComponent = SceneComp;
+
+	ProjectileMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("Projectile Mesh"));
+	ProjectileMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ProjectileMesh->SetupAttachment(RootComponent);
+
 	CollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Collision Comp"));
 	CollisionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
-	
-	RootComponent = CollisionSphere;
+	CollisionSphere->AttachToComponent(ProjectileMesh,FAttachmentTransformRules::KeepRelativeTransform);
 
-	
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
-	ProjectileMovement->UpdatedComponent = CollisionSphere;
+	ProjectileMovement->UpdatedComponent = RootComponent;
 	ProjectileMovement->bAutoActivate = false;
-
 
 }
 
@@ -32,26 +36,21 @@ AProjectile::AProjectile()
 void AProjectile::BeginPlay()
 {
 	Super::BeginPlay();
-	
 }
 
 // Called every frame
 void AProjectile::Tick(float DeltaTime)
 {
 	Super::Tick(DeltaTime);
-
 }
-
 
 void AProjectile::LaunchProjectile(FVector arrowVelocity)
 {
-
 	//CollisionCap->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	
+	OnProjectileFired.Broadcast();
 	ProjectileMovement->Activate();
 	ProjectileMovement->Velocity = arrowVelocity;
 	//ProjectileMovement->SetVelocityInLocalSpace(arrowVelocity);
-
 }
 
 void AProjectile::DestroyProjectile(float TimeTakenBeforeDestroyed)

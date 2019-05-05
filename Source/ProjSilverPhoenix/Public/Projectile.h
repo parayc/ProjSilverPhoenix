@@ -6,16 +6,21 @@
 #include "GameFramework/Actor.h"
 #include "Projectile.generated.h"
 
-
 class UStaticMeshComponent;
 class USphereComponent;
 class UProjectileMovementComponent;
 class USceneComponent;
+
+DECLARE_DYNAMIC_MULTICAST_DELEGATE(FOnArrowFiredSignature);
+
 UCLASS()
 class PROJSILVERPHOENIX_API AProjectile : public AActor
 {
 	GENERATED_BODY()
-	
+
+	UPROPERTY(BlueprintAssignable, Category = "Events")
+	FOnArrowFiredSignature OnProjectileFired;
+
 public:	
 	// Sets default values for this actor's properties
 	AProjectile();
@@ -35,9 +40,12 @@ protected:
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile")
 	class UProjectileMovementComponent* ProjectileMovement;
 
+	UPROPERTY(VisibleAnywhere, BlueprintReadOnly, Category = "Projectile")
 	class USceneComponent * SceneComp;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,Category = "Projectile")
 	class USphereComponent* CollisionSphere;
+
 	UPROPERTY(VisibleAnywhere, BlueprintReadOnly,Category = "Projectile")
 	class UStaticMeshComponent* ProjectileMesh;
 	
