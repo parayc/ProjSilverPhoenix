@@ -22,7 +22,7 @@ class PROJSILVERPHOENIX_API ABow : public ARangeWeapon
 
 private:
 
-	void FireArrow(FVector arrowVelocity);
+	void FireArrow(FVector arrowVelocity, float arrowDamage);
 
 	void OnFireEnd();
 
@@ -31,14 +31,17 @@ private:
 
 	FVector CalculateArrowVelocity(FVector endPoint);
 
-	//This is called when the bow begins to charge
+	//This is called in the player anim instance when the bow begins to charge
 	UFUNCTION(BlueprintCallable, Category = "Bow")
-		void BowCharging();
-	//this is called when the bow charging animation is complete
+	void BowCharging();
+
+	//this is called in the player anim instance when the bow charging animation is complete
 	UFUNCTION(BlueprintCallable, Category = "Bow")
 	void BowFullyCharged();
 
 	void CalculateProjectileSpeed();
+
+	void CalculateProjectileDamage();
 
 	FVector AimDirection();
 
@@ -77,6 +80,7 @@ private:
 	FOnDrawBowEndSignature OnDrawBowEnd;
 
 	AProjectile* currentProjectile = nullptr;
+
 	/*The socket on the bow the arrow attach to when its ready to fire*/
 	UPROPERTY(EditAnywhere, Category = "Bow")
 	FName ArrowRestSocket = "ArrowRestSocket";
@@ -93,6 +97,8 @@ private:
 	bool bIsDrawingBow = false;
 
 	FTimerHandle BowDrawingTimeHandle;
+
+	FTimerHandle BowDamageTimeHandle;
 	
 	FTimerHandle OnFireEndTimeHandle;
 
@@ -106,6 +112,14 @@ private:
 	/*Gets the percentage of the current launch speed and adds to it */
 	UPROPERTY(EditAnywhere, Category = "Bow", meta =  (ClampMin = "0", ClampMax = "1"))
 	float PercentageIncrease = 0.12f;
+
+	UPROPERTY(EditAnywhere, Category = "Bow")
+	float BaseDamage = 6.f;
+
+	UPROPERTY(EditAnywhere, Category = "Bow")
+	float MaxDamage = 45.f;
+
+	float CurrentDamage;
 
 	float LaunchSpeed;
 	/*This offset the camera to the left or the right of the owning pawn*/

@@ -28,12 +28,15 @@ void ABow::Tick(float DeltaTime)
 void ABow::BowCharging()
 {
 	LaunchSpeed = InitialLaunchSpeed;
+	CurrentDamage = BaseDamage;
 	GetWorldTimerManager().SetTimer(BowDrawingTimeHandle,this, &ABow::CalculateProjectileSpeed, BowDrawingChargeRate,true,0.0f);
+	GetWorldTimerManager().SetTimer(BowDamageTimeHandle, this, &ABow::CalculateProjectileDamage, BowDrawingChargeRate, true, 0.0f);
 }
 
 void ABow::BowFullyCharged()
 {
 	GetWorldTimerManager().ClearTimer(BowDrawingTimeHandle);
+	GetWorldTimerManager().ClearTimer(BowDamageTimeHandle);
 }
 
 void ABow::CalculateProjectileSpeed()
@@ -41,10 +44,14 @@ void ABow::CalculateProjectileSpeed()
 	LaunchSpeed += LaunchSpeed * PercentageIncrease;
 }
 
+void ABow::CalculateProjectileDamage()
+{
+	CurrentDamage += 6.f; //TODO - remove magic number
+}
+
 void ABow::StartAttack()
 {
 	//Check weather the player can fire . e.g. ammo, current arrow is not shooting, are they aiming
-	//if (!CanFire()) return;
 	if (!GetIsAiming()) return;
 	OnBowCharged.Broadcast();
 	bIsDrawingBow = true;
@@ -71,8 +78,10 @@ void ABow::ReleaseAttack()
 		UE_LOG(LogTemp, Error, TEXT("Error - No Bow Firing animation selected for %s"), *this->GetName());
 	}
 
+	//UE_LOG(LogTemp, Error, TEXT("Damage %f"), CurrentDamage);
 	auto arrorVelcity = CalculateArrowVelocity(AimDirection());
-	FireArrow(arrorVelcity);
+	float damage = CurrentDamage;
+	FireArrow(arrorVelcity, damage);
 }
 
 void ABow::PressFocus()
@@ -106,8 +115,11 @@ void ABow::ReleaseFocus()
 	bIsDrawingBow = false;
 }
 
-void ABow::FireArrow(FVector arrowVelocity)
+void ABow::FireArrow(FVector arrowVelocity, float arrowDamage)
 {
+	if (!currentProjectile) return;
+
+	currentProjectile->SetProjectileDamage(arrowDamage);
 	currentProjectile->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	currentProjectile->LaunchProjectile(arrowVelocity);
 	currentProjectile->DestroyProjectile(5.f);
@@ -151,13 +163,10 @@ FVector ABow::CalculateArrowVelocity(FVector endPoint)
 	FVector arrowVelocity = endPoint - muzzleLoc;
 	arrowVelocity.Normalize();
 
-	UE_LOG(LogTemp, Warning, TEXT("SA LunchSpeed: %f"), LaunchSpeed);
 	float projectileSpeed = LaunchSpeed * LaunchSpeed;
 
 	projectileSpeed = FMath::Clamp(projectileSpeed, minProjectileSpeed, maxProjectileSpeed);
 	arrowVelocity *= projectileSpeed;
-
-	UE_LOG(LogTemp, Warning, TEXT("Distance: %f"), projectileSpeed);
 
 	return arrowVelocity;
 }
@@ -178,14 +187,14 @@ FVector ABow::AimDirection()
 	playerOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 
 	FVector StartTrace = EyeLocation;
-	FVector EndTrace = (EyeRotation.Vector() * 10000) + StartTrace;
+	FVector EndTrace = (EyeRotation.Vector() * 5500) + StartTrace;
 
 	if (GetWorld()->LineTraceSingleByChannel(Hit, StartTrace, EndTrace, ECC_Camera, TraceParams))
 	{
 		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
 		return Hit.ImpactPoint;
 	}
-	//DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
+	DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
 	return EndTrace;
 }
 
