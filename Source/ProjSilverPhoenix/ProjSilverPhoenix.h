@@ -6,6 +6,7 @@
 
 #define ECC_Weapon ECC_GameTraceChannel1
 #define ECC_TargetSystem ECC_GameTraceChannel2
+#define ECC_RangeWeapon ECC_GameTraceChannel3
 
 UENUM(BlueprintType)
 enum class EAIStates : uint8

@@ -8,6 +8,7 @@
 #include "Kismet/KismetMathLibrary.h"
 #include "TimerManager.h"
 #include "GameFramework/MovementComponent.h"
+#include "ProjSilverPhoenix.h"
 
 
 ABow::ABow()
@@ -16,7 +17,7 @@ ABow::ABow()
 	BackSocketName = FName("MeleeBackSocket"); //TODO - Create back socket for bow
 
 	LaunchSpeed = 0;
-	CameraOffset = FVector(0, 40, 0);
+	CameraOffset = FVector(0, 5, 0);
 }
 
 void ABow::Tick(float DeltaTime)
@@ -189,13 +190,22 @@ FVector ABow::AimDirection()
 	FVector StartTrace = EyeLocation;
 	FVector EndTrace = (EyeRotation.Vector() * 5500) + StartTrace;
 
-	if (GetWorld()->LineTraceSingleByChannel(Hit, StartTrace, EndTrace, ECC_Camera, TraceParams))
+	FVector EndPoint = EndTrace;
+	if (GetWorld()->LineTraceSingleByChannel(Hit, StartTrace, EndTrace, ECC_RangeWeapon, TraceParams))
 	{
-		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
-		return Hit.ImpactPoint;
+		//DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
+		EndPoint = Hit.ImpactPoint;
 	}
-	DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
-	return EndTrace;
+	//DrawDebugLine(GetWorld(), StartTrace, EndPoint, FColor(255, 0, 0), true, 10.f);
+	
+	FVector weapon = WeaponMesh->GetSocketLocation(ArrowRestSocket);
+	if (GetWorld()->LineTraceSingleByChannel(Hit, weapon, EndPoint, ECC_RangeWeapon, TraceParams))
+	{
+		EndPoint = Hit.ImpactPoint;
+	}
+	//DrawDebugLine(GetWorld(), weapon, EndPoint, FColor(255, 255, 0), true, 10.f);
+	
+	return EndPoint;
 }
 
 bool ABow::CanFire()

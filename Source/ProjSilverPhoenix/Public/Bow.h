@@ -127,5 +127,5 @@ private:
 	FVector CameraOffset;
 
 	UPROPERTY(EditAnywhere, Category = "Bow")
-	float ZoomFOV = 70.f;
+	float ZoomFOV = 55.f;
 };
