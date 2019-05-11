@@ -25,7 +25,7 @@ AProjectile::AProjectile()
 	ProjectileMesh->SetupAttachment(RootComponent);
 
 	CollisionSphere = CreateDefaultSubobject<USphereComponent>(TEXT("Collision Comp"));
-	//CollisionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	CollisionSphere->SetCollisionEnabled(ECollisionEnabled::NoCollision);
 	CollisionSphere->AttachToComponent(ProjectileMesh,FAttachmentTransformRules::KeepRelativeTransform);
 
 	ProjectileMovement = CreateDefaultSubobject<UProjectileMovementComponent>(TEXT("Projectile Movement"));
@@ -43,7 +43,6 @@ void AProjectile::BeginPlay()
 	{
 		CollisionSphere->OnComponentBeginOverlap.AddDynamic(this, &AProjectile::OnHit);
 	}
-	
 }
 
 // Called every frame
@@ -56,7 +55,6 @@ void AProjectile::OnHit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 {
 	if (OtherActor == nullptr) return;
 
-	UE_LOG(LogTemp, Error, TEXT("ActorHit %s"), *OtherActor->GetName());
 	UHealthComponent* HealthComp = OtherActor->FindComponentByClass<UHealthComponent>();
 	if (HealthComp)
 	{
@@ -70,11 +68,9 @@ void AProjectile::OnHit(UPrimitiveComponent* OverlappedComp, AActor* OtherActor,
 			UGameplayStatics::ApplyPointDamage(OtherActor, Damage, HitDirection, hitResult, pawnController,this, DamageType);
 			UE_LOG(LogTemp, Error, TEXT("ActorHit %s"), *OtherActor->GetName());
 		}
-		
 	}
 
 	Destroy();
-
 }
 
 void AProjectile::SetProjectileDamage(float damage)
@@ -84,13 +80,10 @@ void AProjectile::SetProjectileDamage(float damage)
 
 void AProjectile::LaunchProjectile(FVector arrowVelocity)
 {
-	//CollisionCap->SetCollisionEnabled(ECollisionEnabled::QueryOnly);
-	
 	OnProjectileFired.Broadcast();
+	CollisionSphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
 	ProjectileMovement->Activate();
 	ProjectileMovement->Velocity = arrowVelocity;
-	CollisionSphere->SetCollisionEnabled(ECollisionEnabled::QueryAndPhysics);
-	//ProjectileMovement->SetVelocityInLocalSpace(arrowVelocity);
 }
 
 void AProjectile::DestroyProjectile(float TimeTakenBeforeDestroyed)

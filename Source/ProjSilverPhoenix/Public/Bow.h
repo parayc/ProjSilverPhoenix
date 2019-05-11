@@ -29,7 +29,7 @@ private:
 	UFUNCTION(BlueprintCallable, Category = "Bow")
 	void SpawnArrow();
 
-	FVector CalculateArrowVelocity(FVector endPoint);
+	FVector CalculateArrowVelocity(FVector targetDestination);
 
 	//This is called in the player anim instance when the bow begins to charge
 	UFUNCTION(BlueprintCallable, Category = "Bow")
@@ -72,6 +72,8 @@ public:
 	virtual void Tick(float DeltaTime) override;
 
 private:
+	UPROPERTY(VisibleAnywhere)
+	UStaticMeshComponent* ArrowMesh;
 
 	UPROPERTY(BlueprintAssignable, Category = "Events")
 	FOnBowCharhingSignature OnBowCharged;
@@ -81,7 +83,11 @@ private:
 
 	AProjectile* currentProjectile = nullptr;
 
-	/*The socket on the bow the arrow attach to when its ready to fire*/
+	
+	UPROPERTY(EditAnywhere, Category = "Bow")
+	FName ArrowSpawnSocket = "ArrowSpawnSocket";
+
+	/*This is used for the dummy arrow*/
 	UPROPERTY(EditAnywhere, Category = "Bow")
 	FName ArrowRestSocket = "ArrowRestSocket";
 

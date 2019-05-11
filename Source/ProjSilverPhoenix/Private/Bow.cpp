@@ -9,6 +9,7 @@
 #include "TimerManager.h"
 #include "GameFramework/MovementComponent.h"
 #include "ProjSilverPhoenix.h"
+#include "Components/StaticMeshComponent.h"
 
 
 ABow::ABow()
@@ -16,6 +17,10 @@ ABow::ABow()
 	WeaponSocketName = FName("BowSocket");
 	BackSocketName = FName("MeleeBackSocket"); //TODO - Create back socket for bow
 
+	ArrowMesh = CreateDefaultSubobject<UStaticMeshComponent>(TEXT("ArrowMesh"));
+	ArrowMesh->SetupAttachment(RootComponent, ArrowRestSocket);
+	ArrowMesh->SetCollisionEnabled(ECollisionEnabled::NoCollision);
+	ArrowMesh->SetVisibility(false);
 	LaunchSpeed = 0;
 	CameraOffset = FVector(0, 5, 0);
 }
@@ -56,7 +61,8 @@ void ABow::StartAttack()
 	if (!GetIsAiming()) return;
 	OnBowCharged.Broadcast();
 	bIsDrawingBow = true;
-	SpawnArrow();
+	ArrowMesh->SetVisibility(true);
+
 }
 
 void ABow::ReleaseAttack()
@@ -78,9 +84,9 @@ void ABow::ReleaseAttack()
 	{
 		UE_LOG(LogTemp, Error, TEXT("Error - No Bow Firing animation selected for %s"), *this->GetName());
 	}
-
-	//UE_LOG(LogTemp, Error, TEXT("Damage %f"), CurrentDamage);
-	auto arrorVelcity = CalculateArrowVelocity(AimDirection());
+	ArrowMesh->SetVisibility(false);
+	SpawnArrow();
+	FVector arrorVelcity = CalculateArrowVelocity(AimDirection());
 	float damage = CurrentDamage;
 	FireArrow(arrorVelcity, damage);
 }
@@ -148,20 +154,19 @@ void ABow::SpawnArrow()
 	FActorSpawnParameters SpawnParams;
 	SpawnParams.SpawnCollisionHandlingOverride = ESpawnActorCollisionHandlingMethod::AlwaysSpawn;
 
-	FVector arrowSocketLoc = WeaponMesh->GetSocketLocation(ArrowRestSocket);
-	FRotator arrowSocketRot = WeaponMesh->GetSocketRotation(ArrowRestSocket);
+	FVector arrowSocketLoc = WeaponMesh->GetSocketLocation(ArrowSpawnSocket);
+	FRotator arrowSocketRot = WeaponMesh->GetSocketRotation(ArrowSpawnSocket);
 	
 	currentProjectile = GetWorld()->SpawnActor<AProjectile>(ProjectileToShoot, arrowSocketLoc, arrowSocketRot, SpawnParams);
-	currentProjectile->AttachToComponent(WeaponMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, ArrowRestSocket);
+	currentProjectile->AttachToComponent(WeaponMesh, FAttachmentTransformRules::SnapToTargetIncludingScale, ArrowSpawnSocket);
 	currentProjectile->SetOwner(this);
 
 }
 
-FVector ABow::CalculateArrowVelocity(FVector endPoint)
+FVector ABow::CalculateArrowVelocity(FVector targetDestination)
 {
-
-	FVector muzzleLoc = WeaponMesh->GetSocketLocation(ArrowRestSocket);
-	FVector arrowVelocity = endPoint - muzzleLoc;
+	FVector muzzleLoc = WeaponMesh->GetSocketLocation(ArrowSpawnSocket);
+	FVector arrowVelocity = targetDestination - muzzleLoc;
 	arrowVelocity.Normalize();
 
 	float projectileSpeed = LaunchSpeed * LaunchSpeed;
@@ -188,23 +193,19 @@ FVector ABow::AimDirection()
 	playerOwner->GetActorEyesViewPoint(EyeLocation, EyeRotation);
 
 	FVector StartTrace = EyeLocation;
-	FVector EndTrace = (EyeRotation.Vector() * 5500) + StartTrace;
-
+	FVector EndTrace = (EyeRotation.Vector() * 4000) + StartTrace;
+	
 	FVector EndPoint = EndTrace;
 	if (GetWorld()->LineTraceSingleByChannel(Hit, StartTrace, EndTrace, ECC_RangeWeapon, TraceParams))
 	{
-		//DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
+		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
 		EndPoint = Hit.ImpactPoint;
+		if (Hit.Actor.Get())
+		{
+			UE_LOG(LogTemp, Error, TEXT("Hit %s"), *Hit.Actor.Get()->GetName());
+		}
 	}
-	//DrawDebugLine(GetWorld(), StartTrace, EndPoint, FColor(255, 0, 0), true, 10.f);
-	
-	FVector weapon = WeaponMesh->GetSocketLocation(ArrowRestSocket);
-	if (GetWorld()->LineTraceSingleByChannel(Hit, weapon, EndPoint, ECC_RangeWeapon, TraceParams))
-	{
-		EndPoint = Hit.ImpactPoint;
-	}
-	//DrawDebugLine(GetWorld(), weapon, EndPoint, FColor(255, 255, 0), true, 10.f);
-	
+
 	return EndPoint;
 }
 
@@ -237,7 +238,7 @@ bool ABow::CanAttachToBowString() const
 	{
 		return !GetIsFiring() && !playerOwner->GetIsJumping() && (GetIsDrawingBow() || GetIsAiming() || MyPawn->GetCurrentState() == EPlayerStates::PS_Combat);
 	}
-	
+
 	return false;
 }
 
