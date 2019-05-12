@@ -65,7 +65,6 @@ void AMeleeWeapon::StartAttack()
 	}
 	
 	SetLastSokcetFrame();
-
 }
 
 void AMeleeWeapon::StopAttack()
@@ -99,7 +98,6 @@ void AMeleeWeapon::ReleaseFocus()
 
 void AMeleeWeapon::TraceSwing()
 {
-
 	FHitResult HitResult;
 	//This doesnt work 
 	FCollisionQueryParams TraceParams;
@@ -108,7 +106,6 @@ void AMeleeWeapon::TraceSwing()
 	TraceParams.bTraceComplex = true;
 
 	FVector TraceStart, TraceEnd;
-
 
 	StartSocket = WeaponMesh->GetSocketLocation(SocketBase);
 	EndSocket = WeaponMesh->GetSocketLocation(SocketTip);
@@ -140,7 +137,7 @@ void AMeleeWeapon::TraceSwing()
 				{
 					EnemiesHit.Add(HitActor);
 					//Deal damage to enemy that was added
-					HandleDamage(HitResult, SwordDamageType);
+					HandleDamage(HitResult, PrimaryDamageType);
 					SpawnHitEffext(HitResult);
 					//We only want to play sounds if the actor got hit or not invinble 
 					UCombatComponent* CombatComp = Cast<UCombatComponent>(HitResult.GetActor()->GetComponentByClass(UCombatComponent::StaticClass()));
@@ -151,9 +148,7 @@ void AMeleeWeapon::TraceSwing()
 					}
 				}
 			}
-		
 		}
-
 	}
 
 	/* Store the location of the previous frame*/
@@ -180,7 +175,6 @@ bool AMeleeWeapon::IsTargetWithinSight(AActor* Target)
 		{
 			return true;
 		}
-
 	}
 
 	return false;
@@ -225,7 +219,7 @@ void AMeleeWeapon::GroundSlamAttack()
 				if (HealthComp && IsTargetWithinSight(Hit.GetActor()) && !EnemiesHit.Contains(Hit.GetActor()))
 				{
 						EnemiesHit.Add(Hit.GetActor());
-						HandleDamage(Hit, GroundSlamDamageType);
+						HandleDamage(Hit, SecondaryDamageType);
 						UCombatComponent* CombatComp = Cast<UCombatComponent>(Hit.GetActor()->GetComponentByClass(UCombatComponent::StaticClass()));
 						if (CombatComp)
 						{
@@ -317,7 +311,6 @@ void AMeleeWeapon::DealDamage(const FHitResult& HitResult, TSubclassOf<UDamageTy
 	float DealtDamage = Damage * DamageModifier;
 	//We pass the impact point instead of the hit direction
 	UGameplayStatics::ApplyPointDamage(HitResult.GetActor(), DealtDamage, HitResult.ImpactPoint, HitResult, MyPawn->GetInstigatorController(), this, DamageType);
-	
 
 }
 

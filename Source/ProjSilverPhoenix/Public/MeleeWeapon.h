@@ -128,12 +128,6 @@ private:
 	TArray<AActor*> EnemiesHit;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Melee Weapon")
-		TSubclassOf<UDamageType> SwordDamageType;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Melee Weapon")
-		TSubclassOf<UDamageType> GroundSlamDamageType;
-
-	UPROPERTY(EditDefaultsOnly, Category = "Melee Weapon")
 	float DamageModifier = 1.0f;
 
 	UPROPERTY(EditDefaultsOnly, Category = "Melee Weapon")

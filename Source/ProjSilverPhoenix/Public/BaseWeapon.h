@@ -52,10 +52,10 @@ public:
 	void DestroyWeapon();
 
 	/*The Socket will connect to the owner body*/
-	UPROPERTY(EditDefaultsOnly, Category = "WeaponSetup")
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	FName WeaponSocketName;
 
-	UPROPERTY(EditDefaultsOnly, Category = "WeaponSetup")
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
 	FName BackSocketName;
 
 
@@ -65,6 +65,12 @@ protected:
 	/** pawn owner */
 	UPROPERTY(BlueprintReadOnly)
 	class AXBaseCharacter* MyPawn;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	TSubclassOf<UDamageType> PrimaryDamageType;
+
+	UPROPERTY(EditDefaultsOnly, Category = "Weapon")
+	TSubclassOf<UDamageType> SecondaryDamageType;
 
 private:
 

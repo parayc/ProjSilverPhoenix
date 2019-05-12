@@ -126,7 +126,7 @@ void ABow::FireArrow(FVector arrowVelocity, float arrowDamage)
 {
 	if (!currentProjectile) return;
 
-	currentProjectile->SetProjectileDamage(arrowDamage);
+	currentProjectile->SetDamageProperties(arrowDamage,PrimaryDamageType);
 	currentProjectile->DetachFromActor(FDetachmentTransformRules::KeepWorldTransform);
 	currentProjectile->LaunchProjectile(arrowVelocity);
 	currentProjectile->DestroyProjectile(5.f);
@@ -200,10 +200,6 @@ FVector ABow::AimDirection()
 	{
 		DrawDebugLine(GetWorld(), StartTrace, EndTrace, FColor(255, 0, 0), true, 10.f);
 		EndPoint = Hit.ImpactPoint;
-		if (Hit.Actor.Get())
-		{
-			UE_LOG(LogTemp, Error, TEXT("Hit %s"), *Hit.Actor.Get()->GetName());
-		}
 	}
 
 	return EndPoint;

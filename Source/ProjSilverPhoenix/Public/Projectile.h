@@ -29,7 +29,7 @@ public:
 
 	void DestroyProjectile(float TimeTakenBeforeDestroyed);
 
-	void SetProjectileDamage(float damage);
+	void SetDamageProperties(float damage, TSubclassOf<UDamageType> DamageType);
 
 protected:
 	// Called when the game starts or when spawned
@@ -62,6 +62,8 @@ private:
 	void DestroyProjectile();
 
 	FTimerHandle DestroyHandle;
+
+	TSubclassOf<UDamageType> ProjectileDamageType;
 	
 	
 };
